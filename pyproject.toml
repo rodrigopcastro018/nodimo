@@ -1,0 +1,40 @@
+[build-system]
+requires = ['setuptools']
+build-backend = 'setuptools.build_meta'
+
+[metadata]
+name = 'nodimo'
+version = '1.0.0'
+
+[tool.setuptools.packages]
+find = {}  # Scan the project directory with the default parameters
+
+[project]
+name = 'nodimo'
+version = '1.0.0'
+authors = [
+  {name = 'Rodrigo Castro', email = 'rodrigo.pcastro@outlook.com'}
+]
+maintainers = [
+  {name = 'Rodrigo Castro', email = 'rodrigo.pcastro@outlook.com'}
+]
+description = "Nodimo is a tool that creates nondimensional models."
+readme = 'README.md'
+requires-python = '>=3.8'
+license = {file = 'LICENSE.txt'}
+keywords = ['dimensional analysis']
+classifiers = [
+  'Development Status :: 3 - Alpha',
+  'Intended Audience :: Education',
+  'Topic :: Dimensional analysis',
+  'Programming Language :: Python :: 3',
+  'License :: MIT License',
+  'Framework :: Jupyter :: JupyterLab',
+]
+dependencies = ['numpy', 'sympy']
+
+[project.optional-dependencies]
+notebook = ['jupyter>=1.0.0']
+
+[project.urls]
+'Homepage' = 'https://github.com/rodrigopcastro/nodimo'
