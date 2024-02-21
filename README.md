@@ -1,3 +1,5 @@
+# Nodimo
+
 The main purpose of nodimo is to transform a dimensional relationship
 between variables into a nondimensional one. The variables are gathered
 in nondimensional groups such that the number of groups is lower than
