@@ -1,6 +1,6 @@
 """Nodimo is a tool that creates nondimensional models.
 
-The main purpose of nodimo is to transform a dimensional relationship
+The main purpose of Nodimo is to transform a dimensional relationship
 between variables into a nondimensional one. The variables are gathered
 in nondimensional groups such that the number of groups is lower than
 the number of variables. The resulting nondimensional model is, at the
