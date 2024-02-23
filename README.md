@@ -37,11 +37,15 @@ t0 = Variable('theta_0')
 
 ndmodel = NonDimensionalModel(T, L, m, g, t0)
 ```
-    Variables that can not be part of the model:
-        m
-    Dimensions that can not be part of the model:
-        M
-    
+
+Nodimo detects that the mass and its dimension can not belong to the model
+```
+Variables that can not be part of the model:
+    m
+Dimensions that can not be part of the model:
+    M
+```
+
 ```python
 ndmodel.dimensional_function.show()
 ```
@@ -50,11 +54,7 @@ $\displaystyle T = \pi{\left(L,g,\theta_{0} \right)}$
 ```python
 ndmodel.dimensional_matrix.show()
 ```
-$\displaystyle  
-\begin{array}{r|rrrr} & T & L & g & \theta_{0}\\ \hline  
-\mathtt{\text{L}} & \phantom{-}0 & \phantom{-}1 & \phantom{-}1 & \phantom{-}0\\  
-\mathtt{\text{T}} & \phantom{-}1 & \phantom{-}0 & -2 & \phantom{-}0\\  
-\end{array}$
+$\displaystyle \begin{array}{r|rrrr} & T & L & g & \theta_{0}\\ \hline \mathtt{\text{L}} & \phantom{-}0 & \phantom{-}1 \phantom{-}1 & \phantom{-}0\\ \mathtt{\text{T}} & \phantom{-}1 & \phantom{-}0 & -2 & \phantom{-}0\\ \end{array}$
 
 ```python
 ndmodel.show()
