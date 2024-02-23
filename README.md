@@ -50,10 +50,10 @@ $\displaystyle T = \pi{\left(L,g,\theta_{0} \right)}$
 ```python
 ndmodel.dimensional_matrix.show()
 ```
-$\displaystyle
-\begin{array}{r|rrrr} & T & L & g & \theta_{0}\\ \hline
-\mathtt{\text{L}} & \phantom{-}0 & \phantom{-}1 & \phantom{-}1 & \phantom{-}0\\
-\mathtt{\text{T}} & \phantom{-}1 & \phantom{-}0 & -2 & \phantom{-}0\\
+$\displaystyle  
+\begin{array}{r|rrrr} & T & L & g & \theta_{0}\\ \hline  
+\mathtt{\text{L}} & \phantom{-}0 & \phantom{-}1 & \phantom{-}1 & \phantom{-}0\\  
+\mathtt{\text{T}} & \phantom{-}1 & \phantom{-}0 & -2 & \phantom{-}0\\  
 \end{array}$
 
 ```python
