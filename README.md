@@ -25,6 +25,8 @@ pip install nodimo
 ### Basic example
 This example deals with the simple pendulum problem (see image below).
 
+< img src='examples/simple_pendulum.png' />
+
 The nondimensional model for the pendulum's period as a function of the other
 variables is built as:
 ```python
@@ -43,7 +45,7 @@ After that, the nondimensional model can be displayed with the following command
 ```python
 ndmodel.show()
 ```
-> $\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}$
+    $\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}$
 
 For more functionalities and examples, check the documentation.
 
