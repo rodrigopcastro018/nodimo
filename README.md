@@ -45,7 +45,10 @@ After that, the nondimensional model can be displayed with the following command
 ```python
 ndmodel.show()
 ```
-$\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}$
+[comment]: <> ($\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}$)
+```math
+\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}
+```
 
 For more functionalities and examples, check the documentation.
 
