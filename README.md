@@ -23,7 +23,7 @@ pip install nodimo
 
 ## Getting started
 ### Basic example
-This example deals with the simple pendulum problem (See image below).
+This example deals with the simple pendulum problem (see image below).
 
 The nondimensional model for the pendulum's period as a function of the other
 variables is built as:
@@ -39,11 +39,13 @@ t0 = Variable('theta_0')
 ndmodel = NonDimensionalModel(T, L, m, g, t0)
 ```
 
-After that, the nondimensional model can be presented with the following command
+After that, the nondimensional model can be displayed with the following command
 ```python
 ndmodel.show()
 ```
-$\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}$
+> $\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}$
+
+For more functionalities and examples, check the documentation.
 
 ## License
 Nodimo is open-source and released under the [MIT License](LICENSE)
