@@ -25,7 +25,7 @@ pip install nodimo
 ### Basic example
 This example deals with the simple pendulum problem (see image below).
 
-< img src='examples/simple_pendulum.png' />
+< img src='example/simple_pendulum.png' />
 
 The nondimensional model for the pendulum's period as a function of the other
 variables is built as:
