@@ -22,13 +22,14 @@ pip install nodimo
 ```
 
 ## Getting started
-In the following example, we ...
+### Basic example
+This example deals with the simple pendulum problem (See image below).
+
+The nondimensional model for the pendulum's period as a function of the other
+variables is built as:
 ```python
 from nodimo import Variable, NonDimensionalModel
-```
 
-
-```python
 T = Variable('T', M=0, L=0, T=1, dependent=True)
 L = Variable('L', M=0, L=1, T=0, scaling=True)
 m = Variable('m', M=1, L=0, T=0)
@@ -38,24 +39,7 @@ t0 = Variable('theta_0')
 ndmodel = NonDimensionalModel(T, L, m, g, t0)
 ```
 
-Nodimo detects that the mass and its dimension can not belong to the model
-```
-Variables that can not be part of the model:
-    m
-Dimensions that can not be part of the model:
-    M
-```
-
-```python
-ndmodel.dimensional_function.show()
-```
-$\displaystyle T = \pi{\left(L,g,\theta_{0} \right)}$
-
-```python
-ndmodel.dimensional_matrix.show()
-```
-$\displaystyle \begin{array}{r|rrrr} & T & L & g & \theta_{0}\\ \hline \mathtt{\text{L}} & \phantom{-}0 & \phantom{-}1 \phantom{-}1 & \phantom{-}0\\ \mathtt{\text{T}} & \phantom{-}1 & \phantom{-}0 & -2 & \phantom{-}0\\ \end{array}$
-
+After that, the nondimensional model can be presented with the following command
 ```python
 ndmodel.show()
 ```
