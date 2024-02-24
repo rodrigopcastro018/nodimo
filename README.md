@@ -23,7 +23,7 @@ pip install nodimo
 
 ## Getting started
 ### Basic example
-This example deals with the simple pendulum problem (see image below).
+Simple pendulum:
 
 <p align="center" width="100%">
     <img width="30%" src="example/simple_pendulum.png">
@@ -34,16 +34,16 @@ variables is built as:
 ```python
 from nodimo import Variable, NonDimensionalModel
 
-T = Variable('T', M=0, L=0, T=1, dependent=True)
-L = Variable('L', M=0, L=1, T=0, scaling=True)
-m = Variable('m', M=1, L=0, T=0)
-g = Variable('g', M=0, L=1, T=-2, scaling=True)
-t0 = Variable('theta_0')
+T = Variable('T', M=0, L=0, T=1, dependent=True)  # period
+L = Variable('L', M=0, L=1, T=0, scaling=True)    # length
+m = Variable('m', M=1, L=0, T=0)                  # mass
+g = Variable('g', M=0, L=1, T=-2, scaling=True)   # gravity
+t0 = Variable('theta_0')                          # initial angle
 
 ndmodel = NonDimensionalModel(T, L, m, g, t0)
 ```
 
-After that, the nondimensional model can be displayed with the following command
+After that, the nondimensional model can be displayed as:
 ```python
 ndmodel.show()
 ```
