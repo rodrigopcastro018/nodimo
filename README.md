@@ -1,27 +1,17 @@
 # Nodimo
 
-The main purpose of Nodimo is to transform a dimensional relationship
-between variables into a nondimensional one. The variables are gathered
-in nondimensional groups such that the number of groups is lower than
-the number of variables. The resulting nondimensional model is, at the
-same time, a generalization and simplification of the dimensional model.
+The main purpose of Nodimo is to transform a dimensional relationship between variables into a nondimensional one. The variables are gathered in nondimensional groups such that the number of groups is lower than the number of variables. The resulting nondimensional model is, at the same time, a generalization and simplification of the dimensional model.
 
-Nodimo supports any number of dimensions and variables. It can be used
-for applications in science, engineering, economics, finance, medicine
-and pharmacology. The resulting nondimensional groups can be used as the
-basis for further studies in similarity and model testing.
+Nodimo supports any number of dimensions and variables. It can be used for applications in science, engineering, economics, finance, medicine and pharmacology. The resulting nondimensional groups can be used as the basis for further studies in similarity and model testing.
 
 ## Installation
-
-### Prerequisites
-Nodimo requires `numpy` and `sympy`, which are automatically installed.
-
-### Install Nodimo
+Nodimo and its dependencies (`numpy` and `sympy`) are installed by:
 ```shell
 pip install nodimo
 ```
 
 ## Getting started
+Nodimo is best experienced when runned on `jupyter notebooks`.
 ### Basic example
 Simple pendulum:
 
@@ -29,8 +19,7 @@ Simple pendulum:
     <img width="30%" src="example/simple_pendulum.png">
 </p>
 
-The nondimensional model for the pendulum's period as a function of the other
-variables is built as:
+The nondimensional model for the pendulum's period as a function of the other variables is built and displayed as:
 ```python
 from nodimo import Variable, NonDimensionalModel
 
@@ -41,12 +30,10 @@ g = Variable('g', M=0, L=1, T=-2, scaling=True)   # gravity
 t0 = Variable('theta_0')                          # initial angle
 
 ndmodel = NonDimensionalModel(T, L, m, g, t0)
-```
-
-After that, the nondimensional model can be displayed as:
-```python
 ndmodel.show()
 ```
+
+And the result is:
 ```math
 \displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}
 ```
