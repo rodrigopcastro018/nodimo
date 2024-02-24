@@ -10,8 +10,9 @@ Nodimo and its dependencies (`numpy` and `sympy`) are installed by:
 pip install nodimo
 ```
 
+Nodimo is best experienced when runned on [jupyter notebooks](https://github.com/jupyter/notebook).
+
 ## Getting started
-Nodimo is best experienced when runned on `jupyter notebooks`.
 ### Basic example
 Simple pendulum:
 
