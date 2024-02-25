@@ -1,5 +1,5 @@
 [build-system]
-requires = ['setuptools']
+requires = ['setuptools', 'wheel']
 build-backend = 'setuptools.build_meta'
 
 [metadata]
@@ -7,34 +7,48 @@ name = 'nodimo'
 version = '1.0.0'
 
 [tool.setuptools.packages]
-find = {}  # Scan the project directory with the default parameters
+find = {}
 
 [project]
 name = 'nodimo'
 version = '1.0.0'
 authors = [
-  {name = 'Rodrigo Castro', email = 'rodrigo.pcastro@outlook.com'}
+  {name = 'Rodrigo Castro', email = 'rodrigopcastro018@gmail.com'}
 ]
 maintainers = [
-  {name = 'Rodrigo Castro', email = 'rodrigo.pcastro@outlook.com'}
+  {name = 'Rodrigo Castro', email = 'rodrigopcastro018@gmail.com'}
 ]
 description = "Nodimo is a tool that creates nondimensional models."
 readme = 'README.md'
-requires-python = '>=3.8'
-license = {file = 'LICENSE.txt'}
+requires-python = '>=3.9'
+license = {file = 'LICENSE'}
 keywords = ['dimensional analysis']
 classifiers = [
-  'Development Status :: 3 - Alpha',
+  'Development Status :: 5 - Production/Stable',
+  'License :: OSI Approved :: MIT License',
   'Intended Audience :: Education',
-  'Topic :: Dimensional analysis',
+  'Intended Audience :: Research',
+  'Topic :: Dimensional Analysis',
+  'Topic :: Science',
+  'Topic :: Engineering',
+  'Topic :: Economics',
+  'Topic :: Finance',
+  'Programming Language :: Python',
   'Programming Language :: Python :: 3',
-  'License :: MIT License',
-  'Framework :: Jupyter :: JupyterLab',
+  'Programming Language :: Python :: 3.9',
+  'Programming Language :: Python :: 3.10',
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3 :: Only',
+  'Typing :: Typed',
+  'Environment :: Console',
+  'Environment :: Jupyter Notebook',
+  'Operating System :: OS Independent',
 ]
 dependencies = ['numpy', 'sympy']
 
 [project.optional-dependencies]
-notebook = ['jupyter>=1.0.0']
+notebook = ['jupyter']
 
 [project.urls]
 'Homepage' = 'https://github.com/rodrigopcastro/nodimo'

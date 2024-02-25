@@ -1,5 +1,5 @@
 <p align="center" width="100%">
-    <img src="example/nodimo_logo.png" alt="Nodimo Logo">
+    <img src="nodimo_logo.png" alt="Nodimo Logo">
 </p>
 
 ---
@@ -18,7 +18,7 @@
 # Nodimo
 The main purpose of Nodimo is to transform a dimensional relationship between variables into a nondimensional one. The variables are gathered in nondimensional groups such that the number of groups is lower than the number of variables. The resulting nondimensional model is, at the same time, a generalization and simplification of the dimensional model.
 
-Nodimo supports any number of dimensions and variables. It can be used for applications in science, engineering, economics, finance, medicine and pharmacology. The resulting nondimensional groups can be used as the basis for further studies in similarity and model testing.
+Nodimo supports any number of dimensions and variables. It can be used for applications in science, engineering, economics and finance. The resulting nondimensional groups can be used as the basis for further studies in similarity and model testing.
 
 ## Installation
 Nodimo and its dependencies (`numpy` and `sympy`) are installed by:
@@ -33,7 +33,7 @@ When running Nodimo on the terminal, make sure that the terminal supports Unicod
 Simple pendulum:
 
 <p align="center" width="100%">
-    <img width="30%" src="example/simple_pendulum.png" alt="Simple Pendulum">
+    <img width="30%" src="simple_pendulum.png" alt="Simple Pendulum">
 </p>
 
 The nondimensional model for the pendulum's period as a function of the other variables is built and displayed as:
