@@ -1,3 +1,7 @@
+<p align="center" width="100%">
+    <img src="example/nodimo_logo.png" alt="Nodimo Logo">
+</p>
+
 <p align="center">
     <a href="https://www.python.org/" alt="Python">
         <img src="https://img.shields.io/badge/python-3-green" /></a>
