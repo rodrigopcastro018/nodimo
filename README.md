@@ -1,10 +1,8 @@
 <p align="center">
-<a href="https://caer.readthedocs.io/en/latest/" target="_blank">
-    <img src="https://img.shields.io/badge/docs-view-blue" alt="Documentation">
-</a>
-<a href="https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE" target="_blank">
-    <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
-</a>
+<a href="https://caer.readthedocs.io/en/latest/" alt="Documentation">
+    <img src="https://img.shields.io/badge/docs-view-blue" /></a>
+<a href="https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE" alt="License">
+    <img src="https://img.shields.io/badge/license-MIT-green" /></a>
 </p>
 
 # Nodimo
