@@ -1,8 +1,12 @@
 <p align="center">
-<a href="https://caer.readthedocs.io/en/latest/" alt="Documentation">
-    <img src="https://img.shields.io/badge/docs-view-blue" /></a>
-<a href="https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE" alt="License">
-    <img src="https://img.shields.io/badge/license-MIT-green" /></a>
+    <a href="https://img.shields.io/badge/python-3-green" alt="Python">
+        <img src="https://www.python.org/" /></a>
+    <a href="https://caer.readthedocs.io/en/latest/" alt="Documentation">
+        <img src="https://img.shields.io/badge/docs-view-blue" /></a>
+    <a href="https://github.com/jupyter/notebook" alt="Jupyter">
+        <img src="https://img.shields.io/badge/Jupyter-%23F37626.svg?style=for-the-badge&logo=Jupyter&logoColor=white" /></a>
+    <a href="https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE" alt="License">
+        <img src="https://img.shields.io/badge/license-MIT-green" /></a>
 </p>
 
 # Nodimo
