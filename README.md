@@ -1,3 +1,12 @@
+<p align="center">
+<a href="https://caer.readthedocs.io/en/latest/" target="_blank">
+    <img src="https://img.shields.io/badge/docs-view-blue" alt="Documentation">
+</a>
+<a href="https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE" target="_blank">
+    <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+</a>
+</p>
+
 # Nodimo
 
 The main purpose of Nodimo is to transform a dimensional relationship between variables into a nondimensional one. The variables are gathered in nondimensional groups such that the number of groups is lower than the number of variables. The resulting nondimensional model is, at the same time, a generalization and simplification of the dimensional model.
@@ -10,14 +19,14 @@ Nodimo and its dependencies (`numpy` and `sympy`) are installed by:
 pip install nodimo
 ```
 
-Nodimo is best experienced when runned on [jupyter notebooks](https://github.com/jupyter/notebook).
+When running Nodimo on the terminal, make sure that the terminal supports Unicode characters. For the best experience, it is recommended the use of [jupyter notebooks](https://github.com/jupyter/notebook).
 
 ## Getting started
 ### Basic example
 Simple pendulum:
 
 <p align="center" width="100%">
-    <img width="30%" src="example/simple_pendulum.png">
+    <img width="30%" src="example/simple_pendulum.png" alt="Simple Pendulum">
 </p>
 
 The nondimensional model for the pendulum's period as a function of the other variables is built and displayed as:
