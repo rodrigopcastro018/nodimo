@@ -15,7 +15,7 @@ authors = [
 maintainers = [
   {name = 'Rodrigo Castro', email = 'rodrigopcastro018@gmail.com'}
 ]
-description = "Nodimo is a tool that creates nondimensional models."
+description = "Nodimo is a tool that creates nondimensional models"
 readme = 'README.md'
 requires-python = '>=3.9'
 license = {file = 'LICENSE'}
@@ -42,4 +42,4 @@ dependencies = ['numpy>=1.17.5', 'sympy>=1.6']
 notebook = ['jupyter']
 
 [project.urls]
-'Homepage' = 'https://github.com/rodrigopcastro018/nodimo'
+'Source' = 'https://github.com/rodrigopcastro018/nodimo'

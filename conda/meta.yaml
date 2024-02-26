@@ -1,0 +1,33 @@
+{% set name = "nodimo" %}
+{% set version = "1.0.0" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+about:
+  summary: "Nodimo is a tool that creates nondimensional models"
+  license: MIT
+  license_file: LICENSE
+  Home: https://github.com/rodrigopcastro018/nodimo
+  dev_url: https://github.com/rodrigopcastro018/nodimo
+
+source:
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 5147a2bfa6cd06b0b1bc6411c80dee31eede87776b8d9d573c9762d13c47ca7a
+
+requirements:
+  host:
+    - pip
+    - python
+  run:
+    - python
+    - numpy>=1.17.5
+    - sympy>=1.6
+
+build:
+  script: "{{ PYTHON }} -m pip install . -vv "
+
+extra:
+  recipe-maintainers:
+    - rodrigopcastro018
