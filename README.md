@@ -5,10 +5,8 @@
 ---
 
 <p align="center">
-    <a href="https://www.python.org/" alt="Python">
+    <a href="https://pypi.org/project/nodimo/" alt="Python">
         <img src="https://img.shields.io/badge/python-3-green" /></a>
-    <a href="https://caer.readthedocs.io/en/latest/" alt="Documentation">
-        <img src="https://img.shields.io/badge/docs-view-blue" /></a>
     <a href="https://github.com/jupyter/notebook" alt="Jupyter">
         <img src="https://img.shields.io/badge/jupyter-notebook-orange" /></a>
     <a href="https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE" alt="License">

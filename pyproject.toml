@@ -1,13 +1,10 @@
 [build-system]
-requires = ['setuptools', 'wheel']
+requires = ['setuptools>=61.0.0', 'wheel']
 build-backend = 'setuptools.build_meta'
 
 [metadata]
 name = 'nodimo'
 version = '1.0.0'
-
-[tool.setuptools.packages]
-find = {}
 
 [project]
 name = 'nodimo'
@@ -27,12 +24,8 @@ classifiers = [
   'Development Status :: 5 - Production/Stable',
   'License :: OSI Approved :: MIT License',
   'Intended Audience :: Education',
-  'Intended Audience :: Research',
-  'Topic :: Dimensional Analysis',
-  'Topic :: Science',
-  'Topic :: Engineering',
-  'Topic :: Economics',
-  'Topic :: Finance',
+  'Intended Audience :: Science/Research',
+  'Topic :: Scientific/Engineering',
   'Programming Language :: Python',
   'Programming Language :: Python :: 3',
   'Programming Language :: Python :: 3.9',
@@ -41,14 +34,12 @@ classifiers = [
   'Programming Language :: Python :: 3.12',
   'Programming Language :: Python :: 3 :: Only',
   'Typing :: Typed',
-  'Environment :: Console',
-  'Environment :: Jupyter Notebook',
   'Operating System :: OS Independent',
 ]
-dependencies = ['numpy', 'sympy']
+dependencies = ['numpy>=1.17.5', 'sympy>=1.6']
 
 [project.optional-dependencies]
 notebook = ['jupyter']
 
 [project.urls]
-'Homepage' = 'https://github.com/rodrigopcastro/nodimo'
+'Homepage' = 'https://github.com/rodrigopcastro018/nodimo'
