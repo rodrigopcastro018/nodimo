@@ -10,9 +10,9 @@
     <a href="" alt="Documentation">
         <img src="https://img.shields.io/badge/docs-view-blue" /></a>
     <a href="" alt="Github Downloads">
-        <img src="https://img.shields.io/github/downloads/rodrigopcastro018/nodimo/total.svg" /></a>
-    <a href="https://anaconda.org/rodrigopcastro018/nodimo" alt="Anaconda Downloads">
-        <img src="https://anaconda.org/rodrigopcastro018/nodimo/badges/downloads.svg" /></a>
+        <img src="https://img.shields.io/github/downloads/rodrigopcastro018/nodimo/total.svg?label=Github%20downloads&color=blue" /></a>
+    <a href="https://anaconda.org/rodrigopcastro018/nodimo" alt="Conda Downloads">
+        <img src="https://img.shields.io/conda/d/rodrigopcastro018/nodimo?label=Conda%20downloads&color=green" /></a>
     <a href="https://github.com/jupyter/notebook" alt="Jupyter">
         <img src="https://img.shields.io/badge/jupyter-notebook-orange" /></a>
     <a href="https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE" alt="License">
@@ -28,6 +28,11 @@ Nodimo supports any number of dimensions and variables. It can be used for appli
 Nodimo and its dependencies (`numpy` and `sympy`) are installed by:
 ```shell
 pip install nodimo
+```
+
+Alternatively, Nodimo and dependencies can be installed via conda:
+```shell
+conda install nodimo --channel rodrigopcastro018
 ```
 
 When running Nodimo on the terminal, make sure that the terminal supports Unicode characters. For the best experience, it is recommended the use of [jupyter notebook](https://github.com/jupyter/notebook).

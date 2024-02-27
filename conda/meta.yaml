@@ -19,9 +19,9 @@ source:
 requirements:
   host:
     - pip
-    - python
+    - python>=3.9
   run:
-    - python
+    - python>=3.9
     - numpy>=1.17.5
     - sympy>=1.6
 
