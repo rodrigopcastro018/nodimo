@@ -15,7 +15,7 @@ from nodimo.variables.variable import Variable
 from nodimo._internal import _obtain_dimensions, _build_dimensional_matrix
 
 
-# Alias for type used in VariableGroup.
+# Aliases for types used in VariableGroup.
 ListOrMatrix = Union[list, Matrix]
 
 
@@ -88,7 +88,7 @@ class VariableGroup(Mul):
         terms = [var**exp
                  for var, exp in zip(variables, exponents_list)]
 
-        return super().__new__(cls, *terms)
+        return super().__new__(cls, *terms, evaluate=False)
 
     def __init__(self,
                  variables: list[Variable],
@@ -181,18 +181,22 @@ class VariableGroup(Mul):
 
         Raises
         ------
-        ValueError
-            If the numbers of variables and exponents do not match.
+        TypeError
+            If the list of variables contains at least one not-Variable.
         ValueError
             If the number of variables is lower than two.
         ValueError
+            If the numbers of variables and exponents do not match.
+        ValueError
             If the exponents are not in a row matrix.
         """
-
-        if len(variables) != sp.Mul(*exponents.shape):
-            raise ValueError("Number of variables and exponents must match")
+        
+        if not all(isinstance(var, Variable) for var in variables):
+            raise TypeError("All variables must be of type Variable")
         elif len(variables) < 2:
             raise ValueError("Group must have at least two variables")
+        elif len(variables) != sp.Mul(*exponents.shape):
+            raise ValueError("Number of variables and exponents must match")
         elif exponents.shape[0] != 1:
             raise ValueError("Exponents must be in a row matrix")
 
