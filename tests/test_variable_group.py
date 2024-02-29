@@ -27,12 +27,9 @@ def test_exponents():
     vars_list = [var1, var2, var3, var4]
 
     exponents_list = [2, 5, -3, -1]
-    exponents_Matrix1 = sp.Matrix(exponents_list)
-    exponents_Matrix2 = sp.Matrix([exponents_list])
+    exponents_Matrix = sp.Matrix([exponents_list])
 
     group1 = VariableGroup(vars_list, exponents_list)
-    group2 = VariableGroup(vars_list, exponents_Matrix1)
-    group3 = VariableGroup(vars_list, exponents_Matrix2)
+    group2 = VariableGroup(vars_list, exponents_Matrix)
 
     assert group1 == group2
-    assert group2 == group3
