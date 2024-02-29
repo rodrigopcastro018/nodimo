@@ -173,12 +173,16 @@ class VariableGroup(Mul):
             If the numbers of variables and exponents do not match.
         ValueError
             If the number of variables is lower than two.
+        ValueError
+            If the exponents are not in a row matrix.
         """
 
         if len(self.variables) != sp.Mul(*self.exponents.shape):
             raise ValueError("Number of variables and exponents must match")
         elif len(self.variables) < 2:
             raise ValueError("Group must have at least two variables")
+        elif self.exponents.shape[0] != 1:
+            raise ValueError("Exponents must be in a row matrix")
 
     def get_dimensions(self) -> None:
         """Evaluates the dimensional properties of the group."""
