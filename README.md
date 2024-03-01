@@ -8,7 +8,7 @@
     <a href="https://pypi.org/project/nodimo/" alt="Python">
         <img src="https://img.shields.io/badge/python-3-green" /></a>
     <a href="" alt="Documentation">
-        <img src="https://img.shields.io/badge/docs-view-blue" /></a>
+        <img src="https://img.shields.io/badge/docs-view-8A2BE2" /></a>
     <a href="https://www.pepy.tech/projects/nodimo" alt="Pepy Stats">
         <img src="https://static.pepy.tech/badge/nodimo/month" /></a>
     <a href="https://anaconda.org/rodrigopcastro018/nodimo" alt="Conda Downloads">
