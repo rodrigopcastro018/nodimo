@@ -44,7 +44,7 @@ class VariableGroup(Mul):
     -------
     convert_exponents(exponents)
         Converts exponents from list to Matrix.
-    validate_variables_and_exponents()
+    validate_variables_and_exponents(variables, exponents)
         Validates provided variables and exponents.
     get_dimensions()
         Evaluates the dimensional properties of the group.
@@ -74,7 +74,12 @@ class VariableGroup(Mul):
                 check_inputs: bool = True,
                 check_dimensions: bool = True):
         
-        # Converting and flattening exponents_list.
+        exponents = cls.convert_exponents(exponents)
+
+        if check_inputs:
+            cls.validate_variables_and_exponents(variables, exponents)
+
+        # Flattening exponents_list.
         exponents_list = cls.convert_exponents(exponents).tolist()
         exponents_list = [exp
                           for explist in exponents_list
@@ -83,7 +88,7 @@ class VariableGroup(Mul):
         terms = [var**exp
                  for var, exp in zip(variables, exponents_list)]
 
-        return super().__new__(cls, *terms)
+        return super().__new__(cls, *terms, evaluate=False)
 
     def __init__(self,
                  variables: list[Variable],
@@ -106,9 +111,6 @@ class VariableGroup(Mul):
         super().__init__()
         self.variables: list[Variable] = list(variables)
         self.exponents: Matrix = self.convert_exponents(exponents)
-
-        if check_inputs:
-            self.validate_variables_and_exponents()
 
         # The group is dependent if it contains a dependent variable
         # with exponent.
@@ -164,24 +166,38 @@ class VariableGroup(Mul):
 
         return new_exponents
 
-    def validate_variables_and_exponents(self) -> None:
+    @classmethod
+    def validate_variables_and_exponents(cls,
+                                         variables: list[Variable],
+                                         exponents: Matrix) -> None:
         """Validates provided variables and exponents.
+
+        Parameters
+        ----------
+        variables: list[Variable]
+            List of variables that constitute the group.
+        exponents: Matrix
+            List or matrix containing each variable's exponent.
 
         Raises
         ------
-        ValueError
-            If the numbers of variables and exponents do not match.
+        TypeError
+            If the list of variables contains at least one not-Variable.
         ValueError
             If the number of variables is lower than two.
         ValueError
+            If the numbers of variables and exponents do not match.
+        ValueError
             If the exponents are not in a row matrix.
         """
-
-        if len(self.variables) != sp.Mul(*self.exponents.shape):
-            raise ValueError("Number of variables and exponents must match")
-        elif len(self.variables) < 2:
+        
+        if not all(isinstance(var, Variable) for var in variables):
+            raise TypeError("All variables must be of type Variable")
+        elif len(variables) < 2:
             raise ValueError("Group must have at least two variables")
-        elif self.exponents.shape[0] != 1:
+        elif len(variables) != sp.Mul(*exponents.shape):
+            raise ValueError("Number of variables and exponents must match")
+        elif exponents.shape[0] != 1:
             raise ValueError("Exponents must be in a row matrix")
 
     def get_dimensions(self) -> None:
