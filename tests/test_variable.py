@@ -8,6 +8,14 @@ def test_name():
 
 
 def test_dimensions():
+    var1 = Variable('var1', d1=1, d2=-1, d3=-4)
+    var2 = Variable('var2', mass=3, length=-3, time=2)
+
+    assert var1.dimensions == {'d1':1, 'd2':-1, 'd3':-4}
+    assert var2.dimensions == {'mass':3, 'length':-3, 'time':2}
+
+
+def test_nondimensional():
     # Dimensional variables
     dvar1 = Variable('dvar1', d1=0, d2=0, d3=0, d4=0, d5=1)
     dvar2 = Variable('dvar2', d1=0, d2=0, d3=0, d4=0, d5=1.5)
