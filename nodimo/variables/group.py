@@ -15,7 +15,7 @@ from nodimo.variables.variable import Variable
 from nodimo._internal import _obtain_dimensions, _build_dimensional_matrix
 
 
-# Aliases for types used in VariableGroup.
+# Alias for type used in VariableGroup.
 ListOrMatrix = Union[list, Matrix]
 
 
