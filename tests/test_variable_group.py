@@ -19,6 +19,7 @@ def test_variables():
 
     assert group1 == group2
     assert group1.variables == group2.variables
+    assert isinstance(group2.variables, list)
 
 def test_exponents():
     var1 = Variable('var1', d1=1, d2=-1)
