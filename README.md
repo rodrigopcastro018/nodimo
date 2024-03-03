@@ -52,11 +52,11 @@ The nondimensional model for the pendulum's period as a function of the other va
 from nodimo import Variable, NonDimensionalModel
 
 # Variables' dimensions: Mass (M), Length (L) and Time (T)
-T = Variable('T', mass=0, length=0, time=1, dependent=True)  # period
-L = Variable('L', mass=0, length=1, time=0, scaling=True)    # length
-m = Variable('m', mass=1, length=0, time=0)                  # mass
-g = Variable('g', mass=0, length=1, time=-2, scaling=True)   # gravity
-t0 = Variable('theta_0')                                     # initial angle
+T = Variable('T', M=0, L=0, T=1, dependent=True)  # period
+L = Variable('L', M=0, L=1, T=0, scaling=True)    # length
+m = Variable('m', M=1, L=0, T=0)                  # mass
+g = Variable('g', M=0, L=1, T=-2, scaling=True)   # gravity
+t0 = Variable('theta_0')                          # initial angle
 
 ndmodel = NonDimensionalModel(T, L, m, g, t0)
 ndmodel.show()
