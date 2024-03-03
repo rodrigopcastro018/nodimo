@@ -5,12 +5,12 @@
 ---
 
 <p align="center">
-    <a href="https://pypi.org/project/nodimo/" alt="Python">
+    <a href="https://pypi.org/project/nodimo" alt="Python">
         <img src="https://img.shields.io/badge/python-3-green" /></a>
     <a href="" alt="Documentation">
         <img src="https://img.shields.io/badge/docs-view-8A2BE2" /></a>
-    <a href="https://www.pepy.tech/projects/nodimo" alt="Pepy Stats">
-        <img src="https://static.pepy.tech/badge/nodimo/month" /></a>
+    <a href="https://pypi.org/project/nodimo" alt="Pepy Stats">
+        <img src="https://img.shields.io/pypi/dm/nodimo" /></a>
     <a href="https://anaconda.org/rodrigopcastro018/nodimo" alt="Conda Downloads">
         <img src="https://img.shields.io/conda/d/rodrigopcastro018/nodimo?label=Conda%20downloads&color=green" /></a>
     <a href="" alt="Github Downloads">
