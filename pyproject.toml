@@ -40,7 +40,12 @@ dependencies = ['numpy>=1.17.5', 'sympy>=1.6']
 
 [project.optional-dependencies]
 notebook = ['jupyter']
-test = ['mypy', 'pytest', 'nbmake', 'ipykernel']
+test = ['mypy', 'pytest', 'nbmake', 'ipython']
 
 [project.urls]
 'Source' = 'https://github.com/rodrigopcastro018/nodimo'
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--nbmake"
+testpaths = ["tests"]
