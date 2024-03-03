@@ -9,12 +9,12 @@
         <img src="https://img.shields.io/badge/python-3-green" /></a>
     <a href="" alt="Documentation">
         <img src="https://img.shields.io/badge/docs-view-8A2BE2" /></a>
-    <a href="https://pypi.org/project/nodimo" alt="Pepy Stats">
-        <img src="https://img.shields.io/pypi/dm/nodimo" /></a>
+    <a href="https://pypi.org/project/nodimo" alt="PyPI Downloads">
+        <img src="https://img.shields.io/pypi/dm/nodimo?color=blue" /></a>
     <a href="https://anaconda.org/rodrigopcastro018/nodimo" alt="Conda Downloads">
-        <img src="https://img.shields.io/conda/d/rodrigopcastro018/nodimo?label=Conda%20downloads&color=green" /></a>
+        <img src="https://img.shields.io/conda/d/rodrigopcastro018/nodimo?label=conda%20downloads&color=green" /></a>
     <a href="" alt="Github Downloads">
-        <img src="https://img.shields.io/github/downloads/rodrigopcastro018/nodimo/total.svg?label=Github%20downloads&color=blue" /></a>
+        <img src="https://img.shields.io/github/downloads/rodrigopcastro018/nodimo/total.svg?label=github%20downloads&color=blue" /></a>
     <a href="https://github.com/jupyter/notebook" alt="Jupyter">
         <img src="https://img.shields.io/badge/jupyter-notebook-orange" /></a>
     <a href="https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE" alt="License">
