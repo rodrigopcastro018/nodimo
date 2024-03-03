@@ -1,4 +1,5 @@
 import pytest
+from sympy.matrices.common import NonInvertibleMatrixError
 from nodimo import Variable, VariableGroup, ModelFunction, NonDimensionalModel
 
 
@@ -43,9 +44,31 @@ def test_nondimensional_model():
     assert ndmodel.nondimensional_function == ndfunction
 
 
-def test_check_of_scaling_variables():
-    pass
-
-
 def test_build_of_nondimensional_model():
-    pass
+    var1 = Variable('var1', d1=2, d2=0, d3=1, scaling=True)
+    var2 = Variable('var2', d1=-1, d2=3, d3=-1, dependent=True)
+    var3 = Variable('var3', d1=0, d2=0, d3=0)
+    var4 = Variable('var4', d1=0, d2=5, d3=-1, scaling=True)
+    var5 = Variable('var5', d1=1, d2=0, d3=3)
+
+    ndmodel = NonDimensionalModel(var1, var2, var3, var4, var5,
+                                  build_now=False, display_messages=False)
+    
+    assert not hasattr(ndmodel, 'nondimensional_groups')
+    assert not hasattr(ndmodel, 'nondimensional_function')
+
+
+def test_check_of_scaling_variables():
+    var1 = Variable('var1', d1=2, d2=0, d3=1, scaling=True)
+    var2 = Variable('var2', d1=-1, d2=3, d3=-1, dependent=True)
+    var3 = Variable('var3', d1=0, d2=0, d3=0)
+    var4 = Variable('var4', d1=0, d2=5, d3=-1, scaling=True)
+    var5 = Variable('var5', d1=1, d2=0, d3=3)
+    var6 = Variable('var6', d1=2, d2=5, d3=0, scaling=True)
+
+    ndmodel = NonDimensionalModel(var1, var2, var3, var4, var5, var6,
+                                  build_now=False, display_messages=False)
+    ndmodel._check_scaling_variables = False
+
+    with pytest.raises(NonInvertibleMatrixError):
+        ndmodel.build_nondimensional_model()

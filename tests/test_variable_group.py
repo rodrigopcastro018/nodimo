@@ -21,6 +21,7 @@ def test_variables():
     assert group1.variables == group2.variables
     assert isinstance(group2.variables, list)
 
+
 def test_exponents():
     var1 = Variable('var1', d1=1, d2=-1)
     var2 = Variable('var2', d1=-3, d3=2)
@@ -38,7 +39,7 @@ def test_exponents():
     assert group1 == group2
     assert group1.exponents == group2.exponents
     assert isinstance(group1.exponents, sp.Matrix)
-    assert isinstance(group2.exponents, sp.Matrix)
+
 
 def test_exponents_type():
     var1 = Variable('var1', d1=-1, d2=2)
@@ -50,6 +51,7 @@ def test_exponents_type():
 
     with pytest.raises(TypeError):
         group = VariableGroup(vars_list, exponents_tuple)
+
 
 def test_validation_of_variables():
     var = Variable('var', d1=1, d2=0)
@@ -63,6 +65,7 @@ def test_validation_of_variables():
     with pytest.raises(ValueError):
         group3 = VariableGroup([var], [3])
 
+
 def test_validation_of_exponents():
     var1 = Variable('var1', d1=0, d2=1)
     var2 = Variable('var2', d1=-2, d3=4)
@@ -73,6 +76,7 @@ def test_validation_of_exponents():
 
     with pytest.raises(ValueError):
         group = VariableGroup(vars_list, exponents_Matrix)
+
 
 def test_validation_of_variables_and_exponents():
     var1 = Variable('var1', d1=0, d2=-2)

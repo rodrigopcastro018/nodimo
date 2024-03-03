@@ -1,6 +1,11 @@
 import sympy as sp
 from nodimo import Variable, VariableGroup
-from nodimo._internal import _obtain_dimensions, _build_dimensional_matrix
+from nodimo._internal import (_obtain_dimensions, _build_dimensional_matrix,
+                              _is_running_on_jupyter)
+
+
+def test_environment():
+    assert not _is_running_on_jupyter
 
 
 def test_obtain_dimensions():

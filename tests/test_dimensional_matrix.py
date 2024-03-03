@@ -21,15 +21,15 @@ def test_dimensions():
 
     group = VariableGroup([var1, var2], [3, 1])
 
-    dimensions = ['d1', 'd2']
-
     dmatrix1 = DimensionalMatrix(var1, var2)
-    dmatrix2 = DimensionalMatrix(var1, var2, dimensions=dimensions)
-    dmatrix3 = DimensionalMatrix(var2, group)
+    dmatrix2 = DimensionalMatrix(var1, var2, dimensions=['d1', 'd2'])
+    dmatrix3 = DimensionalMatrix(var1, var2, dimensions=['d2'])
+    dmatrix4 = DimensionalMatrix(var2, group)
 
-    assert dmatrix1.dimensions == dimensions
-    assert dmatrix2.dimensions == dimensions
-    assert dmatrix3.dimensions == dimensions
+    assert dmatrix1.dimensions == ['d1', 'd2']
+    assert dmatrix2.dimensions == ['d1', 'd2']
+    assert dmatrix1[1,:] == dmatrix3
+    assert dmatrix4.dimensions == ['d1', 'd2']
 
 
 def test_matrix():
