@@ -1,7 +1,7 @@
-/venv/
-dist/
-build/
-nodimo.egg-info/
-__pycache__/
+venv
+dist
+build
+nodimo.egg-info
+__pycache__
 .coverage
-htmlcov/
+htmlcov
