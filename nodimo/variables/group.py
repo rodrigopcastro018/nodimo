@@ -154,7 +154,7 @@ class VariableGroup(Mul):
             If the type of exponents is not list or Matrix.
         """
 
-        if not isinstance(exponents, list | Matrix):
+        if not isinstance(exponents, (list, Matrix)):
             raise TypeError("exponents type must be list or sympy.Matrix")
 
         if isinstance(exponents, list):
