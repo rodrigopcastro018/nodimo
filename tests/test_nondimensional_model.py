@@ -72,3 +72,21 @@ def test_check_of_scaling_variables():
 
     with pytest.raises(NonInvertibleMatrixError):
         ndmodel.build_nondimensional_model()
+
+
+# Special case: number of dimensions is larger than the dimensional
+# matrix rank.
+def test_special_case():
+    var1 = Variable('var1', d1= 1, d2= 0, d3= 1, dependent=True)
+    var2 = Variable('var2', d1= 0, d2= 1, d3= 1)
+    var3 = Variable('var3', d1= 1, d2= 2, d3= 3)
+    var4 = Variable('var4', d1= 1, d2=-1, d3= 0, scaling=True)
+    var5 = Variable('var5', d1=-2, d2= 1, d3=-1, scaling=True)
+
+    ndmodel = NonDimensionalModel(var1, var2, var3, var4, var5)
+
+    group1 = VariableGroup([var1, var2, var3, var4, var5], [1, 0, 0, 1, 1])
+    group2 = VariableGroup([var1, var2, var3, var4, var5], [0, 1, 0, 2, 1])
+    group3 = VariableGroup([var1, var2, var3, var4, var5], [0, 0, 1, 5, 3])
+
+    assert ndmodel.nondimensional_groups == [group1, group2, group3]

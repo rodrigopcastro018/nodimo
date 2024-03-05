@@ -3,3 +3,5 @@ dist/
 build/
 nodimo.egg-info/
 __pycache__/
+.coverage
+htmlcov/
