@@ -4,11 +4,12 @@ build-backend = 'setuptools.build_meta'
 
 [metadata]
 name = 'nodimo'
-version = '1.0.0'
+version = '1.1.0'
+exclude = ['tests']
 
 [project]
 name = 'nodimo'
-version = '1.0.0'
+version = '1.1.0'
 authors = [
   {name = 'Rodrigo Castro', email = 'rodrigopcastro018@gmail.com'}
 ]
@@ -36,10 +37,46 @@ classifiers = [
   'Typing :: Typed',
   'Operating System :: OS Independent',
 ]
-dependencies = ['numpy>=1.17.5', 'sympy>=1.6']
+dependencies = ['numpy>=1.0', 'sympy>=1.0']
 
 [project.optional-dependencies]
-notebook = ['jupyter']
+test = ['mypy>=1.0', 'pytest>=6.2', 'nbmake>=1.0']
+dev = ['tox>=4.0', 'tox-pyenv-redux>=1.0']
 
 [project.urls]
 'Source' = 'https://github.com/rodrigopcastro018/nodimo'
+
+[tool.setuptools.packages.find]
+exclude = ['conda']
+
+[tool.mypy]
+python_version = '3.12'
+files = 'nodimo'
+exclude = ['tests']
+ignore_missing_imports = 'True'
+
+[tool.pytest.ini_options]
+minversion = '6.2'
+addopts = '--nbmake'
+testpaths = ['tests']
+
+[tool.tox]
+legacy_tox_ini = """
+    [tox]
+    min_version = 4.0
+    requires = tox-pyenv-redux>=1.0
+    env_list = py{39,310,311,312}-numpy{1.0,1.26.4}-sympy{1.0,1.12},
+               type
+
+    [testenv]
+    pyenv_discovery = fallback
+    deps =
+        pytest>=6.2
+        nbmake>=1.0
+    commands = pytest
+
+    [testenv:type]
+    deps = 
+        mypy>=1.0
+    commands = mypy
+"""
