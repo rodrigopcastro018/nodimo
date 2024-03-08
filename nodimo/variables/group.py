@@ -88,7 +88,7 @@ class VariableGroup(Mul):
         terms = [var**exp
                  for var, exp in zip(variables, exponents_list)]
 
-        return super().__new__(cls, *terms, evaluate=False)
+        return super().__new__(cls, *terms)
 
     def __init__(self,
                  variables: list[Variable],
