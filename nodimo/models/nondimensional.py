@@ -22,9 +22,6 @@ from nodimo._internal import (_is_running_on_jupyter,
 from .function import ModelFunction
 from .dimensional import DimensionalModel
 
-if _is_running_on_jupyter:
-    from IPython.display import Math
-
 
 class NonDimensionalModel(DimensionalModel):
     """Creates a nondimensional model from a given set of variables.
@@ -405,10 +402,10 @@ class NonDimensionalModels(DimensionalModel):
                 scaling_group_latex = R',\ '.join([sp.latex(var) for var in
                                                    self.scaling_groups[i]])
                 
-                scaling_group = Math(R'\text{Scaling group }'
-                                     + str(i + 1)
-                                     + R'\text{:}\ '
-                                     + scaling_group_latex)
+                scaling_group = (R'\text{Scaling group }'
+                                 + str(i + 1)
+                                 + R'\text{:}\ '
+                                 + scaling_group_latex)
             else:
                 scaling_group_str = sp.pretty(self.scaling_groups[i])[1:-1]
                 

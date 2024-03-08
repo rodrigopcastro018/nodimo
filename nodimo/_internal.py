@@ -29,22 +29,43 @@ try:
     _is_running_on_jupyter = True if get_ipython() is not None else False
     if not _is_running_on_jupyter:
         raise
-    from IPython.display import display, Markdown
+    from IPython.display import display, Markdown, HTML
 except:
     _is_running_on_jupyter = False
 
+def _custom_display(obj_latex: str) -> None:
+    """Displays object using a custom CSS style.
 
-def _show_object(obj: Any) -> None:
+    This custom display function was created to avoid vertical scrolling
+    bars on the right of cells outputs, specially when running jupyter
+    notebook in Google Chrome (issue #10 on github repository).
+
+    Parameters
+    ----------
+    obj_latex: str
+        Latex representation of the object to be displayed.
+    """
+
+    css_style = '<style>.output{overflow: visible !important}</style>'
+
+    display(HTML(css_style + '$$' + obj_latex + '$$'))
+
+def _show_object(obj: Any, use_custom_css: bool = True) -> None:
     """Prints object in shell.
 
     Parameters
     ----------
     obj: Any
         The object to print.
+    use_custom_css: bool, optional (default=True)
+        If True, the object is displayed using custom css.
     """
 
     if _is_running_on_jupyter:
-        display(obj)
+        if use_custom_css:
+            _custom_display(obj)
+        else:
+            display(obj)
     else:
         print()
         sp.pprint(obj, root_notation=False)
@@ -55,7 +76,7 @@ def _print_horizontal_line() -> None:
     """Prints a horizontal line."""
 
     if _is_running_on_jupyter:
-        display(Markdown('---'))
+        display(Markdown('<hr>'))
     else:
         sp.pprint(78 * '-')
 
