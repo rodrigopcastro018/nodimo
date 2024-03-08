@@ -132,4 +132,4 @@ class ModelFunction(Equality):
     def show(self) -> None:
         """Displays the function."""
 
-        _show_object(self)
+        _show_object(sp.latex(self, root_notation=False))

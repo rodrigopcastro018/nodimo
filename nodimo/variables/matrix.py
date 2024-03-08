@@ -18,9 +18,6 @@ from nodimo._internal import (_is_running_on_jupyter,
 from .variable import Variable
 from .group import VariableGroup
 
-if _is_running_on_jupyter:
-    from IPython.display import Math
-
 
 # Aliases for types used in ModelFunction.
 VariableOrGroup = Union[Variable, VariableGroup]
@@ -162,10 +159,10 @@ class DimensionalMatrix(Matrix):
     def show(self) -> None:
         """Displays the labeled dimensional matrix."""
 
-        dimensional_matrix: Union[Math, Matrix]
+        dimensional_matrix: Union[str, Matrix]
 
         if _is_running_on_jupyter:
-            dimensional_matrix = Math(self.latex)
+            dimensional_matrix = self.latex
         else:
             dimensional_matrix = self.labeled_matrix
 
