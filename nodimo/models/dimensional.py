@@ -63,7 +63,7 @@ class DimensionalModel:
     DimModel
 
     Examples
-    -------
+    --------
     Period of a simple pendulum:
     First, consider the dimensions mass (M), length (L) and time (T).
     Second, assuming that P is period, m is mass and, g is gravitational

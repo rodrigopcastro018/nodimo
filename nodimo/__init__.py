@@ -1,4 +1,8 @@
-"""Nodimo is a tool that creates nondimensional models.
+"""
+Nodimo
+======
+
+Nodimo is a tool that creates nondimensional models.
 
 The main purpose of Nodimo is to transform a dimensional relationship
 between variables into a nondimensional one. The variables are gathered
@@ -17,12 +21,19 @@ The use of this package requires basic knowledge of dimensional
 analysis, specially on choosing the appropriate set of scaling
 parameters and indentifying established nondimensional groups.
 
-Subpackages
------------
-variables
-    This subpackage provides basic usage for variables.
-models
-    This subpackage provides the tools to build models.
+Classes
+-------
+
+.. autosummary::
+    :toctree:
+
+    Variable
+    VariableGroup
+    DimensionalMatrix
+    ModelFunction
+    DimensionalModel
+    NonDimensionalModel
+    NonDimensionalModels
 
 Examples
 --------

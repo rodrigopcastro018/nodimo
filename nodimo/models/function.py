@@ -44,7 +44,7 @@ class ModelFunction(Equality):
         Displays the function.
 
     Examples
-    -------
+    --------
     Newton's second law:
     First, consider the dimensions mass (M), length (L) and time (T).
     Second, assuming that F is force, m is mass and a is acceleration,

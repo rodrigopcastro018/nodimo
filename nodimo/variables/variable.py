@@ -1,11 +1,3 @@
-"""This module contains the class to create a variable.
-
-Classes
--------
-Variable = Var
-    Creates a symbolic variable.
-"""
-
 from sympy import Symbol
 
 

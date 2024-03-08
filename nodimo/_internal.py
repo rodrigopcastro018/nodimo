@@ -55,7 +55,7 @@ def _print_horizontal_line() -> None:
     """Prints a horizontal line."""
 
     if _is_running_on_jupyter:
-        display(Markdown('---'))
+        display(Markdown('<hr>'))
     else:
         sp.pprint(78 * '-')
 

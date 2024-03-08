@@ -64,7 +64,7 @@ class DimensionalMatrix(Matrix):
     DimMatrix
 
     Examples
-    -------
+    --------
     Hooke's law:
     First, consider the dimensions mass (M), length (L) and time (T).
     Second, assuming that x is displacement, k is stiffness and F is

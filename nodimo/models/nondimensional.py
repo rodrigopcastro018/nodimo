@@ -59,7 +59,7 @@ class NonDimensionalModel(DimensionalModel):
     NonDimModel
 
     Examples
-    -------
+    --------
     Period of a simple pendulum:
     First, consider the dimensions mass (M), length (L) and time (T).
     Second, assume that P is period, m is mass and, g is gravitational
@@ -262,7 +262,7 @@ class NonDimensionalModels(DimensionalModel):
     NonDimModels
 
     Examples
-    -------
+    --------
     Free fall motion:
     First, consider the dimensions mass (M), length (L) and time (T).
     Second, assume that z is height, m is mass, v is velocity, g is
