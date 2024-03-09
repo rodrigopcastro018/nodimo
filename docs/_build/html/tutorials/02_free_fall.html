@@ -9,7 +9,7 @@
         <title>Free Fall - Nodimo 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
     
     
@@ -206,78 +206,110 @@
           </label>
         </div>
         <article role="main">
-          <section id="free-fall">
-<h1>Free Fall<a class="headerlink" href="#free-fall" title="Link to this heading">#</a></h1>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">nodimo</span> <span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">NonDimensionalModels</span>
+          <section id="Free-Fall">
+<h1>Free Fall<a class="headerlink" href="#Free-Fall" title="Link to this heading">#</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">nodimo</span> <span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">NonDimensionalModels</span>
 </pre></div>
 </div>
 </div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">z</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="linenos">2</span><span class="n">m</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="linenos">3</span><span class="n">v</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-<span class="linenos">4</span><span class="n">g</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="linenos">5</span><span class="n">t</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="linenos">6</span><span class="n">z0</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;z_0&#39;</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="linenos">7</span><span class="n">v0</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;v_0&#39;</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">z0</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;z_0&#39;</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">v0</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;v_0&#39;</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">ndmodels</span> <span class="o">=</span> <span class="n">NonDimensionalModels</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">v0</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ndmodels</span> <span class="o">=</span> <span class="n">NonDimensionalModels</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">v0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Variables that can not be part of the model:
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Variables that can not be part of the model:
     m
 Dimensions that can not be part of the model:
     M
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ndmodels</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">ndmodels</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
+<div class="output_area rendered_html docutils container">
+<style>.output{overflow: visible !important}</style>$$\text{Scaling group }1\text{:}\ g,\ z_{0}$$</div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
 </div>
-<div class="cell_output docutils container">
-<div class="math-wrapper output text_latex docutils container">
-<div class="output text_latex math notranslate nohighlight">
-\[\displaystyle \text{Scaling group }1\text{:}\ g,\ z_{0}\]</div>
+<div class="output_area rendered_html docutils container">
+<style>.output{overflow: visible !important}</style>$$\frac{z}{z_{0}} = \Pi{\left(\frac{v}{g^{\frac{1}{2}} z_{0}^{\frac{1}{2}}},\frac{g^{\frac{1}{2}} t}{z_{0}^{\frac{1}{2}}},\frac{v_{0}}{g^{\frac{1}{2}} z_{0}^{\frac{1}{2}}} \right)}$$</div>
 </div>
-<div class="math-wrapper output text_latex docutils container">
-<div class="output text_latex math notranslate nohighlight">
-\[\displaystyle \frac{z}{z_{0}} = \Pi{\left(\frac{v}{g^{\frac{1}{2}} z_{0}^{\frac{1}{2}}},\frac{g^{\frac{1}{2}} t}{z_{0}^{\frac{1}{2}}},\frac{v_{0}}{g^{\frac{1}{2}} z_{0}^{\frac{1}{2}}} \right)}\]</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
 </div>
-<hr>
-<div class="math-wrapper output text_latex docutils container">
-<div class="output text_latex math notranslate nohighlight">
-\[\displaystyle \text{Scaling group }2\text{:}\ g,\ v_{0}\]</div>
+<div class="output_area docutils container">
+<hr></div>
 </div>
-<div class="math-wrapper output text_latex docutils container">
-<div class="output text_latex math notranslate nohighlight">
-\[\displaystyle \frac{g z}{v_{0}^{2}} = \Pi{\left(\frac{v}{v_{0}},\frac{g t}{v_{0}},\frac{g z_{0}}{v_{0}^{2}} \right)}\]</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
 </div>
-<hr>
-<div class="math-wrapper output text_latex docutils container">
-<div class="output text_latex math notranslate nohighlight">
-\[\displaystyle \text{Scaling group }3\text{:}\ z_{0},\ v_{0}\]</div>
+<div class="output_area rendered_html docutils container">
+<style>.output{overflow: visible !important}</style>$$\text{Scaling group }2\text{:}\ g,\ v_{0}$$</div>
 </div>
-<div class="math-wrapper output text_latex docutils container">
-<div class="output text_latex math notranslate nohighlight">
-\[\displaystyle \frac{z}{z_{0}} = \Pi{\left(\frac{v}{v_{0}},\frac{t v_{0}}{z_{0}},\frac{g z_{0}}{v_{0}^{2}} \right)}\]</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
 </div>
-<hr>
+<div class="output_area rendered_html docutils container">
+<style>.output{overflow: visible !important}</style>$$\frac{g z}{v_{0}^{2}} = \Pi{\left(\frac{v}{v_{0}},\frac{g t}{v_{0}},\frac{g z_{0}}{v_{0}^{2}} \right)}$$</div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<hr></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>.output{overflow: visible !important}</style>$$\text{Scaling group }3\text{:}\ z_{0},\ v_{0}$$</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>.output{overflow: visible !important}</style>$$\frac{z}{z_{0}} = \Pi{\left(\frac{v}{v_{0}},\frac{t v_{0}}{z_{0}},\frac{g z_{0}}{v_{0}^{2}} \right)}$$</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<hr></div>
 </div>
 </section>
 
@@ -334,6 +366,8 @@ Dimensions that can not be part of the model:
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>
