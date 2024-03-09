@@ -16,3 +16,5 @@ htmlcov
 # Vscode
 __pycache__
 
+# jupyter
+.ipynb_checkpoints
