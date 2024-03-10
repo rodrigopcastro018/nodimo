@@ -12,6 +12,7 @@ import sympy as sp
 from nodimo.variables.variable import Variable
 from nodimo.variables.matrix import DimensionalMatrix
 from nodimo._internal import _build_dimensional_matrix, _obtain_dimensions
+from nodimo._internal import color_warning, color_end
 
 from .function import ModelFunction
 
@@ -171,12 +172,20 @@ class DimensionalModel:
 
         if display_messages:
             if len(extra_variables) > 0:
-                print("Variables that can not be part of the model:")
-                print("    " + sp.pretty(extra_variables)[1:-1])
+                print(color_warning
+                      + "Variables that can not be part of the model:"
+                      + color_end)
+                print(color_warning
+                      + '    ' + sp.pretty(extra_variables)[1:-1]
+                      + color_end)
 
             if len(extra_dimensions) > 0:
-                print("Dimensions that can not be part of the model:")
-                print("    " + sp.pretty(extra_dimensions)[1:-1])
+                print(color_warning
+                      + "Dimensions that can not be part of the model:"
+                      + color_end)
+                print(color_warning
+                      + '    ' + sp.pretty(extra_dimensions)[1:-1]
+                      + color_end)
 
     def organize_variables(self) -> OrganizedVariablesTuple:
         """Organizes the variables according to their types.
