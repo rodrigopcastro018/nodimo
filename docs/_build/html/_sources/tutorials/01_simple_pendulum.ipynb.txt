@@ -21,7 +21,7 @@
    "id": "1bbab44b-ee18-4507-a92c-1727a09573db",
    "metadata": {},
    "source": [
-    "<center><img src=\"drawings/plain svg/01_simple_pendulum.svg\" width=\"250\"/></center>"
+    "<center><img src=\"drawings/01_simple_pendulum.svg\" width=\"250\"/></center>"
    ]
   },
   {
@@ -86,10 +86,10 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "Variables that can not be part of the model:\n",
-      "    m\n",
-      "Dimensions that can not be part of the model:\n",
-      "    M\n"
+      "\u001b[93mVariables that can not be part of the model:\u001b[0m\n",
+      "\u001b[93m    m\u001b[0m\n",
+      "\u001b[93mDimensions that can not be part of the model:\u001b[0m\n",
+      "\u001b[93m    M\u001b[0m\n"
      ]
     }
    ],

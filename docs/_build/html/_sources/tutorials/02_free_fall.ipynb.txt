@@ -21,7 +21,7 @@
    "id": "c8ab4312-d54c-45e2-bdde-2d007b2914c1",
    "metadata": {},
    "source": [
-    "<center><img src=\"drawings/plain svg/02_free_fall.svg\" width=\"300\"></center>"
+    "<center><img src=\"drawings/02_free_fall.svg\" width=\"300\"></center>"
    ]
   },
   {
@@ -86,10 +86,10 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "Variables that can not be part of the model:\n",
-      "    m\n",
-      "Dimensions that can not be part of the model:\n",
-      "    M\n"
+      "\u001b[93mVariables that can not be part of the model:\u001b[0m\n",
+      "\u001b[93m    m\u001b[0m\n",
+      "\u001b[93mDimensions that can not be part of the model:\u001b[0m\n",
+      "\u001b[93m    M\u001b[0m\n"
      ]
     }
    ],

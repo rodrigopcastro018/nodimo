@@ -2,14 +2,72 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="53.751278mm"
-   height="43.220818mm"
-   viewBox="0 0 53.751278 43.220817"
+   width="53.751274mm"
+   height="43.220821mm"
+   viewBox="0 0 53.751274 43.220821"
    version="1.1"
    id="svg1"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   sodipodi:docname="01_simple_pendulum_inkscape.svg"
+   inkscape:export-filename="01_simple_pendulum.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="2.6761223"
+     inkscape:cx="38.11485"
+     inkscape:cy="85.011062"
+     inkscape:window-width="1920"
+     inkscape:window-height="986"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2"
+     showgrid="false"
+     showguides="true"
+     showborder="true"
+     inkscape:lockguides="false">
+    <inkscape:grid
+       id="grid1"
+       units="mm"
+       originx="-87.74723"
+       originy="-131.75046"
+       spacingx="0.99999998"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="false" />
+    <inkscape:page
+       x="0"
+       y="0"
+       width="53.751274"
+       height="43.220821"
+       id="page48"
+       margin="1"
+       bleed="0"
+       inkscape:export-filename="01_simple_pendulum.svg"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+  </sodipodi:namedview>
   <defs
      id="defs1">
     <marker
@@ -18,9 +76,12 @@
        refX="0"
        refY="0"
        orient="auto-start-reverse"
+       inkscape:stockid="Concave triangle arrow"
        markerWidth="1"
        markerHeight="1"
        viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
        preserveAspectRatio="xMidYMid">
       <path
          transform="scale(0.7)"
@@ -34,9 +95,12 @@
        refX="0"
        refY="0"
        orient="auto-start-reverse"
+       inkscape:stockid="Concave triangle arrow"
        markerWidth="1"
        markerHeight="1"
        viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
        preserveAspectRatio="xMidYMid">
       <path
          transform="scale(0.7)"
@@ -45,6 +109,7 @@
          id="path7" />
     </marker>
     <pattern
+       inkscape:collect="always"
        xlink:href="#Bricks"
        id="pattern27"
        patternTransform="scale(0.01)"
@@ -57,7 +122,10 @@
        height="100"
        id="Bricks"
        style="fill:#000000"
-       patternTransform="scale(0.25,0.25)">
+       patternTransform="scale(0.25,0.25)"
+       inkscape:collect="always"
+       inkscape:label="Bricks"
+       inkscape:isstock="true">
       <g
          id="g13367">
         <rect
@@ -91,15 +159,26 @@
       </g>
     </pattern>
     <linearGradient
-       id="swatch20">
+       id="swatch20"
+       inkscape:swatch="solid">
       <stop
          style="stop-color:#000000;stop-opacity:1;"
          offset="0"
          id="stop20" />
     </linearGradient>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath52">
+      <path
+         id="path52"
+         style="stroke-width:0.1;stroke-linecap:square;paint-order:markers fill stroke;stop-color:#000000"
+         d="m -880.82767,-187.29769 h 1640.84 v 73.28155 h -1640.84 z" />
+    </clipPath>
   </defs>
   <g
-     id="layer3">
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="background">
     <rect
        style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linecap:round;stroke-dasharray:0.600001, 1.2"
        id="rect1"
@@ -107,43 +186,53 @@
        height="43.220818"
        x="87.747231"
        y="131.75046"
-       transform="translate(-87.747229,-131.75046)" />
+       transform="translate(-87.747229,-131.75046)"
+       inkscape:label="white rectangle" />
   </g>
   <g
+     inkscape:label="drawing"
+     inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-87.747232,-131.75046)"
+     transform="translate(-87.74723,-131.75046)"
      style="display:inline">
     <path
        id="path11"
-       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:round;stroke-dasharray:0.6, 1.2;stroke-dashoffset:0"
-       d="M 111.78788,173.13129 V 134.99707" />
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-dasharray:0.60000003,1.20000005;stroke-linecap:round;stroke-dashoffset:0"
+       d="M 111.78788,173.13129 V 134.99707"
+       inkscape:label="centerline" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-dasharray:none;stroke-dashoffset:0;stroke-linecap:round"
        d="m 111.78801,134.9969 c 21.47921,31.50931 21.47921,31.50931 21.47921,31.50931"
-       id="path9" />
+       id="path9"
+       inkscape:label="string" />
     <rect
        style="fill:url(#pattern27);fill-opacity:1;stroke:none;stroke-width:0.189581;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect11"
        width="11.600883"
        height="2.2464244"
        x="105.98756"
-       y="132.75046" />
+       y="132.75046"
+       inkscape:label="support" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:round;stroke-dasharray:0.6, 1.2;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#ConcaveTriangle)"
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-dasharray:0.60000003,1.20000005;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#ConcaveTriangle);stroke-linecap:round"
        d="m 111.78788,173.13129 a 38.135239,38.135239 0 0 0 21.47898,-6.62483"
-       id="path30" />
+       id="path30"
+       inkscape:label="path1" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:round;stroke-dasharray:0.6, 1.2;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#marker31)"
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-dasharray:0.60000003,1.20000005;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#marker31);stroke-linecap:round"
        d="m 90.3089,166.50646 a 38.135239,38.135239 0 0 0 21.47898,6.62483"
-       id="path27" />
+       id="path27"
+       inkscape:label="path2" />
     <circle
        style="fill:#6c6c6c;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="path10"
        cx="133.26721"
        cy="166.50621"
-       r="3.0963218" />
+       r="3.0963218"
+       inkscape:label="bob" />
     <g
-       id="path32-3">
+       id="path32-3"
+       inkscape:label="angle">
       <path
          style="color:#000000;fill:#000000;-inkscape-stroke:none"
          d="m 118.47461,144.80469 c -1.97093,1.3437 -4.3021,2.0625 -6.6875,2.0625 v 0.29883 c 2.44565,-1e-5 4.83475,-0.73564 6.85547,-2.11329 z"
@@ -161,21 +250,26 @@
       </g>
     </g>
     <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.3;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker31)"
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.3;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker31);stroke-linecap:round"
        d="m 89.58723,135.1367 c 0,9.67952 0,9.67952 0,9.67952"
-       id="path44" />
+       id="path44"
+       inkscape:label="gvector" />
   </g>
   <g
+     inkscape:groupmode="layer"
      id="layer2"
+     inkscape:label="text"
      style="display:inline"
-     transform="translate(0.99999897,1.0000045)">
+     transform="translate(1.0000005,1.0000023)">
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        x="90.950897"
        y="141.32919"
        id="text44"
+       inkscape:label="g"
        transform="translate(-88.74723,-132.75046)"><tspan
+         sodipodi:role="line"
          id="tspan44"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.3"
          x="90.950897"
@@ -186,7 +280,9 @@
        x="137.68903"
        y="167.05475"
        id="text44-8"
+       inkscape:label="m"
        transform="translate(-88.74723,-132.75046)"><tspan
+         sodipodi:role="line"
          id="tspan44-5"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.3"
          x="137.68903"
@@ -196,7 +292,9 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        x="35.068783"
        y="17.063482"
-       id="text44-8-7"><tspan
+       id="text44-8-7"
+       inkscape:label="L"><tspan
+         sodipodi:role="line"
          id="tspan44-5-2"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.3"
          x="35.068783"
@@ -207,7 +305,9 @@
        x="114.94952"
        y="150.65971"
        id="text44-1"
+       inkscape:label="theta"
        transform="translate(-88.74723,-132.75046)"><tspan
+         sodipodi:role="line"
          id="tspan44-3"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.3"
          x="114.94952"
