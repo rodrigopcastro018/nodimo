@@ -33,6 +33,12 @@ try:
 except:
     _is_running_on_jupyter = False
 
+
+# ANSI color codes
+color_warning = '\033[93m'
+color_end = '\033[0m'
+
+
 def _custom_display(obj_latex: str) -> None:
     """Displays object using a custom CSS style.
 
@@ -49,6 +55,7 @@ def _custom_display(obj_latex: str) -> None:
     css_style = '<style>.output{overflow: visible !important}</style>'
 
     display(HTML(css_style + '$$' + obj_latex + '$$'))
+
 
 def _show_object(obj: Any, use_custom_css: bool = True) -> None:
     """Prints object in shell.
