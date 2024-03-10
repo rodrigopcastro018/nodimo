@@ -42,7 +42,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'nbsphinx',
-    #'myst_nb'
 ]
 
 templates_path = ['_templates']
@@ -51,12 +50,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # autodoc
 autodoc_inherit_docstrings = False
 autosummary_generate = False
-
-# myst
-# source_suffix = {
-#     '.rst': 'restructuredtext',
-#     '.ipynb': 'myst-nb',
-# }
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

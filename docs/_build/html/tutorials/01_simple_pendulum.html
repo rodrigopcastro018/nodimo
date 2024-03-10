@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Free Fall" href="02_free_fall.html" /><link rel="prev" title="Tutorials" href="index.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Free Fall" href="02_free_fall.html" /><link rel="prev" title="Nodimo Classes" href="00_nodimo_classes.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
         <title>Simple Pendulum - Nodimo 1.1.0 documentation</title>
@@ -158,6 +158,7 @@
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="00_nodimo_classes.html">Nodimo Classes</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Simple Pendulum</a></li>
 <li class="toctree-l2"><a class="reference internal" href="02_free_fall.html">Free Fall</a></li>
 </ul>
@@ -208,6 +209,9 @@
         <article role="main">
           <section id="Simple-Pendulum">
 <h1>Simple Pendulum<a class="headerlink" href="#Simple-Pendulum" title="Link to this heading">#</a></h1>
+<p>The objective here is to obtain a nondimensional representation of the pendulum’s period <code class="docutils literal notranslate"><span class="pre">T</span></code> as a function of the variables depicted in the figure below.</p>
+<center><p><img alt="6d967b7828154f3e90cc5f3ded13024f" class="no-scaled-link" src="tutorials/drawings/plainsvg/01_simple_pendulum.svg" width="250" /></p>
+</center><p>We start by importing the necessary classes from <code class="docutils literal notranslate"><span class="pre">nodimo</span></code>:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -216,18 +220,25 @@
 </pre></div>
 </div>
 </div>
+<p>Next, we define the variables that compose the problem. Note the arguments used:</p>
+<ul class="simple">
+<li><p>The arguments <code class="docutils literal notranslate"><span class="pre">M</span></code>, <code class="docutils literal notranslate"><span class="pre">L</span></code> and <code class="docutils literal notranslate"><span class="pre">T</span></code> represent the dimensions Mass, Length and Time, respectively</p></li>
+<li><p>The Period <code class="docutils literal notranslate"><span class="pre">T</span></code> is the dependent variable, hence the argument <code class="docutils literal notranslate"><span class="pre">dependent=True</span></code></p></li>
+<li><p>The variables <code class="docutils literal notranslate"><span class="pre">L</span></code> and <code class="docutils literal notranslate"><span class="pre">g</span></code> are used as scaling parameters, therefore the argument <code class="docutils literal notranslate"><span class="pre">scaling=True</span></code></p></li>
+</ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">L</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">m</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">t0</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;theta_0&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Period</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>    <span class="c1"># Length</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>                  <span class="c1"># Mass</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>   <span class="c1"># Gravity</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;theta_0&#39;</span><span class="p">)</span>                          <span class="c1"># Initial angle</span>
 </pre></div>
 </div>
 </div>
+<p>Finaly, the nondimensional model is defined. Note that, in the output of the cell, Nodimo detects that the variable <code class="docutils literal notranslate"><span class="pre">m</span></code> and the dimension <code class="docutils literal notranslate"><span class="pre">M</span></code> can not be part of the model.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -247,13 +258,21 @@ Dimensions that can not be part of the model:
     M
 </pre></div></div>
 </div>
+<p>The dimensional and nondimensional functions can be displayed by:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ndmodel</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ndmodel</span><span class="o">.</span><span class="n">dimensional_function</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">ndmodel</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>.output{overflow: visible !important}</style>$$T = \pi{\left(L,g,\theta_{0} \right)}$$</div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
@@ -261,6 +280,7 @@ Dimensions that can not be part of the model:
 <div class="output_area rendered_html docutils container">
 <style>.output{overflow: visible !important}</style>$$\frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}$$</div>
 </div>
+<p>As you can see, the dimensional expression provides a relationship between 4 variables, while the nondimensional one has 2 effective variables (groups). This is one the main advantages of building nondimensional relations between variables.</p>
 </section>
 
         </article>
@@ -277,14 +297,14 @@ Dimensions that can not be part of the model:
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="index.html">
+          <a class="prev-page" href="00_nodimo_classes.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Tutorials</div>
+                <div class="title">Nodimo Classes</div>
                 
               </div>
             </a>

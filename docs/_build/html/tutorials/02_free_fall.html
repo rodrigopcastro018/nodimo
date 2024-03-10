@@ -158,6 +158,7 @@
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="00_nodimo_classes.html">Nodimo Classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="01_simple_pendulum.html">Simple Pendulum</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Free Fall</a></li>
 </ul>
@@ -208,6 +209,10 @@
         <article role="main">
           <section id="Free-Fall">
 <h1>Free Fall<a class="headerlink" href="#Free-Fall" title="Link to this heading">#</a></h1>
+<p>In the free fall problem, an object of mass <code class="docutils literal notranslate"><span class="pre">m</span></code>, at a initial height <code class="docutils literal notranslate"><span class="pre">z0</span></code>, falls under the effect of a gravitational acceleration <code class="docutils literal notranslate"><span class="pre">g</span></code>, with a initial velocity <code class="docutils literal notranslate"><span class="pre">v0</span></code>. At a time instant <code class="docutils literal notranslate"><span class="pre">t</span></code>, the height and velocity are <code class="docutils literal notranslate"><span class="pre">z</span></code> and <code class="docutils literal notranslate"><span class="pre">v</span></code>.</p>
+<center><p><img alt="35fa2f2fed604ca09f63835290e31f19" class="no-scaled-link" src="tutorials/drawings/plainsvg/02_free_fall.svg" width="300" /></p>
+</center><p>The objective here is to determine nondimensional relationships between those variables.</p>
+<p>We start by importing the necessary classes from <code class="docutils literal notranslate"><span class="pre">nodimo</span></code>:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -216,6 +221,7 @@
 </pre></div>
 </div>
 </div>
+<p>Our dependent variable will be <code class="docutils literal notranslate"><span class="pre">z</span></code> and there are three variables that are interesting to set as scaling: <code class="docutils literal notranslate"><span class="pre">g</span></code>, <code class="docutils literal notranslate"><span class="pre">z0</span></code> and <code class="docutils literal notranslate"><span class="pre">v0</span></code>. The variables <code class="docutils literal notranslate"><span class="pre">v</span></code> and <code class="docutils literal notranslate"><span class="pre">t</span></code> are not suitable to be used as scaling parameters, because they are not constants of the problem. And it’s needless to say that <code class="docutils literal notranslate"><span class="pre">m</span></code> can’t be part of our model, but it was added to show how <code class="docutils literal notranslate"><span class="pre">nodimo</span></code> handles these situations.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -230,6 +236,7 @@
 </pre></div>
 </div>
 </div>
+<p>Now, to create all possible nondimensional models using the variables defined above, we execute:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -249,6 +256,8 @@ Dimensions that can not be part of the model:
     M
 </pre></div></div>
 </div>
+<p>As expected, the variable <code class="docutils literal notranslate"><span class="pre">m</span></code> and the dimension <code class="docutils literal notranslate"><span class="pre">M</span></code> can not belong to the model and are discarded.</p>
+<p>To display all possible models, just run the <code class="docutils literal notranslate"><span class="pre">show</span></code> method:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -311,6 +320,7 @@ Dimensions that can not be part of the model:
 <div class="output_area docutils container">
 <hr></div>
 </div>
+<p>In this way, you are able to choose the nondimensional expression that better represents the model for your purpose.</p>
 </section>
 
         </article>
