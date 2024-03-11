@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Nodimo Classes" href="00_nodimo_classes.html" /><link rel="prev" title="Installation" href="../installation.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="DimensionalModel" href="DimensionalModel.html" /><link rel="prev" title="DimensionalMatrix" href="DimensionalMatrix.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
-        <title>Tutorials - Nodimo 1.1.0 documentation</title>
+        <title>ModelFunction - Nodimo 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -156,20 +156,20 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="00_nodimo_classes.html">Nodimo Classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="01_simple_pendulum.html">Simple Pendulum</a></li>
-<li class="toctree-l2"><a class="reference internal" href="02_free_fall.html">Free Fall</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/00_nodimo_classes.html">Nodimo Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/01_simple_pendulum.html">Simple Pendulum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/02_free_fall.html">Free Fall</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../classes/index.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../classes/Variable.html">Variable</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../classes/VariableGroup.html">VariableGroup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../classes/DimensionalMatrix.html">DimensionalMatrix</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../classes/ModelFunction.html">ModelFunction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../classes/DimensionalModel.html">DimensionalModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../classes/NonDimensionalModel.html">NonDimensionalModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../classes/NonDimensionalModels.html">NonDimensionalModels</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Variable.html">Variable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="VariableGroup.html">VariableGroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DimensionalMatrix.html">DimensionalMatrix</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ModelFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DimensionalModel.html">DimensionalModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="NonDimensionalModel.html">NonDimensionalModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="NonDimensionalModels.html">NonDimensionalModels</a></li>
 </ul>
 </li>
 </ul>
@@ -200,21 +200,74 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="tutorials">
-<span id="id1"></span><h1>Tutorials<a class="headerlink" href="#tutorials" title="Link to this heading">#</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="00_nodimo_classes.html">Nodimo Classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="01_simple_pendulum.html">Simple Pendulum</a></li>
-<li class="toctree-l1"><a class="reference internal" href="02_free_fall.html">Free Fall</a></li>
-</ul>
+          <section id="modelfunction">
+<h1>ModelFunction<a class="headerlink" href="#modelfunction" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="nodimo.function.ModelFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nodimo.function.</span></span><span class="sig-name descname"><span class="pre">ModelFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="Variable.html#nodimo.variable.Variable" title="nodimo.variable.Variable"><span class="pre">Variable</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="VariableGroup.html#nodimo.group.VariableGroup" title="nodimo.group.VariableGroup"><span class="pre">VariableGroup</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'f'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/rodrigopcastro018/nodimo/nodimo/function.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nodimo.function.ModelFunction" title="Link to this definition">#</a></dt>
+<dd><p>Creates a function that relates a set of variables or groups.</p>
+<p>This class states a function that represents a model, that is, it
+expresses a relationship between the variables or variable groups
+that constitute a model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>*variables</strong><span class="classifier">Variable or VariableGroup</span></dt><dd><p>Variables or groups that constitute the function.</p>
+</dd>
+<dt><strong>name</strong><span class="classifier">str, default=’f’</span></dt><dd><p>Name that represents the function in symbolic expression.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>ValueError</dt><dd><p>If there is less or more than one dependent variable.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Consider the dimensions mass <code class="docutils literal notranslate"><span class="pre">M</span></code>, length <code class="docutils literal notranslate"><span class="pre">L</span></code> and time <code class="docutils literal notranslate"><span class="pre">T</span></code>.
+Next, assuming that <code class="docutils literal notranslate"><span class="pre">F</span></code> is force, <code class="docutils literal notranslate"><span class="pre">m</span></code> is mass and <code class="docutils literal notranslate"><span class="pre">a</span></code> is
+acceleration, the function <code class="docutils literal notranslate"><span class="pre">h</span></code> that relates these three variables
+is built and displayed as:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">nodimo</span> <span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">ModelFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span> <span class="o">=</span> <span class="n">ModelFunction</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>variables</strong><span class="classifier">list[Variable or VariableGroup]</span></dt><dd><p>List of variables or groups used in the function.</p>
+</dd>
+<dt><strong>dependent_variable</strong><span class="classifier">Variable or VariableGroup</span></dt><dd><p>Dependent variable or group.</p>
+</dd>
+<dt><strong>independent_variables</strong><span class="classifier">list[Variable or VariableGroup]</span></dt><dd><p>List of independent variables or groups.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>show()</strong></p></td>
+<td><p>Displays the function.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</dd></dl>
+
 </section>
 
         </article>
@@ -222,23 +275,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="00_nodimo_classes.html">
+          <a class="next-page" href="DimensionalModel.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Nodimo Classes</div>
+                <div class="title">DimensionalModel</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../installation.html">
+          <a class="prev-page" href="DimensionalMatrix.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Installation</div>
+                <div class="title">DimensionalMatrix</div>
                 
               </div>
             </a>
@@ -260,8 +313,27 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ModelFunction</a><ul>
+<li><a class="reference internal" href="#nodimo.function.ModelFunction"><code class="docutils literal notranslate"><span class="pre">ModelFunction</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

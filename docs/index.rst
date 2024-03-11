@@ -14,15 +14,15 @@ Instructions on how to install Nodimo.
 
 Nodimo applications.
 
-:ref:`API <modules>`
+:ref:`API <classes>`
 --------------------
 
 Nodimo's classes described in detail.
 
 .. toctree::
-   :maxdepth: 1
+   :titlesonly:
    :hidden:
    
    installation.rst
    tutorials/index.rst
-   modules/index.rst
+   classes/index.rst

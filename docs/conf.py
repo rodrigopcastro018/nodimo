@@ -42,6 +42,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'nbsphinx',
+    'numpydoc',
+    'sphinx.ext.linkcode',
 ]
 
 templates_path = ['_templates']
@@ -50,6 +52,23 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # autodoc
 autodoc_inherit_docstrings = False
 autosummary_generate = False
+
+# numpydoc
+numpydoc_show_inherited_class_members = {
+    'nodimo.variable.Variable': False,
+    'nodimo.group.VariableGroup': False,
+    'nodimo.matrix.DimensionalMatrix': False,
+    'nodimo.function.ModelFunction': False,
+}
+
+# linkcode
+def linkcode_resolve(domain, info):
+    if domain != 'py':
+        return None
+    if not info['module']:
+        return None
+    filename = info['module'].replace('.', '/')
+    return f'https://github.com/rodrigopcastro018/nodimo/{filename}.py'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
