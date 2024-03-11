@@ -1,8 +1,13 @@
-"""This module contains the class to create a variable.
+"""
+=================================
+Variable (:mod:`nodimo.variable`)
+=================================
+
+This module contains the class to create a variable.
 
 Classes
 -------
-Variable = Var
+Variable
     Creates a symbolic variable.
 """
 
@@ -13,38 +18,57 @@ class Variable(Symbol):
     """Creates a symbolic variable.
 
     This is the most basic element that is used to build all the other
-    classes in this project. It inherits from the sympy Symbol class the
+    classes in this package. It inherits from the sympy Symbol class the
     ability to be used in mathematical expressions, and adds to it a few
     attributes that are useful in describing its dimensional properties.
 
+    Parameters  
+    ----------
+    name : str
+        The name that will be displayed in symbolic expressions.
+    dependent : bool, default=False
+        If ``True``, the variable is dependent.
+    scaling : bool, default=False
+        If ``True``, the variable can be used as scaling parameter.
+    **dimensions : int
+        The dimensions of the variable given as keyword arguments.
+
     Attributes
     ----------
-    name: str
+    name : str
         The name that will be displayed in symbolic expressions.
-    dimensions: dict[str, int]
+    dimensions : dict[str, int]
         Dictionary containing dimensions' names and exponents.
-    is_dependent: bool
-        If True, the variable is dependent.
-    is_scaling: bool
-        If True, the variable can be used as scaling parameter.
-    is_nondimensional: bool
-        If True, the variable is nondimensional.
+    is_dependent : bool
+        If ``True``, the variable is dependent.
+    is_scaling : bool
+        If ``True``, the variable can be used as scaling parameter.
+    is_nondimensional : bool
+        If ``True``, the variable is nondimensional.
 
-    Alias
-    -----
-    Var
+    Raises
+    ------
+    ValueError
+        If the variable is set as both dependent and scaling.
+    ValueError
+        If the variable is set as scaling, but with no dimensions.
 
     Examples
     --------
+    Considering the dimensions mass ``M``, length ``L`` and time ``T``,
+    a force ``F`` can be defined as:
+
     >>> from nodimo import Variable
-    Considering the dimensions mass (M), length (L) and time (T), a
-    force F can be defined as:
     >>> F = Variable('F', M=1, L=1, T=-2)
-    To define a nondimensional variable A is sufficient to provide
+
+    To define a nondimensional variable ``A`` is sufficient to provide
     just its name:
+
     >>> A = Variable('A')
+
     To use a greek letter in symbolic expressions, just provide its
     english representation as the name of the variable:
+
     >>> a = Variable('alpha')
     """
 
@@ -61,25 +85,6 @@ class Variable(Symbol):
                  dependent: bool = False,
                  scaling: bool = False,
                  **dimensions: int):
-        """
-        Parameters  
-        ----------
-        name: str
-            The name that will be displayed in symbolic expressions.
-        dependent: bool, optional (default=False)
-            If True, the variable is dependent.
-        scaling: bool, optional (default=False)
-            If True, the variable can be used as scaling parameter.
-        **dimensions: int
-            The dimensions of the variable given as keyword arguments.
-
-        Raises
-        ------
-        ValueError
-            If the variable is set as both dependent and scaling.
-        ValueError
-            If the variable is set as scaling, but with no dimensions.
-        """
 
         super().__init__()
         self.dimensions: dict[str, int] = dimensions

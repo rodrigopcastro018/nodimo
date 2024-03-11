@@ -1,20 +1,24 @@
-"""This module contains the class to create a dimensional model.
+"""
+=============================================
+Dimensional Model (:mod:`nodimo.dimensional`)
+=============================================
+
+This module contains the class to create a dimensional model.
 
 Classes
 -------
-DimensionalModel = DimModel
+DimensionalModel
     Creates a dimensional model from a given set of variables.
 """
 
 import numpy as np
 import sympy as sp
 
-from nodimo.variables.variable import Variable
-from nodimo.variables.matrix import DimensionalMatrix
+from nodimo.variable import Variable
+from nodimo.matrix import DimensionalMatrix
+from nodimo.function import ModelFunction
 from nodimo._internal import _build_dimensional_matrix, _obtain_dimensions
 from nodimo._internal import color_warning, color_end
-
-from .function import ModelFunction
 
 
 # Alias for type used in DimensionalModel.
@@ -29,23 +33,32 @@ class DimensionalModel:
     models. A dimensional model states a relationship between variables,
     and this relationship is represented by the dimensional function.
 
+    Parameters
+    ----------
+    *variables : Variable
+        Variables that constitute the model.
+    check_variables : bool, defaul=True
+        If ``True``, extra variables and dimensions are searched.
+    display_messages : bool, default=True
+        If ``True``, extra variables and dimensions are displayed.
+
     Attributes
     ----------
-    variables: list[Variable]
+    variables : list[Variable]
         List of variables that compose the model.
-    dimensions: list[str]
+    dimensions : list[str]
         List with the dimensions' names of the given variables.
-    dimensional_variables: list[Variable]
+    dimensional_variables : list[Variable]
         List of dimensional variables.
-    nondimensional_variables: list[Variable]
+    nondimensional_variables : list[Variable]
         List of nondimensional variables.
-    scaling_variables: list[Variable]
+    scaling_variables : list[Variable]
         List of scaling variables.
-    nonscaling_variables: list[Variable]
+    nonscaling_variables : list[Variable]
         List of nonscaling variables.
-    dimensional_matrix: DimensionalMatrix
+    dimensional_matrix : DimensionalMatrix
         Dimensional matrix for the given set of variables.
-    dimensional_function: ModelFunction
+    dimensional_function : ModelFunction
         Function that represents the dimensional model.
 
     Methods
@@ -54,30 +67,31 @@ class DimensionalModel:
         Builds the main characteristics of the dimensional model.
     search_extra_variables_and_dimensions(display_messages=True)
         Searchs for extra variables and dimensions.
-    organize_variables()
-        Organizes the variables according to their types.
     show_dimensional_function() = show()
         Displays the dimensional function.
 
-    Alias
-    -----
-    DimModel
-
+    Raises
+    ------
+    ValueError
+        If the number of effective variables is lower than two.
+        
     Examples
     --------
-    Period of a simple pendulum:
-    First, consider the dimensions mass (M), length (L) and time (T).
-    Second, assuming that P is period, m is mass and, g is gravitational
-    acceleration, D is the pendulum's length and t0 is the initial
-    angle, the dimensional model (dmodel) for the period is built and
-    shown as:
+    * Simple Pendulum
+
+    Consider the dimensions mass ``M``, length ``L`` and time ``T``.
+    Next, assuming that ``P`` is period, ``m`` is mass and, ``g`` is
+    gravitational acceleration, ``R`` is the pendulum's length and
+    ``t0`` is the initial angle, the dimensional model ``dmodel`` for
+    the period is built and shown as:
+
     >>> from nodimo import Variable, DimensionalModel
     >>> P = Variable('P', T=1, dependent=True)
     >>> m = Variable('m', M=1)
     >>> g = Variable('g', L=1, T=-2, scaling=True)
-    >>> D = Variable('D', L=1, scaling=True)
+    >>> R = Variable('R', L=1, scaling=True)
     >>> t0 = Variable('theta0')
-    >>> dmodel = DimensionalModel(P, m, g, D, t0)
+    >>> dmodel = DimensionalModel(P, m, g, R, t0)
     >>> dmodel.show()
     """
 
@@ -85,21 +99,6 @@ class DimensionalModel:
                  *variables: Variable,
                  check_variables: bool = True,
                  display_messages: bool = True):
-        """
-        Parameters
-        ----------
-        *variables: Variable
-            Variables that constitute the model.
-        check_variables: bool, optional (defaul=True)
-            If True, extra variables and dimensions are searched.
-        display_messages: bool, optional (default=True)
-            If True, extra variables and dimensions are displayed.
-
-        Raises
-        ------
-        ValueError
-            If the number of effective variables is lower than two.
-        """
 
         self.variables: list[Variable] = list(variables)
         self.dimensions: list[str] = _obtain_dimensions(*variables)
@@ -123,7 +122,7 @@ class DimensionalModel:
             self.nondimensional_variables,
             self.scaling_variables,
             self.nonscaling_variables
-        ) = self.organize_variables()
+        ) = self._organize_variables()
 
         self.build_dimensional_model()
 
@@ -144,8 +143,8 @@ class DimensionalModel:
 
         Parameters
         ----------
-        display_messages: bool, optional (default=True)
-            If True, extra variables and dimensions are displayed.
+        display_messages : bool, default=True
+            If ``True``, extra variables and dimensions are displayed.
         """
 
         dimensional_matrix_sp = _build_dimensional_matrix(self.variables,
@@ -187,7 +186,7 @@ class DimensionalModel:
                       + '    ' + sp.pretty(extra_dimensions)[1:-1]
                       + color_end)
 
-    def organize_variables(self) -> OrganizedVariablesTuple:
+    def _organize_variables(self) -> OrganizedVariablesTuple:
         """Organizes the variables according to their types.
 
         The variables are organized into dimensional and nondimensional.
@@ -196,13 +195,13 @@ class DimensionalModel:
 
         Returns
         -------
-        dimensional_variables: list[Variable]
+        dimensional_variables : list[Variable]
             List of dimensional variables.
-        nondimensional_variables: list[Variable]
+        nondimensional_variables : list[Variable]
             List of nondimensional variables.
-        scaling_variables: list[Variable]
+        scaling_variables : list[Variable]
             List of scaling variables.
-        nonscaling_variables: list[Variable]
+        nonscaling_variables : list[Variable]
             List of nonscaling variables.
         """
 

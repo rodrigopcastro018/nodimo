@@ -1,10 +1,15 @@
-"""This module contains the classes to create nondimensional models.
+"""
+====================================================
+Nondimensional Models (:mod:`nodimo.nondimensional`)
+====================================================
+
+This module contains the classes to create nondimensional models.
 
 Classes
 -------
-NonDimensionalModel = NonDimModel
+NonDimensionalModel
     Creates a nondimensional model from a given set of variables.
-NonDimensionalModels = NonDimModels
+NonDimensionalModels
     Creates nondimensional models from a given set of variables.
 """
 
@@ -12,15 +17,14 @@ import sympy as sp
 from sympy import Matrix
 from itertools import combinations
 
-from nodimo.variables.variable import Variable
-from nodimo.variables.group import VariableGroup
+from nodimo.variable import Variable
+from nodimo.group import VariableGroup
+from nodimo.function import ModelFunction
+from nodimo.dimensional import DimensionalModel
 from nodimo._internal import (_is_running_on_jupyter,
                               _show_object,
                               _print_horizontal_line,
                               _build_dimensional_matrix)
-
-from .function import ModelFunction
-from .dimensional import DimensionalModel
 
 
 class NonDimensionalModel(DimensionalModel):
@@ -31,45 +35,54 @@ class NonDimensionalModel(DimensionalModel):
     describes the relationship between the groups and represents the
     model.
 
+    Parameters
+    ----------
+    *variables : Variable
+        Variables that constitute the model.
+    build_now : bool, default=True
+        If ``True``, the variables are validated and the model is built.
+    display_messages : bool, default=True
+        If ``True``, extra variables and dimensions are displayed.
+
     Attributes
     ----------
-    nondimensional_groups: list[VariableGroup]
+    nondimensional_groups : list[VariableGroup]
         List of nondimensional groups.
-    nondimensional_function: ModelFunction
+    nondimensional_function : ModelFunction
         Function that represents the nondimensional model.
 
     Methods
     -------
-    validate_scaling_variables()
-        Validates the set of scaling variables.
     build_nondimensional_model() = build()
         Builds the main characteristics of the nondimensional model.
-    build_exponents_matrix()
-        Builds the matrix of exponents for the nondimensional groups.
-    build_nondimensional_groups()
-        Builds nondimensional groups.
     show_nondimensional_function() = show()
         Displays the nondimensional function.
 
-    Alias
-    -----
-    NonDimModel
+    Raises
+    ------
+    ValueError
+        If the number of scaling variables is not adequate.
+    ValueError
+        If the scaling variables do not form an independent set.
 
     Examples
     --------
-    Period of a simple pendulum:
-    First, consider the dimensions mass (M), length (L) and time (T).
-    Second, assume that P is period, m is mass and, g is gravitational
-    acceleration, D is the pendulum's length and t0 is the initial
-    angle.Third, take g and D as scaling parameters. The nondimensional
-    model (ndmodel) for the period is built and displayed as:
+    * Simple Pendulum
+
+    Consider the dimensions mass ``M``, length ``L`` and time ``T``.
+    Next, assume that ``P`` is period, ``m`` is mass and, ``g`` is
+    gravitational acceleration, ``R`` is the pendulum's length and
+    ``t0`` is the initial angle. In addition, take ``g`` and ``D`` as
+    the scaling parameters. The nondimensional model ``ndmodel`` for the
+    period is built and displayed as:
+
     >>> from nodimo import Variable, NonDimensionalModel
     >>> P = Variable('P', T=1, dependent=True)
     >>> m = Variable('m', M=1)
     >>> g = Variable('g', L=1, T=-2, scaling=True)
-    >>> D = Variable('D', L=1, scaling=True)
+    >>> R = Variable('R', L=1, scaling=True)
     >>> t0 = Variable('theta_0')
-    >>> ndmodel = NonDimensionalModel(P, m, g, D, t0)
+    >>> ndmodel = NonDimensionalModel(P, m, g, R, t0)
     >>> ndmodel.show()
     """
 
@@ -77,16 +90,6 @@ class NonDimensionalModel(DimensionalModel):
                  *variables: Variable,
                  build_now: bool = True,
                  display_messages: bool = True):
-        """
-        Parameters
-        ----------
-        *variables: Variable
-            Variables that constitute the model.
-        build_now: bool, optional (default=True)
-            If True, the variables are validated and the model is built.
-        display_messages: bool, optional (default=True)
-            If True, extra variables and dimensions are displayed.
-        """
 
         super().__init__(*variables, display_messages=display_messages)
 
@@ -98,16 +101,16 @@ class NonDimensionalModel(DimensionalModel):
         self.nondimensional_function: ModelFunction
 
         if build_now:
-            self.validate_scaling_variables()
+            self._validate_scaling_variables()
             self.build_nondimensional_model()
 
-    def validate_scaling_variables(self) -> None:
+    def _validate_scaling_variables(self) -> None:
         """Validates the set of scaling variables.
 
         Raises
         ------
         ValueError
-            If the number of scaling variables is lower than necessary.
+            If the number of scaling variables is not adequate.
         ValueError
             If the scaling variables do not form an independent set.
         """
@@ -127,9 +130,9 @@ class NonDimensionalModel(DimensionalModel):
         """Builds the main properties of the nondimensional model."""
 
         if self._check_scaling_variables:
-            self.validate_scaling_variables()
+            self._validate_scaling_variables()
 
-        self.nondimensional_groups = self.build_nondimensional_groups()
+        self.nondimensional_groups = self._build_nondimensional_groups()
 
         self.nondimensional_function = ModelFunction(
             *self.nondimensional_variables,
@@ -140,20 +143,20 @@ class NonDimensionalModel(DimensionalModel):
     # Alias for build_nondimensional_model.
     build = build_nondimensional_model
 
-    def build_exponents_matrix(self) -> Matrix:
+    def _build_exponents_matrix(self) -> Matrix:
         """Builds the matrix of exponents for the nondimensional groups.
 
         Returns
         -------
-        exponents_matrix: Matrix
+        exponents_matrix : Matrix
             Matrix containing the exponents, where each row is the
             corresponding dimensional variable, and every column
             represents a group.
         
         References
         ----------
-        [1] Thomas Szirtes, Applied Dimensional Analysis and Modeling
-            (Butterworth-Heinemann, 2007), p. 133.
+        .. [1] Thomas Szirtes, Applied Dimensional Analysis and Modeling
+               (Butterworth-Heinemann, 2007), p. 133.
         """
 
         number_of_dimensions = len(self.dimensions)
@@ -191,16 +194,16 @@ class NonDimensionalModel(DimensionalModel):
 
         return exponents_matrix
 
-    def build_nondimensional_groups(self) -> list[VariableGroup]:
+    def _build_nondimensional_groups(self) -> list[VariableGroup]:
         """Builds nondimensional groups.
 
         Returns
         -------
-        nondimensional_groups: list[VariableGroup]
+        nondimensional_groups : list[VariableGroup]
             List containing the nondimensional groups.
         """
 
-        exponents_matrix = self.build_exponents_matrix()
+        exponents_matrix = self._build_exponents_matrix()
 
         nondimensional_groups = []
 
@@ -236,37 +239,42 @@ class NonDimensionalModels(DimensionalModel):
     of scaling variables. It can be understood as a collection of
     nondimensional models.
 
+    Parameters
+    ----------
+    *variables : Variable
+        Variables that constitute the model.
+    display_messages : bool, default=True
+        If ``True``, extra variables and dimensions are displayed.
+
     Attributes
     ----------
-    scaling_groups: list[list[Variable]]
+    scaling_groups : list[list[Variable]]
         List containing sets of validated scaling groups.
-    nondimensional_functions: list[ModelFunction]
+    nondimensional_functions : list[ModelFunction]
         List with one nondimensional function for each scaling group.
 
     Methods
     -------
-    validate_scaling_variables()
-        Validates the starting set of scaling variables.
-    build_scaling_groups()
-        Builds scaling groups from the initial scaling variables.
-    build_nondimensional_functions()
-        Builds one nondimensional function for each scaling group.
     show_nondimensional_functions() = show()
         Displays scaling groups and respective nondimensional functions.
 
-    Alias
-    -----
-    NonDimModels
+    Raises
+    ------
+    ValueError
+        If the number of scaling variables is lower than necessary.
 
     Examples
     --------
-    Free fall motion:
-    First, consider the dimensions mass (M), length (L) and time (T).
-    Second, assume that z is height, m is mass, v is velocity, g is
-    gravitational acceleration, t is time, z0 is the initial height and
-    v0 is the initial velocity. Third, take the initial set of scaling
-    parameters formed by g, z0 and v0. Finally, the nondimensional
-    models (ndmodels) for the height z are built and displayed as:
+    * Free fall
+
+    Consider the dimensions mass ``M``, length ``L`` and time ``T``.
+    Next, assume that ``z`` is height, ``m`` is mass, ``v`` is velocity,
+    ``g`` is gravitational acceleration, ``t`` is time, ``z0`` is the
+    initial height and ``v0`` is the initial velocity. In addition, take
+    the initial set of scaling parameters formed by ``g``, ``z0`` and
+    ``v0``. Finally, the nondimensional models ``ndmodels`` for the
+    height ``z`` are built and displayed as:
+
     >>> from nodimo import Variable, NonDimensionalModels
     >>> z = Variable('z', L=1, dependent=True)
     >>> m = Variable('m', M=1)
@@ -280,24 +288,16 @@ class NonDimensionalModels(DimensionalModel):
     """
 
     def __init__(self, *variables: Variable, display_messages: bool = True):
-        """
-        Parameters
-        ----------
-        *variables: Variable
-            Variables that constitute the model.
-        display_messages: bool, optional (default=True)
-            If True, extra variables and dimensions are displayed.
-        """
 
         super().__init__(*variables, display_messages=display_messages)
 
-        self.validate_scaling_variables()
-        self.scaling_groups: list[list[Variable]] = self.build_scaling_groups()
+        self._validate_scaling_variables()
+        self.scaling_groups: list[list[Variable]] = self._build_scaling_groups()
         self.nondimensional_functions: list[ModelFunction] = (
-            self.build_nondimensional_functions()
+            self._build_nondimensional_functions()
         )
 
-    def validate_scaling_variables(self) -> None:
+    def _validate_scaling_variables(self) -> None:
         """Validates the starting set of scaling variables.
 
         This method validates the starting set of scaling variables. If
@@ -307,8 +307,7 @@ class NonDimensionalModels(DimensionalModel):
         Raises
         ------
         ValueError
-            If the model does not have the minimum number of scaling
-            variables.
+            If the number of scaling variables is lower than necessary.
         """
 
         # If no scaling variables are defined, all independent
@@ -326,12 +325,12 @@ class NonDimensionalModels(DimensionalModel):
                              f"{self.dimensional_matrix.rank_} "
                              f"scaling variables.")
 
-    def build_scaling_groups(self) -> list[list[Variable]]:
+    def _build_scaling_groups(self) -> list[list[Variable]]:
         """Builds scaling groups from the initial scaling variables.
 
         Returns
         -------
-        scaling_groups: list[list[Variable]]
+        scaling_groups : list[list[Variable]]
             List containing sets of validated scaling groups.
         """
 
@@ -353,12 +352,12 @@ class NonDimensionalModels(DimensionalModel):
 
         return scaling_groups
 
-    def build_nondimensional_functions(self) -> list[ModelFunction]:
+    def _build_nondimensional_functions(self) -> list[ModelFunction]:
         """Builds one nondimensional function for each scaling group.
 
         Returns
         -------
-        nondimensional_functions: list[ModelFunction]
+        nondimensional_functions : list[ModelFunction]
             List with one nondimensional function for each scaling
             group.
         """
