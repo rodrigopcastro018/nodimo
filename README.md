@@ -1,5 +1,5 @@
 <p align="center" width="100%">
-    <img src="docs/logo/logo_name_side.svg" alt="Nodimo Logo" width="200">
+    <img src="docs/logo/logo_name_side.svg" alt="Nodimo Logo" width="500">
 </p>
 
 ---
