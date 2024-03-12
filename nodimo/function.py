@@ -17,7 +17,7 @@ from typing import Union
 
 from nodimo.variable import Variable
 from nodimo.group import VariableGroup
-from nodimo._internal import _show_object
+from nodimo._internal import _is_running_on_jupyter, _show_object
 
 
 # Aliases for types used in ModelFunction.
@@ -139,4 +139,7 @@ class ModelFunction(Equality):
     def show(self) -> None:
         """Displays the function."""
 
-        _show_object(sp.latex(self, root_notation=False))
+        if _is_running_on_jupyter:
+            _show_object(sp.latex(self, root_notation=False))
+        else:
+            _show_object(self)
