@@ -59,7 +59,7 @@ def linkcode_resolve(domain, info):
 
 html_theme = 'furo'
 html_static_path = ['_static']
-html_logo = 'logo/nodimo_logo.png'
+html_logo = '_static/logo.svg'
 html_theme_options = {
     "footer_icons": [
         {
