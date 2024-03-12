@@ -2,8 +2,12 @@
 
 Variables
 ---------
-_is_running_on_jupyter: bool
-    If True, the package in running on jupyter notebooks.
+_is_running_on_jupyter : bool
+    If ``True``, the package in running on jupyter notebooks.
+color_warning : str
+    ANSI code for the warning message color.
+color_end : str
+    ANSI code to reset the color.
 
 Functions
 ---------
@@ -20,7 +24,7 @@ _build_dimensional_matrix(variables, dimensions=[])
 import sympy as sp
 from sympy import Matrix
 from typing import Any
-from .variables.variable import Variable
+from nodimo.variable import Variable
 
 
 try:
@@ -48,7 +52,7 @@ def _custom_display(obj_latex: str) -> None:
 
     Parameters
     ----------
-    obj_latex: str
+    obj_latex : str
         Latex representation of the object to be displayed.
     """
 
@@ -62,10 +66,10 @@ def _show_object(obj: Any, use_custom_css: bool = True) -> None:
 
     Parameters
     ----------
-    obj: Any
+    obj : Any
         The object to print.
-    use_custom_css: bool, optional (default=True)
-        If True, the object is displayed using custom css.
+    use_custom_css : bool, default=True
+        If ``True``, the object is displayed using custom css.
     """
 
     if _is_running_on_jupyter:
@@ -93,12 +97,12 @@ def _obtain_dimensions(*variables: Variable) -> list[str]:
 
     Parameters
     ----------
-    *variables: Variable
+    *variables : Variable
         Variables to get the dimensions extracted.
 
     Returns
     -------
-    dimensions: list[str]
+    dimensions : list[str]
         List containing the dimensions' names.
     """
 
@@ -121,15 +125,15 @@ def _build_dimensional_matrix(variables: list[Variable],
 
     Parameters
     ----------
-    variables: list[Variable]
+    variables : list[Variable]
         List with the variables used to build the dimensional matrix.
-    dimensions: list[str], optional (default=[])
+    dimensions : list[str], default=[]
         List with the dimensions' names of the given variables. If not
         provided, this list is obtained from the variables.
 
     Returns
     -------
-    dimensional_matrix: Matrix
+    dimensional_matrix : Matrix
         Matrix with one column for each variable, one row for each
         dimension, and every entry represents the dimension's exponent
         of a particular variable.

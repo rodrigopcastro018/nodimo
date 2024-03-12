@@ -1,5 +1,5 @@
 <p align="center" width="100%">
-    <img src="nodimo_logo.png" alt="Nodimo Logo">
+    <img src="docs/logo/nodimo_logo.png" alt="Nodimo Logo">
 </p>
 
 ---
@@ -44,7 +44,7 @@ When running Nodimo on the terminal, make sure that the terminal supports Unicod
 Simple pendulum:
 
 <p align="center" width="100%">
-    <img width="30%" src="simple_pendulum.png" alt="Simple Pendulum">
+    <img width="30%" src="docs/tutorials/drawings/01_simple_pendulum.svg" alt="Simple Pendulum">
 </p>
 
 The nondimensional model for the pendulum's period as a function of the other variables is built and displayed as:

@@ -8,25 +8,6 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../nodimo'))
 
-# from inspect import getsourcefile
-# # Get path to directory containing this file, conf.py.
-# DOCS_DIRECTORY = os.path.dirname(os.path.abspath(getsourcefile(lambda: 0)))
-# def ensure_pandoc_installed(_):
-#     import pypandoc
-#     # Download pandoc if necessary. If pandoc is already installed and on
-#     # the PATH, the installed version will be used. Otherwise, we will
-#     # download a copy of pandoc into docs/bin/ and add that to our PATH.
-#     pandoc_dir = os.path.join(DOCS_DIRECTORY, "bin")
-#     # Add dir containing pandoc binary to the PATH environment variable
-#     if pandoc_dir not in os.environ["PATH"].split(os.pathsep):
-#         os.environ["PATH"] += os.pathsep + pandoc_dir
-#     pypandoc.ensure_pandoc_installed(
-#         targetfolder=pandoc_dir,
-#         delete_installer=True,
-#     )
-# def setup(app):
-#     app.connect("builder-inited", ensure_pandoc_installed)
-
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
@@ -41,7 +22,9 @@ release = '1.1.0'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'nbsphinx',
+    'nbsphinx',  # This extension requires pandoc (pandoc.org)
+    'numpydoc',
+    'sphinx.ext.linkcode',
 ]
 
 templates_path = ['_templates']
@@ -51,8 +34,29 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 autodoc_inherit_docstrings = False
 autosummary_generate = False
 
+# numpydoc
+numpydoc_show_inherited_class_members = {
+    'nodimo.variable.Variable': False,
+    'nodimo.group.VariableGroup': False,
+    'nodimo.matrix.DimensionalMatrix': False,
+    'nodimo.function.ModelFunction': False,
+}
+
+# linkcode
+branch = 'docstrings'
+branch_url = f'https://github.com/rodrigopcastro018/nodimo/blob/{branch}'
+
+def linkcode_resolve(domain, info):
+    if domain != 'py':
+        return None
+    if not info['module']:
+        return None
+    filename = info['module'].replace('.', '/')
+    return f'{branch_url}/{filename}.py'
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'furo'
 html_static_path = ['_static']
+html_logo = 'logo/nodimo_logo.png'
