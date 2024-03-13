@@ -25,10 +25,11 @@ extensions = [
     'nbsphinx',  # This extension requires pandoc (pandoc.org)
     'numpydoc',
     'sphinx.ext.linkcode',
+    'IPython.sphinxext.ipython_console_highlighting',
 ]
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints']
 
 # autodoc
 autodoc_inherit_docstrings = False
