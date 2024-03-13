@@ -108,6 +108,7 @@ Currently, the documentation is being automatically built and hosted by `Read th
 
 Documentation status: |documentation status|
 
+
 .. _GitHub: https://github.com/rodrigopcastro018/nodimo
 .. _Git: https://git-scm.com/
 .. _mypy: https://mypy-lang.org/
