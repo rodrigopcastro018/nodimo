@@ -63,7 +63,7 @@ class VariableGroup(Mul):
     TypeError
         If the list of variables contains at least one not-Variable.
     ValueError
-        If the number of variables is lower than two.
+        If the number of different variables is lower than two.
     ValueError
         If the numbers of variables and exponents do not match.
     ValueError
@@ -173,8 +173,8 @@ class VariableGroup(Mul):
 
     @classmethod
     def _validate_variables_and_exponents(cls,
-                                         variables: list[Variable],
-                                         exponents: Matrix) -> None:
+                                          variables: list[Variable],
+                                          exponents: Matrix) -> None:
         """Validates provided variables and exponents.
 
         Parameters
@@ -189,7 +189,7 @@ class VariableGroup(Mul):
         TypeError
             If the list of variables contains at least one not-Variable.
         ValueError
-            If the number of variables is lower than two.
+            If the number of different variables is lower than two.
         ValueError
             If the numbers of variables and exponents do not match.
         ValueError
@@ -198,8 +198,8 @@ class VariableGroup(Mul):
         
         if not all(isinstance(var, Variable) for var in variables):
             raise TypeError("All variables must be of type Variable")
-        elif len(variables) < 2:
-            raise ValueError("Group must have at least two variables")
+        elif len(set(variables)) < 2:
+            raise ValueError("Group must have at least two distinct variables")
         elif len(variables) != sp.Mul(*exponents.shape):
             raise ValueError("Number of variables and exponents must match")
         elif exponents.shape[0] != 1:

@@ -105,7 +105,7 @@ class ModelFunction(Equality):
 
     @classmethod
     def _separate_variables(
-            cls, *variables: VariableOrGroup) -> SeparatedVariablesTuple:
+        cls, *variables: VariableOrGroup) -> SeparatedVariablesTuple:
         """Splits the list of variables in dependent and independent.
 
         Parameters
