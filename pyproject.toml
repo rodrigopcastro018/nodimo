@@ -42,7 +42,7 @@ dependencies = ['numpy>=1.0', 'sympy>=1.0']
 [project.optional-dependencies]
 test = ['mypy>=1.0', 'pytest>=6.2', 'nbmake>=1.0']
 dev = ['tox>=4.0', 'tox-pyenv-redux>=1.0']
-docs = ['sphinx>=7.2.6', 'furo>=2024.1.29', 'nbsphinx>=0.9.3', 'numpydoc>=1.6.0']
+docs = ['sphinx>=7.2.6', 'furo>=2024.1.29', 'nbsphinx>=0.9.3', 'numpydoc>=1.6.0', 'IPython>=8.8.0']
 
 [project.urls]
 'Source' = 'https://github.com/rodrigopcastro018/nodimo'

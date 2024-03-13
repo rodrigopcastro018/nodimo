@@ -22,10 +22,9 @@ release = '1.1.0'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'nbsphinx',  # This extension requires pandoc (pandoc.org)
+    'nbsphinx',  # This extension requires pandoc and IPython
     'numpydoc',
     'sphinx.ext.linkcode',
-    'IPython.sphinxext.ipython_console_highlighting',
 ]
 
 templates_path = ['_templates']
@@ -74,4 +73,5 @@ html_theme_options = {
             "class": "",
         },
     ],
+    "top_of_page_button": None,
 }
