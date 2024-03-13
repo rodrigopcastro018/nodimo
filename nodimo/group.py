@@ -173,8 +173,8 @@ class VariableGroup(Mul):
 
     @classmethod
     def _validate_variables_and_exponents(cls,
-                                         variables: list[Variable],
-                                         exponents: Matrix) -> None:
+                                          variables: list[Variable],
+                                          exponents: Matrix) -> None:
         """Validates provided variables and exponents.
 
         Parameters
