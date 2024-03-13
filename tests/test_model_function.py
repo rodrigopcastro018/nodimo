@@ -23,10 +23,11 @@ def test_function_creation():
     var1 = Variable('var1', d1=2, d2=3, dependent=True)
     var2 = Variable('var2', d1=0, dependent=True)
     var3 = Variable('var3', d1=-1, d2=0)
+    var4 = Variable('var4', d1=3, scaling=True)
 
     group1 = VariableGroup([var1, var2], [-1, 2])
     group2 = VariableGroup([var2, var3], [3, 5])
-    group3 = VariableGroup([var3, var3], [8, 7])
+    group3 = VariableGroup([var3, var4], [8, 7])
 
     with pytest.raises(ValueError):
         function1 = ModelFunction()

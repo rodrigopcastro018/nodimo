@@ -43,7 +43,7 @@ numpydoc_show_inherited_class_members = {
 }
 
 # linkcode
-branch = 'docs'
+branch = 'main'
 branch_url = f'https://github.com/rodrigopcastro018/nodimo/blob/{branch}'
 
 def linkcode_resolve(domain, info):

@@ -86,7 +86,7 @@ made with `jupyter notebook`_ were added to the documentation using the extensio
 
 To install all these dependencies, just execute::
 
-    pip install .[doc]
+    pip install .[docs]
 
 From the `docs` folder, create the `html` files by running:
 
