@@ -84,7 +84,10 @@ The documentation is built with `Sphinx`_, using `Furo`_ as a theme. Tutorials
 made with `jupyter notebook`_ were added to the documentation using the extension
 `nbsphinx`_, and docstrings follow the `numpydoc`_ standard.
 
-To install all these dependencies, just execute::
+To work properly, ``nbsphinx`` requires the installation of `IPython`_ and `pandoc`_.
+It's recommended to install the latter manually.
+
+To install all these dependencies (except ``pandoc``), just execute::
 
     pip install .[docs]
 
@@ -97,6 +100,13 @@ From the `docs` folder, create the `html` files by running:
 * on linux or mac::
 
     make html
+
+Read the Docs
+^^^^^^^^^^^^^
+
+Currently, the documentation is being automatically built and hosted by `Read the Docs`_.
+
+Documentation status: |documentation status|
 
 .. _GitHub: https://github.com/rodrigopcastro018/nodimo
 .. _Git: https://git-scm.com/
@@ -112,3 +122,10 @@ From the `docs` folder, create the `html` files by running:
 .. _jupyter notebook: https://github.com/jupyter/notebook
 .. _nbsphinx: https://nbsphinx.readthedocs.io/
 .. _numpydoc: https://numpydoc.readthedocs.io/
+.. _IPython: https://github.com/ipython/ipython
+.. _pandoc: https://pandoc.org/
+.. _Read the Docs: https://readthedocs.org/
+.. |documentation status| image:: https://readthedocs.org/projects/nodimo/badge/?version=latest
+    :target: https://nodimo.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+      

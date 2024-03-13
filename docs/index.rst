@@ -4,8 +4,8 @@
 Nodimo
 ======
 
-Nodimo generalizes dimensional relationships between variables by turning them
-into nondimensional expressions. It supports any number of dimensions and variables
+Nodimo generalizes a dimensional relationship between variables by turning it
+into a nondimensional expression. It supports any number of dimensions and variables
 and can be used for applications in science, engineering, economics and finance.
 The resulting nondimensional functions can be used as the basis for further studies
 in similarity and model testing.

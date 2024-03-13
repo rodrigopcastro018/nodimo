@@ -66,7 +66,12 @@ And the result is:
 \displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}
 ```
 
-For more applications and functionalities, check the documentation.
+For more applications and functionalities, check the [documentation](https://nodimo.readthedocs.io/).
+
+## Documentation status
+
+[![Documentation Status](https://readthedocs.org/projects/nodimo/badge/?version=latest)](https://nodimo.readthedocs.io/en/latest/?badge=latest)
+
 
 ## License
 Nodimo is open-source and released under the [MIT License](LICENSE)
