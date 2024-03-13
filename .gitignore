@@ -1,12 +1,23 @@
+# Virtual Environment
 venv
 
+# Python
 dist
 build
 nodimo.egg-info
 
-__pycache__
+# Pyenv
+.python-version
 
+# Coverage
 .coverage
 htmlcov
 
-.python-version
+# Vscode
+__pycache__
+
+# jupyter
+.ipynb_checkpoints
+
+# docs
+docs/_build

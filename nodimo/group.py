@@ -1,8 +1,13 @@
-"""This module contains the class to create a group of variables.
+"""
+====================================
+Variable Group (:mod:`nodimo.group`)
+====================================
+
+This module contains the class to create a group of variables.
 
 Classes
 -------
-VariableGroup = VarGroup
+VariableGroup
     Creates a product of variables, each raised to an exponent.
 """
 
@@ -11,7 +16,7 @@ import sympy as sp
 from sympy import Mul, Matrix
 from typing import Union
 
-from nodimo.variables.variable import Variable
+from nodimo.variable import Variable
 from nodimo._internal import _obtain_dimensions, _build_dimensional_matrix
 
 
@@ -27,39 +32,50 @@ class VariableGroup(Mul):
     dimensional characteristics of this group of variables are evaluated
     and stored as attributes.
 
+    Parameters
+    ----------
+    variables : list[Variable]
+        List of variables that constitute the group.
+    exponents : list or Matrix
+        List or matrix containing each variable's exponent.
+    check_inputs : bool, default=True
+        If ``True``, variables and exponents are validated.
+    check_dimensions : bool, default=True
+        If ``True``, dimensional properties are evaluated.
+
     Attributes
     ----------
-    variables: list[Variable]
+    variables : list[Variable]
         List of variables that constitute the group.
-    exponents: Matrix
+    exponents : Matrix
         Matrix containing each variable's exponent.
-    dimensions: dict[str, int]
+    dimensions : dict[str, int]
         Dictionary containing dimensions' names and exponents.
-    is_dependent: bool
-        If True, the group is dependent.
-    is_nondimensional: bool
-        If True, the group is nondimensional.
+    is_dependent : bool
+        If ``True``, the group is dependent.
+    is_nondimensional : bool
+        If ``True``, the group is nondimensional.
 
-    Methods
-    -------
-    convert_exponents(exponents)
-        Converts exponents from list to Matrix.
-    validate_variables_and_exponents(variables, exponents)
-        Validates provided variables and exponents.
-    get_dimensions()
-        Evaluates the dimensional properties of the group.
-
-    Alias
-    -----
-    VarGroup
-
+    Raises
+    ------
+    TypeError
+        If the type of ``exponents`` is not ``list`` or ``Matrix``.
+    TypeError
+        If the list of variables contains at least one not-Variable.
+    ValueError
+        If the number of variables is lower than two.
+    ValueError
+        If the numbers of variables and exponents do not match.
+    ValueError
+        If the exponents are not in a row matrix.
+        
     Examples
     --------
-    Reynolds number:
-    First, consider the dimensions mass (M), length (L) and time (T).
-    Second, assuming that V is velocity, D is characteristic length, rho
-    is density and mu is dynamic viscosity, the Reynolds number (Re) is
-    built as:
+    Consider the dimensions mass ``M``, length ``L`` and time ``T``.
+    Next, assuming that ``V`` is velocity, ``D`` is characteristic
+    length, ``rho`` is density and ``mu`` is dynamic viscosity, the
+    Reynolds number ``Re`` is built as:
+
     >>> from nodimo import Variable, VariableGroup
     >>> rho = Variable('rho', M=1, L=-3)
     >>> V = Variable('V', L=1, T=-1)
@@ -73,14 +89,14 @@ class VariableGroup(Mul):
                 exponents: ListOrMatrix,
                 check_inputs: bool = True,
                 check_dimensions: bool = True):
-        
-        exponents = cls.convert_exponents(exponents)
+
+        exponents = cls._convert_exponents(exponents)
 
         if check_inputs:
-            cls.validate_variables_and_exponents(variables, exponents)
+            cls._validate_variables_and_exponents(variables, exponents)
 
         # Flattening exponents_list.
-        exponents_list = cls.convert_exponents(exponents).tolist()
+        exponents_list = cls._convert_exponents(exponents).tolist()
         exponents_list = [exp
                           for explist in exponents_list
                           for exp in explist]
@@ -95,22 +111,10 @@ class VariableGroup(Mul):
                  exponents: ListOrMatrix,
                  check_inputs: bool = True,
                  check_dimensions: bool = True):
-        """
-        Parameters
-        ----------
-        variables: list[Variable]
-            List of variables that constitute the group.
-        exponents: list or Matrix
-            List or matrix containing each variable's exponent.
-        check_inputs: bool, optional (default=True)
-            If True, variables and exponents are validated.
-        check_dimensions: bool, optional (default=True)
-            If True, dimensional properties are evaluated.
-        """
 
         super().__init__()
         self.variables: list[Variable] = list(variables)
-        self.exponents: Matrix = self.convert_exponents(exponents)
+        self.exponents: Matrix = self._convert_exponents(exponents)
 
         # The group is dependent if it contains a dependent variable
         # with exponent.
@@ -130,28 +134,29 @@ class VariableGroup(Mul):
             # If all variables are nondimensional, there is no need to
             # determine the dimensional properties.
             if not self.is_nondimensional:
-                self.get_dimensions()
+                self._get_dimensions()
 
     @classmethod
-    def convert_exponents(cls, exponents: ListOrMatrix) -> Matrix:
-        """Converts a container of type list to the type Matrix.
+    def _convert_exponents(cls, exponents: ListOrMatrix) -> Matrix:
+        """Converts a container of type ``list`` to the type ``Matrix``.
 
         Parameters
         ----------
-        exponents: list or Matrix
+        exponents : list or Matrix
             A container with numbers.
 
         Returns
         -------
         new_exponents: Matrix
-            The exponents container converted to the type Matrix. If the
-            original container is already of the type Matrix, no
-            conversion is done and new_exponents is equal to exponents.
+            The ``exponents`` container converted to ``Matrix`` type. If
+            the original container is already of the type ``Matrix``, no
+            conversion is done and ``new_exponents`` is equal to
+            ``exponents``.
 
         Raises
         ------
         TypeError
-            If the type of exponents is not list or Matrix.
+            If the type of ``exponents`` is not ``list`` or ``Matrix``.
         """
 
         if not isinstance(exponents, (list, Matrix)):
@@ -167,7 +172,7 @@ class VariableGroup(Mul):
         return new_exponents
 
     @classmethod
-    def validate_variables_and_exponents(cls,
+    def _validate_variables_and_exponents(cls,
                                          variables: list[Variable],
                                          exponents: Matrix) -> None:
         """Validates provided variables and exponents.
@@ -200,7 +205,7 @@ class VariableGroup(Mul):
         elif exponents.shape[0] != 1:
             raise ValueError("Exponents must be in a row matrix")
 
-    def get_dimensions(self) -> None:
+    def _get_dimensions(self) -> None:
         """Evaluates the dimensional properties of the group."""
 
         # First, get dimensions names.

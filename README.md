@@ -1,5 +1,5 @@
 <p align="center" width="100%">
-    <img src="nodimo_logo.png" alt="Nodimo Logo">
+    <img src="docs/logo/logo_name_side.svg" alt="Nodimo Logo" width="500">
 </p>
 
 ---
@@ -32,7 +32,7 @@ Nodimo and its dependencies (`numpy` and `sympy`) are installed by:
 pip install nodimo
 ```
 
-Alternatively, Nodimo and dependencies can be installed via conda:
+Alternatively, Nodimo and dependencies can be installed via `conda`:
 ```shell
 conda install nodimo --channel rodrigopcastro018
 ```
@@ -41,22 +41,21 @@ When running Nodimo on the terminal, make sure that the terminal supports Unicod
 
 ## Getting started
 ### Basic example
-Simple pendulum:
+* Simple pendulum
 
 <p align="center" width="100%">
-    <img width="30%" src="simple_pendulum.png" alt="Simple Pendulum">
+    <img width="30%" src="docs/tutorials/drawings/01_simple_pendulum.svg" alt="Simple Pendulum">
 </p>
 
-The nondimensional model for the pendulum's period as a function of the other variables is built and displayed as:
+The nondimensional model for the pendulum's period `T` as a function of the other variables is built and displayed as:
 ```python
 from nodimo import Variable, NonDimensionalModel
 
-# Variables' dimensions: Mass (M), Length (L) and Time (T)
-T = Variable('T', M=0, L=0, T=1, dependent=True)  # period
-L = Variable('L', M=0, L=1, T=0, scaling=True)    # length
-m = Variable('m', M=1, L=0, T=0)                  # mass
-g = Variable('g', M=0, L=1, T=-2, scaling=True)   # gravity
-t0 = Variable('theta_0')                          # initial angle
+T = Variable('T', mass=0, length=0, time=1, dependent=True)  # period
+L = Variable('L', mass=0, length=1, time=0, scaling=True)    # length
+m = Variable('m', mass=1, length=0, time=0)                  # mass
+g = Variable('g', mass=0, length=1, time=-2, scaling=True)   # gravity
+t0 = Variable('theta_0')                                     # initial angle
 
 ndmodel = NonDimensionalModel(T, L, m, g, t0)
 ndmodel.show()
@@ -67,7 +66,7 @@ And the result is:
 \displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}
 ```
 
-For more functionalities and examples, check the documentation.
+For more applications and functionalities, check the documentation.
 
 ## License
 Nodimo is open-source and released under the [MIT License](LICENSE)

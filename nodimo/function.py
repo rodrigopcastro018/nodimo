@@ -1,4 +1,9 @@
-"""This module contains the class to creates model functions.
+"""
+=======================================
+Model Function (:mod:`nodimo.function`)
+=======================================
+
+This module contains the class to creates model functions.
 
 Classes
 -------
@@ -10,9 +15,9 @@ import sympy as sp
 from sympy import Equality
 from typing import Union
 
-from nodimo.variables.variable import Variable
-from nodimo.variables.group import VariableGroup
-from nodimo._internal import _show_object
+from nodimo.variable import Variable
+from nodimo.group import VariableGroup
+from nodimo._internal import _is_running_on_jupyter, _show_object
 
 
 # Aliases for types used in ModelFunction.
@@ -27,29 +32,39 @@ class ModelFunction(Equality):
     expresses a relationship between the variables or variable groups
     that constitute a model.
 
+    Parameters
+    ----------
+    *variables : Variable or VariableGroup
+        Variables or groups that constitute the function.
+    name : str, default='f'
+        Name that represents the function in symbolic expression.
+
     Attributes
     ----------
-    variables: list[Variable or VariableGroup]
+    variables : list[Variable or VariableGroup]
         List of variables or groups used in the function.
-    dependent_variable: Variable or VariableGroup
+    dependent_variable : Variable or VariableGroup
         Dependent variable or group.
-    independent_variables: list[Variable or VariableGroup]
+    independent_variables : list[Variable or VariableGroup]
         List of independent variables or groups.
 
     Methods
     -------
-    separate_variables(*variables)
-        Splits the list of variables in dependent and independent.
     show()
         Displays the function.
 
+    Raises
+    ------
+    ValueError
+        If there is less or more than one dependent variable.
+
     Examples
-    -------
-    Newton's second law:
-    First, consider the dimensions mass (M), length (L) and time (T).
-    Second, assuming that F is force, m is mass and a is acceleration,
-    the function h that relates and displays these three variables is
-    built and displayed as:
+    --------
+    Consider the dimensions mass ``M``, length ``L`` and time ``T``.
+    Next, assuming that ``F`` is force, ``m`` is mass and ``a`` is
+    acceleration, the function ``h`` that relates these three variables
+    is built and displayed as:
+
     >>> from nodimo import Variable, ModelFunction
     >>> F = Variable('F', M=1, L=1, T=-2, dependent=True)
     >>> m = Variable('m', M=1)
@@ -62,7 +77,7 @@ class ModelFunction(Equality):
         (
             dependent_variable,
             independent_variables
-        ) = cls.separate_variables(*variables)
+        ) = cls._separate_variables(*variables)
 
         (
             independent_variables_function
@@ -74,14 +89,6 @@ class ModelFunction(Equality):
                                evaluate=False)
 
     def __init__(self, *variables: VariableOrGroup, name: str = 'f'):
-        """
-        Parameters
-        ----------
-        *variables: Variable or VariableGroup
-            Variables or groups that constitute the function.
-        name: str, optional (default='f')
-            Name that represents the function in symbolic expression.
-        """
 
         self.variables: list[VariableOrGroup] = list(variables)
         self.dependent_variable: VariableOrGroup
@@ -90,23 +97,25 @@ class ModelFunction(Equality):
         (
             self.dependent_variable,
             self.independent_variables
-        ) = self.separate_variables(*self.variables)
+        ) = self._separate_variables(*self.variables)
+
+        self.latex: str = sp.latex(self, root_notation=False)
 
     @classmethod
-    def separate_variables(
+    def _separate_variables(
             cls, *variables: VariableOrGroup) -> SeparatedVariablesTuple:
         """Splits the list of variables in dependent and independent.
 
         Parameters
         ----------
-        *variables: Variable or VariableGroup
+        *variables : Variable or VariableGroup
             Variables or groups that constitute the function.
 
         Returns
         -------
-        dependent_variable: Variable
+        dependent_variable : Variable
             Dependent variable or group.
-        independent_variables: list[Variable]
+        independent_variables : list[Variable]
             List of independent variables or groups.
 
         Raises
@@ -132,4 +141,7 @@ class ModelFunction(Equality):
     def show(self) -> None:
         """Displays the function."""
 
-        _show_object(sp.latex(self, root_notation=False))
+        if _is_running_on_jupyter:
+            _show_object(self.latex)
+        else:
+            _show_object(self)
