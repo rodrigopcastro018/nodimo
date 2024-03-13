@@ -99,6 +99,8 @@ class ModelFunction(Equality):
             self.independent_variables
         ) = self._separate_variables(*self.variables)
 
+        self.latex: str = sp.latex(self, root_notation=False)
+
     @classmethod
     def _separate_variables(
             cls, *variables: VariableOrGroup) -> SeparatedVariablesTuple:
@@ -140,6 +142,6 @@ class ModelFunction(Equality):
         """Displays the function."""
 
         if _is_running_on_jupyter:
-            _show_object(sp.latex(self, root_notation=False))
+            _show_object(self.latex)
         else:
             _show_object(self)

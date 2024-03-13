@@ -154,14 +154,10 @@ class DimensionalMatrix(Matrix):
     def show(self) -> None:
         """Displays the labeled dimensional matrix."""
 
-        dimensional_matrix: Union[str, Matrix]
-
         if _is_running_on_jupyter:
-            dimensional_matrix = self.latex
+            _show_object(self.latex)
         else:
-            dimensional_matrix = self.labeled_matrix
-
-        _show_object(dimensional_matrix)
+            _show_object(self.labeled_matrix)
 
 
 # Alias for DimensionalMatrix.

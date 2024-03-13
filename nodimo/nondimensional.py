@@ -271,9 +271,9 @@ class NonDimensionalModels(DimensionalModel):
     Next, assume that ``z`` is height, ``m`` is mass, ``v`` is velocity,
     ``g`` is gravitational acceleration, ``t`` is time, ``z0`` is the
     initial height and ``v0`` is the initial velocity. In addition, take
-    the initial set of scaling parameters formed by ``g``, ``z0`` and
-    ``v0``. Finally, the nondimensional models ``ndmodels`` for the
-    height ``z`` are built and displayed as:
+    the set of scaling parameters formed by ``g``, ``z0`` and ``v0``.
+    Finally, the nondimensional models ``ndmodels`` for the height ``z``
+    are built and displayed as:
 
     >>> from nodimo import Variable, NonDimensionalModels
     >>> z = Variable('z', L=1, dependent=True)

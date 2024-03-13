@@ -27,6 +27,8 @@ from typing import Any
 from nodimo.variable import Variable
 
 
+_is_running_on_jupyter: bool
+
 try:
     from IPython import get_ipython
 
@@ -39,8 +41,8 @@ except:
 
 
 # ANSI color codes
-color_warning = '\033[93m'
-color_end = '\033[0m'
+color_warning: str = '\033[93m'
+color_end: str = '\033[0m'
 
 
 def _custom_display(obj_latex: str) -> None:

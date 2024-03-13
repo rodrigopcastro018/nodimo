@@ -4,6 +4,9 @@
 Contributing
 ============
 
+This section provides some instructions for those who want to contribute with
+the development of Nodimo.
+
 Development Environment
 -----------------------
 
@@ -27,31 +30,31 @@ Activate the virtual environment by running::
 
     venv/scripts/activate
 
-And install ``nodimo`` in editable mode with::
+From the repository folder, install Nodimo in editable mode with::
 
     pip install -e .
 
 Testing
 -------
 
-To instal ``nodimo`` dependencies for testing, run::
+To install Nodimo testing dependencies, run::
 
     pip install .[test]
 
-``nodimo`` contains type hints that can be checked with `mypy`_ by running::
+Nodimo contains type hints that can be checked with `mypy`_ by running::
 
     mypy
 
-Main functionalities can be tested with `pytest`_, by executing::
+Main functionalities can be tested with `pytest`_ by executing::
 
     pytest
 
-The `nbmake`_ plugin is responsible for testing the `*.ipynb` files in the `tests` folder.
+The `nbmake`_ plugin is responsible for testing the `ipynb` files in the `tests` folder.
 
 Testing multiple environments
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``nodimo`` can be tested for multiple versions of its dependencies and python.
+Nodimo can be tested for multiple versions of its dependencies and python.
 
 Multiple python versions can be installed with `pyenv`_ (or `pyenv-win`_ for windows).
 After installing ``pyenv``, install the desired versions of python by running::
@@ -64,11 +67,11 @@ And set them to local with::
 
 The package `tox`_ is used for test automation. It's recommended to follow the
 instructions in the website on how to install it. During the development of
-``nodimo`` on windows, it was also necessary the installation of `tox-pyenv-redux`_
-to enable the discovery of the ``pyenv`` python environemnts by tox.
+Nodimo on windows, it was also necessary the installation of `tox-pyenv-redux`_
+to enable the discovery of the ``pyenv`` python environments by ``tox``.
 
 With ``tox`` configurations already contained in the setup file `pyproject.toml`, 
-all that remains is to run::
+all that remains is to run, in the repository folder::
 
     tox
 
@@ -95,7 +98,7 @@ From the `docs` folder, create the `html` files by running:
 
     make html
 
-.. _GitHub: https://github.com/
+.. _GitHub: https://github.com/rodrigopcastro018/nodimo
 .. _Git: https://git-scm.com/
 .. _mypy: https://mypy-lang.org/
 .. _pytest: https://docs.pytest.org/

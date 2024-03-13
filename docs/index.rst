@@ -37,4 +37,4 @@ Basic information necessary to contribute to Nodimo.
    installation.rst
    tutorials/index.rst
    classes/index.rst
-   contributing/contributing.rst
+   contributing.rst
