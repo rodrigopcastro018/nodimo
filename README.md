@@ -32,7 +32,7 @@ Nodimo and its dependencies (`numpy` and `sympy`) are installed by:
 pip install nodimo
 ```
 
-Alternatively, Nodimo and dependencies can be installed via conda:
+Alternatively, Nodimo and dependencies can be installed via `conda`:
 ```shell
 conda install nodimo --channel rodrigopcastro018
 ```

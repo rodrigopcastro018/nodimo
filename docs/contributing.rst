@@ -109,6 +109,6 @@ From the `docs` folder, create the `html` files by running:
 .. _tox-pyenv-redux: https://github.com/un-def/tox-pyenv-redux
 .. _Sphinx: https://www.sphinx-doc.org/
 .. _Furo: https://github.com/pradyunsg/furo
-.. _jupyter notebook: https://jupyter.org/
+.. _jupyter notebook: https://github.com/jupyter/notebook
 .. _nbsphinx: https://nbsphinx.readthedocs.io/
 .. _numpydoc: https://numpydoc.readthedocs.io/
