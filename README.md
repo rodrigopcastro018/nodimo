@@ -7,7 +7,7 @@
 <p align="center">
     <a href="https://pypi.org/project/nodimo" alt="Python">
         <img src="https://img.shields.io/badge/python-3-green" /></a>
-    <a href="" alt="Documentation">
+    <a href="https://nodimo.readthedocs.io/" alt="Documentation">
         <img src="https://img.shields.io/badge/docs-view-8A2BE2" /></a>
     <a href="https://pypi.org/project/nodimo" alt="PyPI Downloads">
         <img src="https://img.shields.io/pypi/dm/nodimo?color=blue" /></a>
