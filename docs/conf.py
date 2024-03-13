@@ -76,4 +76,4 @@ html_theme_options = {
     "top_of_page_button": None,
 }
 
-html_favicon = 'logo/logo_favico32.png'
+html_favicon = 'logo/logo_favico.png'
