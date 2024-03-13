@@ -198,8 +198,8 @@ class VariableGroup(Mul):
         
         if not all(isinstance(var, Variable) for var in variables):
             raise TypeError("All variables must be of type Variable")
-        elif len(variables) < 2:
-            raise ValueError("Group must have at least two variables")
+        elif len(set(variables)) < 2:
+            raise ValueError("Group must have at least two distinct variables")
         elif len(variables) != sp.Mul(*exponents.shape):
             raise ValueError("Number of variables and exponents must match")
         elif exponents.shape[0] != 1:
