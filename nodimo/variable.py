@@ -93,6 +93,19 @@ class Variable(Symbol):
         self.is_nondimensional: bool = all(dim == 0
                                            for dim in self.dimensions.values())
 
+        self._validate_variable()
+
+    def _validate_variable(self) -> None:
+        """Validates variable's arguments.
+        
+        Raises
+        ------
+        ValueError
+            If the variable is set as both dependent and scaling.
+        ValueError
+            If the variable is set as scaling, but with no dimensions.
+        """
+
         if self.is_dependent and self.is_scaling:
             raise ValueError(
                 "A variable can not be both dependent and scaling")

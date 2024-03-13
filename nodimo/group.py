@@ -63,7 +63,7 @@ class VariableGroup(Mul):
     TypeError
         If the list of variables contains at least one not-Variable.
     ValueError
-        If the number of variables is lower than two.
+        If the number of different variables is lower than two.
     ValueError
         If the numbers of variables and exponents do not match.
     ValueError
@@ -189,7 +189,7 @@ class VariableGroup(Mul):
         TypeError
             If the list of variables contains at least one not-Variable.
         ValueError
-            If the number of variables is lower than two.
+            If the number of different variables is lower than two.
         ValueError
             If the numbers of variables and exponents do not match.
         ValueError
