@@ -47,7 +47,7 @@ class ModelFunction(Equality):
         Dependent variable or group.
     independent_variables : list[Variable or VariableGroup]
         List of independent variables or groups.
-    latex: str
+    latex : str
         String that represents the function in latex format.
 
     Methods
