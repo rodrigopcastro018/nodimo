@@ -72,6 +72,5 @@ For more applications and functionalities, check the [documentation](https://nod
 
 [![Documentation Status](https://readthedocs.org/projects/nodimo/badge/?version=latest)](https://nodimo.readthedocs.io/en/latest/?badge=latest)
 
-
 ## License
 Nodimo is open-source and released under the [MIT License](LICENSE)

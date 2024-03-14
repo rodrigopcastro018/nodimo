@@ -59,7 +59,7 @@ ignore_missing_imports = 'True'
 [tool.pytest.ini_options]
 minversion = '6.2'
 addopts = '--nbmake'
-testpaths = ['tests']
+testpaths = ['tests', 'docs/tutorials']
 
 [tool.tox]
 legacy_tox_ini = """
