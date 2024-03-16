@@ -43,3 +43,22 @@ def test_function_creation():
     
     with pytest.raises(ValueError):
         function5 = ModelFunction(group1, group2)
+
+
+def test_function_display(capfd):
+    var1 = Variable('var1', d1=1, d2=-1)
+    var2 = Variable('var2', d1=2, d2=-3, dependent=True)
+    var3 = Variable('var3', d1=5, d2=-7)
+    group = VariableGroup([var1, var3], [5,-1])
+
+    mfunction = ModelFunction(var1, var2, group)
+
+    mfunction.show()
+    out, _ = capfd.readouterr()
+    assert out == (''
+                   '\n'
+                   '        ⎛          5⎞\n'
+                   '        ⎜      var₁ ⎟\n'
+                   'var₂ = f⎜var₁, ─────⎟\n'
+                   '        ⎝       var₃⎠\n'
+                   '\n')

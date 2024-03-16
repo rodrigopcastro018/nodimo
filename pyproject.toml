@@ -58,7 +58,7 @@ ignore_missing_imports = 'True'
 
 [tool.pytest.ini_options]
 minversion = '6.2'
-addopts = '--nbmake'
+addopts = '--nbval --cov=nodimo --cov-report html:cov_html'
 testpaths = ['tests', 'docs/tutorials']
 
 [tool.tox]

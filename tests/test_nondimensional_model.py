@@ -90,3 +90,22 @@ def test_special_case():
     group3 = VariableGroup([var1, var2, var3, var4, var5], [0, 0, 1, 5, 3])
 
     assert ndmodel.nondimensional_groups == [group1, group2, group3]
+
+
+def test_nondimensional_model_display(capfd):
+    F = Variable('F', M=1, L=1, T=-2, dependent=True)
+    rho = Variable('rho', M=1, L=-3, T=0, scaling=True)
+    U = Variable('U', M=0, L=1, T=-1, scaling=True)
+    mu = Variable('mu', M=1, L=-1, T=-1)
+    D = Variable('D', M=0, L=1, T=0, scaling=True)
+
+    ndmodel = NonDimensionalModel(F, rho, U, mu, D)
+
+    ndmodel.show()
+    out, _ = capfd.readouterr()
+    assert out == ('\n'
+                   '   F       ⎛  μ  ⎞\n'
+                   '─────── = Π⎜─────⎟\n'
+                   ' 2  2      ⎝D⋅U⋅ρ⎠\n'
+                   'D ⋅U ⋅ρ           \n'
+                   '\n')
