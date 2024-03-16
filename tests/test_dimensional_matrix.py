@@ -1,3 +1,4 @@
+import sys
 import sympy as sp
 from nodimo import Variable, VariableGroup, DimensionalMatrix
 
@@ -86,3 +87,19 @@ def test_rank():
     assert dmatrix5.rank_ == 4
     assert dmatrix6.rank_ == 4
     assert dmatrix7.rank_ == 4
+
+
+def test_matrix_display(capfd):
+    var1 = Variable('var1', d1=-1, d2=3)
+    var2 = Variable('var2', d1=4, d2=-2, dependent=True)
+    dmatrix = DimensionalMatrix(var1, var2)
+
+    dmatrix.show()
+    out, _ = capfd.readouterr()
+    assert out == ('\n'
+                   '⎡    var₁  var₂⎤\n'
+                   '⎢              ⎥\n'
+                   '⎢d₁   -1    4  ⎥\n'
+                   '⎢              ⎥\n'
+                   '⎣d₂   3     -2 ⎦\n'
+                   '\n')

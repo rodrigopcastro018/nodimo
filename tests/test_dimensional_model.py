@@ -73,3 +73,22 @@ def test_model_creation():
     
     with pytest.raises(ValueError):
         dmodel2 = DimensionalModel(var2, var3, var4, display_messages=False)
+
+
+def test_dimensional_model_display(capfd):
+    P = Variable('P', T=1, dependent=True)
+    m = Variable('m', M=1)
+    g = Variable('g', L=1, T=-2, scaling=True)
+    R = Variable('R', L=1, scaling=True)
+    t0 = Variable('theta0')
+    dmodel = DimensionalModel(P, m, g, R, t0)
+
+    dmodel.show()
+    out, _ = capfd.readouterr()
+    assert out == ('\x1b[93mVariables that can not be part of the model:\x1b[0m\n'
+                   '\x1b[93m    m\x1b[0m\n'
+                   '\x1b[93mDimensions that can not be part of the model:\x1b[0m\n'
+                   '\x1b[93m    M\x1b[0m\n'
+                   '\n'
+                   'P = π(g, R, θ₀)\n'
+                   '\n')

@@ -70,3 +70,50 @@ def test_nondimensional_models():
                                     display_messages=False)
 
     assert ndmodels.nondimensional_functions == ndfunctions
+
+
+def test_nondimensional_models_display(capfd):
+    z = Variable('z', L=1, dependent=True)
+    m = Variable('m', M=1)
+    v = Variable('v', L=1, T=-1)
+    g = Variable('g', L=1, T=-2, scaling=True)
+    t = Variable('t', T=1)
+    z0 = Variable('z_0', L=1, scaling=True)
+    v0 = Variable('v_0', L=1, T=-1, scaling=True)
+
+    ndmodels = NonDimensionalModels(z, m, v, g, t, z0, v0,
+                                    display_messages=False)
+
+    ndmodels.show()
+    out, _ = capfd.readouterr()
+    assert out == ('\n'
+                   'Scaling group 1: g, z₀\n'
+                   '\n'
+                   '\n'
+                   '      ⎛             1/2              ⎞\n'
+                   'z     ⎜    v       g   ⋅t      v₀    ⎟\n'
+                   '── = Π⎜──────────, ──────, ──────────⎟\n'
+                   'z₀    ⎜ 1/2   1/2    1/2    1/2   1/2⎟\n'
+                   '      ⎝g   ⋅z₀     z₀      g   ⋅z₀   ⎠\n'
+                   '\n'
+                   + '-' * 78 + '\n'
+                   '\n'
+                   'Scaling group 2: g, v₀\n'
+                   '\n'
+                   '\n'
+                   'g⋅z    ⎛v   g⋅t  g⋅z₀⎞\n'
+                   '─── = Π⎜──, ───, ────⎟\n'
+                   '  2    ⎜v₀   v₀    2 ⎟\n'
+                   'v₀     ⎝         v₀  ⎠\n'
+                   '\n'
+                    + '-' * 78 + '\n'
+                   '\n'
+                   'Scaling group 3: z₀, v₀\n'
+                   '\n'
+                   '\n'
+                   'z     ⎛v   t⋅v₀  g⋅z₀⎞\n'
+                   '── = Π⎜──, ────, ────⎟\n'
+                   'z₀    ⎜v₀   z₀     2 ⎟\n'
+                   '      ⎝          v₀  ⎠\n'
+                   '\n'
+                   + '-' * 78 + '\n')

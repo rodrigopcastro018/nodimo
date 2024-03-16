@@ -35,7 +35,7 @@ try:
     _is_running_on_jupyter = True if get_ipython() is not None else False
     if not _is_running_on_jupyter:
         raise
-    from IPython.display import display, Markdown, HTML
+    from IPython.display import display, Markdown, Math, HTML
 except:
     _is_running_on_jupyter = False
 
@@ -78,7 +78,7 @@ def _show_object(obj: Any, use_custom_css: bool = True) -> None:
         if use_custom_css:
             _custom_display(obj)
         else:
-            display(obj)
+            display(Math(obj))
     else:
         print()
         sp.pprint(obj, root_notation=False)
@@ -91,7 +91,7 @@ def _print_horizontal_line() -> None:
     if _is_running_on_jupyter:
         display(Markdown('<hr>'))
     else:
-        sp.pprint(78 * '-')
+        print(78 * '-')
 
 
 def _obtain_dimensions(*variables: Variable) -> list[str]:

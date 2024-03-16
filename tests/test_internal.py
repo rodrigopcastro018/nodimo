@@ -1,11 +1,42 @@
 import sympy as sp
 from nodimo import Variable, VariableGroup
-from nodimo._internal import (_obtain_dimensions, _build_dimensional_matrix,
-                              _is_running_on_jupyter)
+from nodimo._internal import (_is_running_on_jupyter,
+                              _show_object,
+                              _print_horizontal_line,
+                              _obtain_dimensions,
+                              _build_dimensional_matrix)
 
 
 def test_environment():
     assert not _is_running_on_jupyter
+
+
+def test_show_object(capfd):
+    var1 = Variable('var1', d1=1, d2=2, dependent=True)
+    var2 = Variable('var2', d1=-2, d2=3)
+    group = VariableGroup([var1, var2], [-2,3])
+
+    _show_object(var1)
+    out_var1, _ = capfd.readouterr()
+
+    _show_object(group)
+    out_group, _ = capfd.readouterr()
+
+    assert out_var1 == '\nvar₁\n\n'
+    assert out_group == ('\n'
+                         '    3\n'
+                         'var₂ \n'
+                         '─────\n'
+                         '    2\n'
+                         'var₁ \n'
+                         '\n')
+
+
+def test_horizontal_line(capfd):
+    _print_horizontal_line()
+    out, _ = capfd.readouterr()
+
+    assert out == 78 * '-' + '\n'
 
 
 def test_obtain_dimensions():
