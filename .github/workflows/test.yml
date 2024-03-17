@@ -1,18 +1,13 @@
 name: Test
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    types: [opened, synchronize]
+on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.11"]
       fail-fast: false
 
     steps:
