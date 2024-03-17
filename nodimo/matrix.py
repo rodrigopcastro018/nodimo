@@ -151,11 +151,16 @@ class DimensionalMatrix(Matrix):
 
         return latex_representation
 
+    def _repr_latex_(self) -> str:
+        """Latex representation for IPython display."""
+
+        return f'$\displaystyle {self.latex}$'
+    
     def show(self) -> None:
         """Displays the labeled dimensional matrix."""
 
         if _is_running_on_jupyter:
-            _show_object(self.latex)
+            _show_object(self)
         else:
             _show_object(self.labeled_matrix)
 

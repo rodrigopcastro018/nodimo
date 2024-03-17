@@ -16,6 +16,7 @@ NonDimensionalModels
 import sympy as sp
 from sympy import Matrix
 from itertools import combinations
+from IPython.display import Math
 
 from nodimo.variable import Variable
 from nodimo.group import VariableGroup
@@ -401,16 +402,16 @@ class NonDimensionalModels(DimensionalModel):
                 scaling_group_latex = R',\ '.join([sp.latex(var) for var in
                                                    self.scaling_groups[i]])
                 
-                scaling_group = (R'\text{Scaling group }'
-                                 + str(i + 1)
-                                 + R'\text{:}\ '
-                                 + scaling_group_latex)
+                scaling_group = Math(R'\text{Scaling group }'
+                                     + str(i + 1)
+                                     + R'\text{:}\ '
+                                     + scaling_group_latex)
             else:
                 scaling_group_str = sp.pretty(self.scaling_groups[i])[1:-1]
                 
                 scaling_group = f"Scaling group {i + 1}: " + scaling_group_str
 
-            _show_object(scaling_group)
+            _show_object(scaling_group, use_custom_css=False)
             function.show()
             _print_horizontal_line()
 
