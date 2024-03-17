@@ -35,7 +35,7 @@ try:
     _is_running_on_jupyter = True if get_ipython() is not None else False
     if not _is_running_on_jupyter:
         raise
-    from IPython.display import display, Markdown, Math, HTML
+    from IPython.display import display, Markdown, HTML
 except:
     _is_running_on_jupyter = False
 
@@ -45,7 +45,7 @@ color_warning: str = '\033[93m'
 color_end: str = '\033[0m'
 
 
-def _custom_display(obj_latex: str) -> None:
+def _custom_display(obj: Any) -> None:
     """Displays object using a custom CSS style.
 
     This custom display function was created to avoid vertical scrolling
@@ -54,13 +54,15 @@ def _custom_display(obj_latex: str) -> None:
 
     Parameters
     ----------
-    obj_latex : str
-        Latex representation of the object to be displayed.
+    obj : Any
+        The object to print.
     """
 
-    css_style = '<style>.output{overflow: visible !important}</style>'
+    css_style = ('<style>.jp-OutputArea-output{'
+        'overflow-y: hidden;'
+    '}</style>')
 
-    display(HTML(css_style + '$$' + obj_latex + '$$'))
+    display(HTML(css_style + f'${obj._repr_latex_()}$'))
 
 
 def _show_object(obj: Any, use_custom_css: bool = True) -> None:
@@ -78,7 +80,7 @@ def _show_object(obj: Any, use_custom_css: bool = True) -> None:
         if use_custom_css:
             _custom_display(obj)
         else:
-            display(Math(obj))
+            display(obj)
     else:
         print()
         sp.pprint(obj, root_notation=False)
