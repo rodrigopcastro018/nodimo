@@ -58,8 +58,14 @@ ignore_missing_imports = 'True'
 
 [tool.pytest.ini_options]
 minversion = '6.2'
-addopts = '--nbval --cov=nodimo --cov-report html:cov_html'
+addopts = '--nbval --cov=nodimo --cov-report html:coverage/cov_html'
 testpaths = ['tests', 'docs/tutorials']
+
+[tool.coverage.run]
+data_file = 'coverage/.coverage'
+
+[tool.coverage.html]
+directory = 'coverage/htmlcov'
 
 [tool.tox]
 legacy_tox_ini = """

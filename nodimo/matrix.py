@@ -154,7 +154,7 @@ class DimensionalMatrix(Matrix):
     def _repr_latex_(self) -> str:
         """Latex representation for IPython display."""
 
-        return f'$\displaystyle {self.latex}$'
+        return f'$\\displaystyle {self.latex}$'
     
     def show(self) -> None:
         """Displays the labeled dimensional matrix."""

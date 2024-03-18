@@ -10,8 +10,7 @@ nodimo.egg-info
 .python-version
 
 # Coverage
-.coverage
-htmlcov
+coverage
 
 # Vscode
 __pycache__
