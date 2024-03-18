@@ -23,11 +23,11 @@ jobs:
       
       - name: Run pytest
         run: pytest
-        env:
-          COVERAGE_FILE: coverage/.coverage.${{ runner.os }}-py${{ matrix.python-version }}
+        # env:
+        #   COVERAGE_FILE: coverage/.coverage.${{ runner.os }}-py${{ matrix.python-version }}
 
       - name: Upload coverage html files
         uses: actions/upload-artifact@v4
         with:
           name: coverage-html
-          path: coverage/cov_html
+          path: coverage/cov_html.${{ runner.os }}-py${{ matrix.python-version }}
