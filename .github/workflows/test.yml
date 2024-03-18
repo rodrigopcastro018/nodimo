@@ -37,5 +37,7 @@ jobs:
       - name: Upload coverage html files
         uses: actions/upload-artifact@v4
         with:
-          name: coverage_html
-          path: coverage/cov_html
+          # name: coverage_html
+          # path: coverage/cov_html
+          name: coverage_data_files
+          path: coverage
