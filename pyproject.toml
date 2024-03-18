@@ -58,10 +58,11 @@ ignore_missing_imports = 'True'
 
 [tool.pytest.ini_options]
 minversion = '6.2'
-addopts = '--nbval --cov=nodimo --cov-report html:coverage/cov_html'
+addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report html:coverage/cov_html'  # NOTE: remember this issue: https://github.com/computationalmodelling/nbval/issues/103
 testpaths = ['tests', 'docs/tutorials']
 
 [tool.coverage.run]
+source = ['nodimo']
 data_file = 'coverage/.coverage'
 
 [tool.coverage.html]
