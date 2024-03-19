@@ -65,6 +65,10 @@ testpaths = ['tests', 'docs/tutorials']
 source = ['nodimo']
 data_file = 'coverage/.coverage'
 context = '${CONTEXT}'
+relative_files = 'True'
+
+[tool.coverage.paths]
+source = ['nodimo']
 
 [tool.coverage.html]
 directory = 'coverage/htmlcov'
