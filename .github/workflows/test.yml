@@ -62,6 +62,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
       - name: Download coverage files
         uses: actions/download-artifact@v4
         with:
@@ -69,10 +76,16 @@ jobs:
           pattern: coverage-*
           merge-multiple: true
       
-      - run: coverage combine coverage
-      - run: coverage html --show-contexts --title "Coverage for ${{ github.sha }}"
+      - name: Install coverage
+        run: pip install coverage[toml]
+      
+      - name: Coverage combine
+        run: coverage combine coverage
+      
+      - name: Generate combined coverage HTML
+        run: coverage html --show-contexts --title "Coverage for ${{ github.sha }}"
 
-      - name: Store coverage HTML
+      - name: Store combined coverage HTML
         uses: actions/upload-artifact@v4
         with:
           name: coverage_html
