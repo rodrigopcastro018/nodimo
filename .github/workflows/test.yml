@@ -58,7 +58,7 @@ jobs:
   combine_coverage:
 
     name: Combine Coverage
-    needs: test
+    needs: merge_coverage
     runs-on: ubuntu-latest
 
     steps:
