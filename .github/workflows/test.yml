@@ -40,20 +40,40 @@ jobs:
           name: coverage-${{ runner.os }}-py${{ matrix.python-version }}
           path: coverage
 
-  merge_coverage:
+  # merge_coverage:
 
-    name: Merge Coverage
+  #   name: Merge Coverage
+  #   needs: test
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+
+  #     - name: Merge Coverage
+  #       uses: actions/upload-artifact/merge@v4
+  #       with:
+  #         name: coverage
+  #         pattern: coverage-*
+  #         delete-merged: true
+
+  combine_coverage:
+
+    name: Combine Coverage
     needs: test
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Merge Coverage
-        uses: actions/upload-artifact/merge@v4
+      - name: Download coverage files
+        uses: actions/download-artifact@v4
         with:
-          name: coverage
+          path: coverage
           pattern: coverage-*
-          delete-merged: true
+          merge-multiple: true
+      
+      - run: coverage combine coverage
+      - run: coverage html --show-contexts --title "Coverage for ${{ github.sha }}"
 
-  # coverage-combine:
-  #   needs:
+      - name: Store coverage HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage_html
+          path: coverage/htmlcov
