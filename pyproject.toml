@@ -59,7 +59,6 @@ ignore_missing_imports = 'True'
 [tool.pytest.ini_options]
 minversion = '6.2'
 addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report=term-missing'  # https://github.com/computationalmodelling/nbval/issues/103
-# addopts = '--nbval --cov-config=pyproject.toml --cov-report=term-missing'
 testpaths = ['tests', 'docs/tutorials']
 
 [tool.coverage.run]
@@ -78,15 +77,15 @@ directory = 'coverage/htmlcov'
 legacy_tox_ini = """
     [tox]
     min_version = 4.0
-    requires = tox-pyenv-redux>=1.0
-    env_list = py{39,310,311,312}-numpy{1.0,1.26.4}-sympy{1.0,1.12},
+    env_list = numpy{1.0,1.26.4}-sympy{1.0,1.12},
                type
 
     [testenv]
-    pyenv_discovery = fallback
     deps =
         pytest>=6.2
-        nbmake>=1.0
+        nbval>=0.11
+        coverage>=7.0
+        pytest-cov>=2.10
     commands = pytest
 
     [testenv:type]
