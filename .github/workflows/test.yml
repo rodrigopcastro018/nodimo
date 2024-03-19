@@ -3,13 +3,16 @@ name: Test
 on: [push, pull_request]
 
 jobs:
+  
   test:
 
-    runs-on: ubuntu-latest
     strategy:
       matrix:
+        os: [windows-latest, ubuntu-latest]
         python-version: ["3.11"]
       fail-fast: false
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
@@ -35,52 +38,52 @@ jobs:
           name: coverage-${{ runner.os }}-py${{ matrix.python-version }}
           path: coverage
 
-  # merge_coverage:
+  merge_coverage:
 
-  #   name: Merge Coverage
-  #   needs: test
-  #   runs-on: ubuntu-latest
+    name: Merge Coverage
+    needs: test
+    runs-on: ubuntu-latest
 
-  #   steps:
+    steps:
 
-  #     - name: Merge Coverage
-  #       uses: actions/upload-artifact/merge@v4
-  #       with:
-  #         name: coverage
-  #         pattern: coverage-*
-  #         delete-merged: true
+      - name: Merge Coverage
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: coverage
+          pattern: coverage-*
+          delete-merged: true
 
-  # combine_coverage:
+  combine_coverage:
 
-  #   name: Combine Coverage
-  #   needs: merge_coverage
-  #   runs-on: ubuntu-latest
+    name: Combine Coverage
+    needs: merge_coverage
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-  #     - name: Download coverage files
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: coverage
-  #         path: coverage
+      - name: Download coverage files
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage
+          path: coverage
       
-  #     - name: Install coverage
-  #       run: pip install coverage[toml]
+      - name: Install coverage
+        run: pip install coverage[toml]
       
-  #     - name: Coverage combine
-  #       run: coverage combine coverage
+      - name: Coverage combine
+        run: coverage combine coverage
       
-  #     - name: Generate combined coverage HTML
-  #       run: coverage html --show-contexts --title "Coverage for ${{ github.sha }}"
+      - name: Generate combined coverage HTML
+        run: coverage html --show-contexts --title "Coverage for ${{ github.sha }}"
 
-  #     - name: Store combined coverage HTML
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: coverage_html
-  #         path: coverage/htmlcov
+      - name: Store combined coverage HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage_html
+          path: coverage/htmlcov
