@@ -37,7 +37,7 @@ classifiers = [
   'Typing :: Typed',
   'Operating System :: OS Independent',
 ]
-dependencies = ['numpy>=1.0', 'sympy>=1.0']
+dependencies = ['numpy>=1.20.0', 'sympy>=1.7']
 
 [project.optional-dependencies]
 test = ['mypy>=1.0', 'pytest>=6.2', 'nbval>=0.11', 'coverage>=7.0', 'pytest-cov>=2.10']
@@ -77,19 +77,34 @@ directory = 'coverage/htmlcov'
 legacy_tox_ini = """
     [tox]
     min_version = 4.0
-    env_list = numpy{1.0,1.26.4}-sympy{1.0,1.12},
-               type
-
-    [testenv]
-    deps =
+    env_list = 
+        pytest-coverage
+        type
+    
+    [testenv:pytest-coverage]
+    deps = 
         pytest>=6.2
         nbval>=0.11
         coverage>=7.0
         pytest-cov>=2.10
-    commands = pytest
+        {env:NUMPY}
+        {env:SYMPY}
+    commands = 
+        pytest
+    pass_env = 
+        INITIAL_CONTEXT
+        NUMPY_VERSION
+        SYMPY_VERSION
+    set_env = 
+        NUMPY = numpy=={env:NUMPY_VERSION}
+        SYMPY = sympy=={env:SYMPY_VERSION}
+        CONTEXT = {env:INITIAL_CONTEXT}-numpy{env:NUMPY_VERSION} \ 
+                                       -sympy{env:SYMPY_VERSION}
+        COVERAGE_FILE = coverage/.coverage.{env:CONTEXT}
 
     [testenv:type]
     deps = 
         mypy>=1.0
-    commands = mypy
+    commands =
+        mypy
 """
