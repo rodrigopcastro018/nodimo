@@ -98,8 +98,7 @@ legacy_tox_ini = """
     set_env = 
         NUMPY = numpy=={env:NUMPY_VERSION}
         SYMPY = sympy=={env:SYMPY_VERSION}
-        CONTEXT = {env:INITIAL_CONTEXT}-numpy{env:NUMPY_VERSION} \ 
-                                       -sympy{env:SYMPY_VERSION}
+        CONTEXT = {env:INITIAL_CONTEXT}-numpy{env:NUMPY_VERSION}-sympy{env:SYMPY_VERSION}
         COVERAGE_FILE = coverage/.coverage.{env:CONTEXT}
 
     [testenv:type]
