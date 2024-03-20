@@ -64,7 +64,7 @@ testpaths = ['tests', 'docs/tutorials']
 [tool.coverage.run]
 source = ['nodimo']
 data_file = 'coverage/.coverage'
-context = '${CONTEXT}'
+# context = '${CONTEXT}'
 relative_files = 'true'  # https://github.com/nedbat/coveragepy/issues/597
 
 [tool.coverage.paths]
