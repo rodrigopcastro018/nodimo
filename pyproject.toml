@@ -64,6 +64,7 @@ testpaths = ['tests', 'docs/tutorials']
 [tool.coverage.run]
 source = ['nodimo']
 data_file = 'coverage/.coverage'
+context = '${CONTEXT}'
 relative_files = 'true'
 
 [tool.coverage.paths]
