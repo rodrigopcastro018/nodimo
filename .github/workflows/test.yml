@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.py.python }}
@@ -50,13 +50,13 @@ jobs:
 
   merge_coverage:
 
-    name: Merge Coverage
+    name: Merge coverage
     needs: test
     runs-on: ubuntu-latest
 
     steps:
 
-      - name: Merge Coverage
+      - name: Merge coverage
         uses: actions/upload-artifact/merge@v4
         with:
           name: coverage
@@ -65,7 +65,7 @@ jobs:
 
   combine_coverage:
 
-    name: Combine Coverage
+    name: Combine coverage
     needs: merge_coverage
     runs-on: ubuntu-latest
 
@@ -97,3 +97,36 @@ jobs:
         with:
           name: coverage_html
           path: coverage/htmlcov
+
+  smokeshow_coverage:
+
+    name: smokeshow coverage
+    needs: combine_coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download coverage HTML
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage_html
+          path: coverage/htmlcov
+      
+      - name: Install smokeshow
+        run: pip install smokeshow
+      
+      - name: smokeshow coverage HTML
+        run: smokeshow upload coverage/htmlcov
+        env:
+          SMOKESHOW_GITHUB_STATUS_DESCRIPTION: Coverage {coverage-percentage}
+          SMOKESHOW_GITHUB_COVERAGE_THRESHOLD: 90
+          SMOKESHOW_GITHUB_CONTEXT: coverage
+          SMOKESHOW_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SMOKESHOW_GITHUB_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          SMOKESHOW_AUTH_KEY: ${{ secrets.SMOKESHOW_AUTH_KEY }}

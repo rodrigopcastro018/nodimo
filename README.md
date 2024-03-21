@@ -4,7 +4,7 @@
 
 ---
 
-| **Docs**      | [![Docs Status Badge]][Docs Status]                                                  |
+|               |                                                                                      |
 | ------------- | ------------------------------------------------------------------------------------ |
 | **Docs**      | [![Docs Status Badge]][Docs Status]                                                  |
 | **Tests**     | [![Test Status Badge]][Test Status]                                                  |
