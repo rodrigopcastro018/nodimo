@@ -23,20 +23,13 @@ jobs:
       - name: Install smokeshow
         run: pip install smokeshow
 
-
-      - name: Download coverage HTML
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage_html
-          path: coverage/htmlcov
-
       - uses: dawidd6/action-download-artifact@v3
         with:
           workflow: test.yml
           commit: ${{ github.event.workflow_run.head_sha }}
 
       - name: Smokeshow coverage HTML
-        run: smokeshow upload coverage/htmlcov
+        run: smokeshow upload coverage_html
         env:
           SMOKESHOW_GITHUB_STATUS_DESCRIPTION: Coverage {coverage-percentage}
           SMOKESHOW_GITHUB_COVERAGE_THRESHOLD: 100
