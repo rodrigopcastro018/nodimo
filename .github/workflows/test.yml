@@ -104,6 +104,9 @@ jobs:
     needs: combine_coverage
     runs-on: ubuntu-latest
 
+    permissions:
+      statuses: write
+
     steps:
       - uses: actions/checkout@v4
 
