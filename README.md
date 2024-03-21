@@ -4,14 +4,13 @@
 
 ---
 
-|           |                                                                                      |
-| --------- | ------------------------------------------------------------------------------------ |
-| Docs      | [![Docs Status Badge]][Docs Status]                                                  |
-| Tests     | [![Test Status Badge]][Test Status]                                                  |
-| Python    | [![Python Versions Badge]][Python Versions]                                          |
-| Downloads | [![PyPI Downloads Badge]][PyPI Downloads] [![Conda Downloads Badge]][Conda Downloads]|
-| License   | [![License Badge]][License]                                                          |
-|           |                                                                                      |
+| <span>        |                                                                                      |
+| ------------- | ------------------------------------------------------------------------------------ |
+| **Docs**      | [![Docs Status Badge]][Docs Status]                                                  |
+| **Tests**     | [![Test Status Badge]][Test Status]                                                  |
+| **Python**    | [![Python Versions Badge]][Python Versions]                                          |
+| **Downloads** | [![PyPI Downloads Badge]][PyPI Downloads] [![Conda Downloads Badge]][Conda Downloads]|
+| **License**   | [![License Badge]][License]                                                          |
 
 # Nodimo
 The main purpose of Nodimo is to transform a dimensional relationship between variables into a nondimensional one. The variables are gathered in nondimensional groups such that the number of groups is lower than the number of variables. The resulting nondimensional model is, at the same time, a generalization and simplification of the dimensional model.
