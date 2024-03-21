@@ -58,14 +58,13 @@ ignore_missing_imports = 'True'
 
 [tool.pytest.ini_options]
 minversion = '6.2'
-addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report=term-missing'  # https://github.com/computationalmodelling/nbval/issues/103
+addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report=term-missing'
 testpaths = ['tests', 'docs/tutorials']
 
 [tool.coverage.run]
 source = ['nodimo']
 data_file = 'coverage/.coverage'
-# context = '${CONTEXT}'
-relative_files = 'true'  # https://github.com/nedbat/coveragepy/issues/597
+relative_files = 'true'
 
 [tool.coverage.paths]
 source = ['nodimo']
