@@ -4,22 +4,13 @@
 
 ---
 
-<p align="center">
-    <a href="https://pypi.org/project/nodimo" alt="Python">
-        <img src="https://img.shields.io/badge/python-3-green" /></a>
-    <a href="https://nodimo.readthedocs.io/" alt="Documentation">
-        <img src="https://img.shields.io/badge/docs-view-8A2BE2" /></a>
-    <a href="https://pypi.org/project/nodimo" alt="PyPI Downloads">
-        <img src="https://img.shields.io/pypi/dm/nodimo?color=blue" /></a>
-    <a href="https://anaconda.org/rodrigopcastro018/nodimo" alt="Conda Downloads">
-        <img src="https://img.shields.io/conda/d/rodrigopcastro018/nodimo?label=conda%20downloads&color=green" /></a>
-    <a href="" alt="Github Downloads">
-        <img src="https://img.shields.io/github/downloads/rodrigopcastro018/nodimo/total.svg?label=github%20downloads&color=blue" /></a>
-    <a href="https://github.com/jupyter/notebook" alt="Jupyter">
-        <img src="https://img.shields.io/badge/jupyter-notebook-orange" /></a>
-    <a href="https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE" alt="License">
-        <img src="https://img.shields.io/badge/license-MIT-green" /></a>
-</p>
+|               |                                                                                      |
+| ------------- | ------------------------------------------------------------------------------------ |
+| **Docs**      | [![Docs Status Badge]][Docs Status]                                                  |
+| **Tests**     | [![Test Status Badge]][Test Status]                                                  |
+| **Python**    | [![Python Versions Badge]][Python Versions]                                          |
+| **Downloads** | [![PyPI Downloads Badge]][PyPI Downloads] [![Conda Downloads Badge]][Conda Downloads]|
+| **License**   | [![License Badge]][License]                                                          |
 
 # Nodimo
 The main purpose of Nodimo is to transform a dimensional relationship between variables into a nondimensional one. The variables are gathered in nondimensional groups such that the number of groups is lower than the number of variables. The resulting nondimensional model is, at the same time, a generalization and simplification of the dimensional model.
@@ -37,7 +28,7 @@ Alternatively, Nodimo and dependencies can be installed via `conda`:
 conda install nodimo --channel rodrigopcastro018
 ```
 
-When running Nodimo on the terminal, make sure that the terminal supports Unicode characters. For the best experience, it is recommended the use of [jupyter notebook](https://github.com/jupyter/notebook).
+When running Nodimo on the terminal, make sure that the terminal supports Unicode characters. For the best experience, it is recommended the use of [jupyter notebook][Jupyter Notebook].
 
 ## Getting started
 ### Basic example
@@ -62,15 +53,24 @@ ndmodel.show()
 ```
 
 And the result is:
-```math
-\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}
-```
 
-For more applications and functionalities, check the [documentation](https://nodimo.readthedocs.io/).
+$$\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}$$
 
-## Documentation status
+For more applications and functionalities, check the [documentation][Docs Status].
 
-[![Documentation Status](https://readthedocs.org/projects/nodimo/badge/?version=latest)](https://nodimo.readthedocs.io/en/latest/?badge=latest)
+# Aknowledgements
 
-## License
-Nodimo is open-source and released under the [MIT License](LICENSE)
+<!-- Links -->
+[Docs Status]: https://nodimo.readthedocs.io/
+[Docs Status Badge]: https://img.shields.io/readthedocs/nodimo?color=8A2BE2
+[Test Status]: https://github.com/rodrigopcastro018/nodimo/actions/workflows/test.yml
+[Test Status Badge]: https://github.com/rodrigopcastro018/nodimo/actions/workflows/test.yml/badge.svg?branch=main
+[Python Versions]: https://pypi.org/project/nodimo
+[Python Versions Badge]: https://img.shields.io/pypi/pyversions/nodimo
+[PyPI Downloads]: https://pypi.org/project/nodimo
+[PyPI Downloads Badge]: https://img.shields.io/pypi/dm/nodimo?label=PyPI%20downloads&color=blue
+[Conda Downloads]: https://anaconda.org/rodrigopcastro018/nodimo
+[Conda Downloads Badge]: https://img.shields.io/conda/d/rodrigopcastro018/nodimo?label=Conda%20downloads&color=green
+[License]: https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE
+[License Badge]: https://img.shields.io/github/license/rodrigopcastro018/nodimo?color=orange
+[Jupyter Notebook]: https://github.com/jupyter/notebook

@@ -5,48 +5,58 @@ on: [push, pull_request]
 jobs:
   
   test:
-
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
-        python-version: ["3.11"]
+        os:
+          - windows-latest
+          - ubuntu-latest
+          - macos-latest
+        py:
+          - python: '3.9'
+            numpy: '1.20.0'
+            sympy: '1.7'
+          - python: '3.12'
+            numpy: '1.26.4'
+            sympy: '1.12'
       fail-fast: false
 
+    name: ${{ matrix.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
+    
     runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Set up python
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install Nodimo and test dependencies
-        run: python -m pip install -e .[test]
+          python-version: ${{ matrix.py.python }}
       
-      - name: Run pytest
-        run: pytest
+      - name: Install tox
+        run: python -m pip install tox
 
+      - name: Run tox
+        run: tox
         env:
-          COVERAGE_FILE: coverage/.coverage.${{ runner.os }}-py${{ matrix.python-version }}
-          CONTEXT: ${{ runner.os }}-py${{ matrix.python-version }}
+          INITIAL_CONTEXT: ${{ runner.os }}-py${{ matrix.py.python }}
+          NUMPY_VERSION: ${{ matrix.py.numpy }}
+          SYMPY_VERSION: ${{ matrix.py.sympy }}
 
       - name: Store coverage files
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-${{ runner.os }}-py${{ matrix.python-version }}
+          name: coverage-${{ runner.os }}-py${{ matrix.py.python }}
           path: coverage
 
   merge_coverage:
 
-    name: Merge Coverage
+    name: Merge coverage
     needs: test
     runs-on: ubuntu-latest
 
     steps:
 
-      - name: Merge Coverage
+      - name: Merge coverage
         uses: actions/upload-artifact/merge@v4
         with:
           name: coverage
@@ -55,7 +65,7 @@ jobs:
 
   combine_coverage:
 
-    name: Combine Coverage
+    name: Combine coverage
     needs: merge_coverage
     runs-on: ubuntu-latest
 
@@ -63,7 +73,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -87,3 +97,36 @@ jobs:
         with:
           name: coverage_html
           path: coverage/htmlcov
+
+  smokeshow_coverage:
+
+    name: smokeshow coverage
+    needs: combine_coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download coverage HTML
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage_html
+          path: coverage/htmlcov
+      
+      - name: Install smokeshow
+        run: pip install smokeshow
+      
+      - name: smokeshow coverage HTML
+        run: smokeshow upload coverage/htmlcov
+        env:
+          SMOKESHOW_GITHUB_STATUS_DESCRIPTION: Coverage {coverage-percentage}
+          SMOKESHOW_GITHUB_COVERAGE_THRESHOLD: 100
+          SMOKESHOW_GITHUB_CONTEXT: coverage
+          SMOKESHOW_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SMOKESHOW_GITHUB_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          SMOKESHOW_AUTH_KEY: ${{ secrets.SMOKESHOW_AUTH_KEY }}
