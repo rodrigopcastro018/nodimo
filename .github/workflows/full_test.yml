@@ -1,4 +1,4 @@
-name: Test Full
+name: Full Test
 
 on:
   push:
