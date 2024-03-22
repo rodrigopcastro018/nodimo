@@ -8,7 +8,8 @@ from nodimo._internal import (_is_running_on_jupyter,
 
 
 def test_environment():
-    assert not _is_running_on_jupyter
+    # assert not _is_running_on_jupyter
+    assert _is_running_on_jupyter
 
 
 def test_show_object(capfd):

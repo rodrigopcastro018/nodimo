@@ -106,7 +106,7 @@ jobs:
 
   smokeshow_coverage:
 
-    name: smokeshow coverage
+    name: Smokeshow coverage
     needs: combine_coverage
     runs-on: ubuntu-latest
 
@@ -130,7 +130,7 @@ jobs:
       - name: Install smokeshow
         run: pip install smokeshow
       
-      - name: smokeshow coverage HTML
+      - name: Smokeshow coverage HTML
         run: smokeshow upload coverage/htmlcov
         env:
           SMOKESHOW_GITHUB_STATUS_DESCRIPTION: Coverage {coverage-percentage}
