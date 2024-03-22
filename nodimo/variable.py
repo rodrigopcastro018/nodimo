@@ -76,7 +76,7 @@ class Variable(Symbol):
                 name: str,
                 dependent: bool = False,
                 scaling: bool = False,
-                **dimensions: int):
+                 **dimensions: int):
         
         return super().__new__(cls, name)
 
@@ -87,8 +87,8 @@ class Variable(Symbol):
                  **dimensions: int):
 
         super().__init__()
-        # self.dimensions: dict[str, int] = dimensions
-        self.dimensions = dimensions
+        self.dimensions: dict[str, int] = dimensions
+
         self.is_dependent: bool = dependent
         self.is_scaling: bool = scaling
         self.is_nondimensional: bool = all(dim == 0

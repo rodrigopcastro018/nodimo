@@ -47,8 +47,6 @@ class ModelFunction(Equality):
         Dependent variable or group.
     independent_variables : list[Variable or VariableGroup]
         List of independent variables or groups.
-    latex : str  # TODO: remove this later, after some tests
-        String that represents the function in latex format.  # TODO: remove this later, after some tests
 
     Methods
     -------
@@ -100,8 +98,6 @@ class ModelFunction(Equality):
             self.dependent_variable,
             self.independent_variables
         ) = self._separate_variables(*self.variables)
-
-        self.latex: str = sp.latex(self, root_notation=False)  # TODO: remove this later, after some tests
 
     @classmethod
     def _separate_variables(
