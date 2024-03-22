@@ -4,13 +4,13 @@
 
 ---
 
-|               |                                                                                      |
-| ------------- | ------------------------------------------------------------------------------------ |
-| **Docs**      | [![Docs Status Badge]][Docs Status]                                                  |
-| **Tests**     | [![Test Status Badge]][Test Status]                                                  |
-| **Python**    | [![Python Versions Badge]][Python Versions]                                          |
-| **Downloads** | [![PyPI Downloads Badge]][PyPI Downloads] [![Conda Downloads Badge]][Conda Downloads]|
-| **License**   | [![License Badge]][License]                                                          |
+|             |                                                                               |
+| ----------- | ----------------------------------------------------------------------------- |
+| **Docs**    | [![Docs Status Badge]][Docs Status]                                           |
+| **Tests**   | [![Test Status Badge]][Test Status] [![Coverage Badge]][Coverage]             |
+| **Python**  | [![Python Versions Badge]][Python Versions]                                   |
+| **Version** | [![PyPI Version Badge]][PyPI Version] [![Conda Version Badge]][Conda Version] |
+| **License** | [![License Badge]][License]                                                   |
 
 # Nodimo
 The main purpose of Nodimo is to transform a dimensional relationship between variables into a nondimensional one. The variables are gathered in nondimensional groups such that the number of groups is lower than the number of variables. The resulting nondimensional model is, at the same time, a generalization and simplification of the dimensional model.
@@ -39,6 +39,7 @@ When running Nodimo on the terminal, make sure that the terminal supports Unicod
 </p>
 
 The nondimensional model for the pendulum's period `T` as a function of the other variables is built and displayed as:
+
 ```python
 from nodimo import Variable, NonDimensionalModel
 
@@ -65,12 +66,18 @@ For more applications and functionalities, check the [documentation][Docs Status
 [Docs Status Badge]: https://img.shields.io/readthedocs/nodimo?color=8A2BE2
 [Test Status]: https://github.com/rodrigopcastro018/nodimo/actions/workflows/test.yml
 [Test Status Badge]: https://github.com/rodrigopcastro018/nodimo/actions/workflows/test.yml/badge.svg?branch=main
+[Coverage]: https://coverage-badge.samuelcolvin.workers.dev/redirect/rodrigopcastro018/nodimo
+[Coverage Badge]: https://coverage-badge.samuelcolvin.workers.dev/rodrigopcastro018/nodimo.svg
 [Python Versions]: https://pypi.org/project/nodimo
 [Python Versions Badge]: https://img.shields.io/pypi/pyversions/nodimo
+[PyPI Version]: https://pypi.org/project/nodimo/
+[PyPI Version Badge]: https://img.shields.io/pypi/v/nodimo?label=PyPI&color=orange
+[Conda Version]: https://anaconda.org/rodrigopcastro018/nodimo
+[Conda Version Badge]: https://img.shields.io/conda/v/rodrigopcastro018/nodimo?label=Conda&color=green
 [PyPI Downloads]: https://pypi.org/project/nodimo
 [PyPI Downloads Badge]: https://img.shields.io/pypi/dm/nodimo?label=PyPI%20downloads&color=blue
 [Conda Downloads]: https://anaconda.org/rodrigopcastro018/nodimo
 [Conda Downloads Badge]: https://img.shields.io/conda/d/rodrigopcastro018/nodimo?label=Conda%20downloads&color=green
 [License]: https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE
-[License Badge]: https://img.shields.io/github/license/rodrigopcastro018/nodimo?color=orange
+[License Badge]: https://img.shields.io/github/license/rodrigopcastro018/nodimo?label=License&color=yellow
 [Jupyter Notebook]: https://github.com/jupyter/notebook
