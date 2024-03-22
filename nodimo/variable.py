@@ -74,8 +74,7 @@ class Variable(Symbol):
 
     def __new__(cls,
                 name: str,
-                # dependent: bool = False,
-                dependent=False,
+                dependent: bool = False,
                 scaling: bool = False,
                 **dimensions: int):
         
@@ -83,13 +82,13 @@ class Variable(Symbol):
 
     def __init__(self,
                  name: str,
-                #  dependent: bool = False,
-                 dependent=False,
+                 dependent: bool = False,
                  scaling: bool = False,
                  **dimensions: int):
 
         super().__init__()
-        self.dimensions: dict[str, int] = dimensions
+        # self.dimensions: dict[str, int] = dimensions
+        self.dimensions = dimensions
         self.is_dependent: bool = dependent
         self.is_scaling: bool = scaling
         self.is_nondimensional: bool = all(dim == 0
