@@ -73,9 +73,9 @@ class Variable(Symbol):
     """
 
     def __new__(cls,
-                name,
-                # name: str,
-                dependent: bool = False,
+                name: str,
+                # dependent: bool = False,
+                dependent=False,
                 scaling: bool = False,
                 **dimensions: int):
         
@@ -83,7 +83,8 @@ class Variable(Symbol):
 
     def __init__(self,
                  name: str,
-                 dependent: bool = False,
+                #  dependent: bool = False,
+                 dependent=False,
                  scaling: bool = False,
                  **dimensions: int):
 
