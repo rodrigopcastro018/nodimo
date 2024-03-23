@@ -11,7 +11,7 @@ on:
 jobs:
   
   test:
-    name: Test on latest dependencies
+    name: Quick test on latest dependencies
     runs-on: ubuntu-latest
 
     steps:

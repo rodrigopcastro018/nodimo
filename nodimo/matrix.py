@@ -11,12 +11,6 @@ DimensionalMatrix
     Creates a dimensional matrix from a given set of variables.
 """
 
-def test(abacate: str):
-    pera = abacate
-    return pera
-
-pera = test(2)
-
 import sympy as sp
 from sympy import Matrix
 from typing import Union
