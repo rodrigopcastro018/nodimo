@@ -58,8 +58,8 @@ ignore_missing_imports = 'True'
 
 [tool.pytest.ini_options]
 minversion = '6.2'
-addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report=term-missing --junit-xml=pytest_result.xml'
-# addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report=term-missing'
+# addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report=term-missing --junit-xml=test_results/pytest_result.xml'
+addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report=term-missing'
 testpaths = ['tests', 'docs/tutorials']
 
 [tool.coverage.run]
