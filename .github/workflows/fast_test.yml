@@ -29,7 +29,11 @@ jobs:
         run: mkdir test_results
       
       - name: Run pytest
-        run: pytest | tee test_results/pytest_result.txt
+        run: pytest -q | tee test_results/pytest_result.txt
       
       - name: Run mypy
         run: mypy | tee test_results/mypy_result.txt
+
+      - name: Output test summary
+        run: |
+          echo "| **Case** | mypy | pytest | coverage |\n| :------- | :--: | :----: | :------: |\n|    a     |  b   |   c    |    d     |" >> $GITHUB_STEP_SUMMARY
