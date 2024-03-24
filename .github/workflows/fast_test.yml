@@ -36,4 +36,6 @@ jobs:
 
       - name: Output test summary
         run: |
-          echo "| **Case** | mypy | pytest | coverage |\n| :------- | :--: | :----: | :------: |\n|    a     |  b   |   c    |    d     |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Case** | mypy | pytest | coverage |" >> $GITHUB_STEP_SUMMARY
+          echo "| :------- | :--: | :----: | :------: |" >> $GITHUB_STEP_SUMMARY
+          echo "|    a     |  b   |   c    |    d     |" >> $GITHUB_STEP_SUMMARY
