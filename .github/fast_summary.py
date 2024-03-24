@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+import os
+
+# job_markdown_template = f'| {} | {} | {} | {} |'
+
 def get_test_results():
 
     with open('test_results/mypy_result.txt', 'r') as mypy_result_file:
@@ -40,7 +44,14 @@ def write_test_results():
      is_pytest_successful,
      coverage_value) = get_test_results()
     
+    with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary_env_var:
+        print(f'| {is_mypy_successful} '
+              f'| {is_pytest_successful} '
+              f'| {coverage_value} |',
+              file=summary_env_var)
 
+if __name__ == '__main__':
+    write_test_results()
 
 # | **Case** | mypy | pytest | coverage |
 # | :------- | :--: | :----: | :------: |
