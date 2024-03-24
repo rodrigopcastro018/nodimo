@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import os
+import sys
+
 
 def clean_string(string):
     # Remove null bytes (\x00) and double newline character (\n\n)
@@ -12,57 +14,61 @@ def clean_string(string):
     return new_string
 
 
-def get_test_results():
+def get_test_result(file_path):
+    with open('test_results/' + file_path, 'r') as result_file:
+        # Get full result
+        full_result = clean_string(result_file.read())
 
-    with open('test_results/mypy_result.txt', 'r') as mypy_result_file:
-        # Get full mypy result
-        full_mypy_result = clean_string(mypy_result_file.read())
+        # Get result in final line
+        result = full_result.split('\n')[-2]
 
-        # Get mypy status
-        mypy_result = full_mypy_result.split('\n')[-2]
+        return result
 
-        if 'no issues found' in mypy_result:
-            is_mypy_successful = True
-        else:
-            is_mypy_successful = False
 
-    with open('test_results/pytest_result.txt', 'r') as pytest_result_file:
-        # Get full pytest result
-        full_pytest_result = clean_string(pytest_result_file.read())
-        full_pytest_result_splitted = full_pytest_result.split('\n')
+def get_test_status():
+    # Get mypy status
+    mypy_result = get_test_result('mypy_result.txt')
 
-        # Get pytest status
-        pytest_result = full_pytest_result_splitted[-2]
+    if 'no issues found' in mypy_result:
+        mypy_status = ':heavy_check_mark:'
+    else:
+        mypy_status = ':x:'
 
-        if 'failed' in pytest_result:
-            is_pytest_successful = False
-        else:
-            is_pytest_successful = True
+    # Get pytest status
+    pytest_result = get_test_result('pytest_result.txt')
 
-        # Get coverage value
-        coverage_value = full_pytest_result_splitted[-3].split()[-1]
+    if 'failed' in pytest_result:
+        pytest_status = ':x:'
+    else:
+        pytest_status = ':heavy_check_mark:'
 
-    return is_mypy_successful, is_pytest_successful, coverage_value
+    # Get coverage status
+    coverage_status = get_test_result('coverage_result.txt').split()[-1]
+
+    return mypy_status, pytest_status, coverage_status
+
 
 def write_test_results():
 
-    (is_mypy_successful,
-     is_pytest_successful,
-     coverage_value) = get_test_results()
-    
-    with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary_env_var:
-        print(f'| linux-latest_dependencies '
-              f'| {is_mypy_successful} '
-              f'| {is_pytest_successful} '
-              f'| {coverage_value} |',
-              file=summary_env_var)
+    job_name = sys.argv[1]
+
+    (mypy_status,
+     pytest_status,
+     coverage_status) = get_test_status()
+
+    if 'GITHUB_STEP_SUMMARY' in os.environ:
+        with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary_env_var:
+            print(f'| {job_name} '
+                  f'| {mypy_status} '
+                  f'| {pytest_status} '
+                  f'| {coverage_status} |',
+                  file=summary_env_var)
+    # else:
+    #     print(f'| {job_name} '
+    #           f'| {mypy_status} '
+    #           f'| {pytest_status} '
+    #           f'| {coverage_status} |')
+
 
 if __name__ == '__main__':
     write_test_results()
-
-# | **Case** | mypy | pytest | coverage |
-# | :------- | :--: | :----: | :------: |
-
-# | {} | {} | {} | {} |
-
-# "| **Case** | mypy | pytest | coverage |\n| :------- | :--: | :----: | :------: |\n|    a     |  b   |   c    |    d     |"
