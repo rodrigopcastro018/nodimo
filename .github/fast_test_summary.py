@@ -63,11 +63,6 @@ def write_test_results():
                   f'| {pytest_status} '
                   f'| {coverage_status} |',
                   file=summary_env_var)
-    # else:
-    #     print(f'| {job_name} '
-    #           f'| {mypy_status} '
-    #           f'| {pytest_status} '
-    #           f'| {coverage_status} |')
 
 
 if __name__ == '__main__':

@@ -80,8 +80,10 @@ legacy_tox_ini = """
     env_list = 
         pytest-coverage
         type
-    
+
     [testenv:pytest-coverage]
+    skip_install = true
+    parallel_show_output = true
     deps = 
         pytest>=6.2
         nbval>=0.11
@@ -90,7 +92,8 @@ legacy_tox_ini = """
         {env:NUMPY}
         {env:SYMPY}
     commands = 
-        pytest
+        pytest -q
+        coverage report
     pass_env = 
         INITIAL_CONTEXT
         NUMPY_VERSION
@@ -102,8 +105,12 @@ legacy_tox_ini = """
         COVERAGE_FILE = coverage/.coverage.{env:CONTEXT}
 
     [testenv:type]
+    skip_install = true
+    parallel_show_output = true
+    allowlist_externals = echo
     deps = 
         mypy>=1.0
-    commands =
+    commands = 
         mypy
+        echo "=== nodimo mypy result ends here ==="
 """
