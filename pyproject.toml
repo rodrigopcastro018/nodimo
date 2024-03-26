@@ -83,6 +83,7 @@ legacy_tox_ini = """
 
     [testenv:pytest-coverage]
     skip_install = true
+    ignore_errors = true
     parallel_show_output = true
     deps = 
         pytest>=6.2
@@ -92,8 +93,8 @@ legacy_tox_ini = """
         {env:NUMPY}
         {env:SYMPY}
     commands = 
-        pytest -q
-        coverage report
+        pytest -q --junit-xml=test_results/pytest_result.xml
+        coverage json -o test_results/coverage_result.json
     pass_env = 
         INITIAL_CONTEXT
         NUMPY_VERSION
@@ -107,10 +108,8 @@ legacy_tox_ini = """
     [testenv:type]
     skip_install = true
     parallel_show_output = true
-    allowlist_externals = echo
     deps = 
         mypy>=1.0
     commands = 
-        mypy
-        echo "=== nodimo mypy result ends here ==="
+        mypy --junit-xml test_results/mypy_result.xml
 """

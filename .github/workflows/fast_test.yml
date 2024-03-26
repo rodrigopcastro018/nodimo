@@ -29,16 +29,16 @@ jobs:
         run: mkdir test_results
       
       - name: Run pytest and save result
-        run: pytest -q | tee test_results/pytest_result.txt
+        run: pytest -q --junit-xml=test_results/pytest_result.xml
       
       - name: Save coverage result
-        run: coverage report > test_results/coverage_result.txt
+        run: coverage json -o test_results/coverage_result.json
       
       - name: Run mypy and save result
-        run: mypy | tee test_results/mypy_result.txt
+        run: mypy --junit-xml test_results/mypy_result.xml
 
       - name: Output test summary
         run: |
           echo "| **Case** | mypy | pytest | coverage |" >> $GITHUB_STEP_SUMMARY
           echo "| :------- | :--: | :----: | :------: |" >> $GITHUB_STEP_SUMMARY
-          python .github/fast_test_summary.py linux-latest_dependencies
+          python .github/test_summary.py linux-latest_dependencies
