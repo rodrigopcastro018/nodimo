@@ -37,8 +37,14 @@ jobs:
       - name: Run mypy and save result
         run: mypy --junit-xml test_results/mypy_result.xml
 
-      - name: Output test summary
-        run: |
-          echo "| **Case** | mypy | pytest | coverage |" >> $GITHUB_STEP_SUMMARY
-          echo "| :------- | :--: | :----: | :------: |" >> $GITHUB_STEP_SUMMARY
-          python .github/test_summary.py linux-latest_dependencies
+      - name: Store result files
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ runner.os }}-latest_dependencies
+          path: test_results
+
+      # - name: Output test summary
+      #   run: |
+      #     echo "| **Case** | mypy | pytest | coverage |" >> $GITHUB_STEP_SUMMARY
+      #     echo "| :------- | :--: | :----: | :------: |" >> $GITHUB_STEP_SUMMARY
+      #     python .github/test_summary.py linux-latest_dependencies
