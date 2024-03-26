@@ -51,6 +51,7 @@ jobs:
 
   summary:
     name: Summary creation
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
