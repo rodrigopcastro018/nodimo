@@ -55,6 +55,12 @@ jobs:
           name: coverage-${{ runner.os }}-py${{ matrix.py.python }}
           path: coverage
 
+      - name: Create job summary
+        run: |
+          echo "| **Case** | mypy | pytest | coverage |" >> $GITHUB_STEP_SUMMARY
+          echo "| :------- | :--: | :----: | :------: |" >> $GITHUB_STEP_SUMMARY
+          python .github/test_summary.py ${{ github.job }}
+
   merge_coverage:
 
     name: Merge coverage
