@@ -45,7 +45,7 @@ jobs:
       - name: Run tox
         run: tox
         env:
-          INITIAL_CONTEXT: ${{ runner.os }}-py${{ matrix.py.python }}
+          CONTEXT: ${{ runner.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
           NUMPY_VERSION: ${{ matrix.py.numpy }}
           SYMPY_VERSION: ${{ matrix.py.sympy }}
 

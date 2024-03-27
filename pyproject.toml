@@ -93,16 +93,15 @@ legacy_tox_ini = """
         {env:NUMPY}
         {env:SYMPY}
     commands = 
-        pytest -q --junit-xml=tests_results/pytest_result.xml
-        coverage json -o tests_results/coverage_result.json
+        pytest -q --junit-xml=tests_results/results-{env:CONTEXT}/pytest_result.xml
+        coverage json -o tests_results/results-{env:CONTEXT}/coverage_result.json
     pass_env = 
-        INITIAL_CONTEXT
+        CONTEXT
         NUMPY_VERSION
         SYMPY_VERSION
     set_env = 
         NUMPY = numpy=={env:NUMPY_VERSION}
         SYMPY = sympy=={env:SYMPY_VERSION}
-        CONTEXT = {env:INITIAL_CONTEXT}-numpy{env:NUMPY_VERSION}-sympy{env:SYMPY_VERSION}
         COVERAGE_FILE = coverage/.coverage.{env:CONTEXT}
 
     [testenv:type]
@@ -111,5 +110,7 @@ legacy_tox_ini = """
     deps = 
         mypy>=1.0
     commands = 
-        mypy --junit-xml tests_results/mypy_result.xml
+        mypy --junit-xml tests_results/results-{env:CONTEXT}/mypy_result.xml
+    pass_env = 
+        CONTEXT
 """
