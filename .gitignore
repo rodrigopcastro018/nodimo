@@ -22,4 +22,4 @@ __pycache__
 docs/_build
 
 # TODO: delete this later
-test_results
+tests_results
