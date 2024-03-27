@@ -4,14 +4,14 @@ on:
   push:
     branches:
       - main
-      # - jobsummary
+      - jobsummary
   pull_request:
     branches:
       - main
 
 jobs:
   
-  test:
+  tests:
     strategy:
       matrix:
         os:
@@ -55,16 +55,16 @@ jobs:
           name: coverage-${{ runner.os }}-py${{ matrix.py.python }}
           path: coverage
 
-      - name: Create job summary
-        run: |
-          echo "| **Case** | mypy | pytest | coverage |" >> $GITHUB_STEP_SUMMARY
-          echo "| :------- | :--: | :----: | :------: |" >> $GITHUB_STEP_SUMMARY
-          python .github/test_summary.py ${{ github.job }}
+      - name: Store results folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
+          path: tests_results
 
-  merge_coverage:
+  merge_tests_results:
 
-    name: Merge coverage
-    needs: test
+    name: Merge tests results
+    needs: tests
     runs-on: ubuntu-latest
 
     steps:
@@ -72,77 +72,143 @@ jobs:
       - name: Merge coverage
         uses: actions/upload-artifact/merge@v4
         with:
-          name: coverage
-          pattern: coverage-*
+          name: tests_results
+          pattern: results-*
           delete-merged: true
 
-  combine_coverage:
+  # create_summary:
+  #   name: Table
+  #   needs: test
+  #   strategy:
+  #     matrix:
+  #       os:
+  #         - windows-latest
+  #         - ubuntu-latest
+  #         - macos-latest
+  #       py:
+  #         - python: '3.9'
+  #           numpy: '1.20.0'
+  #           sympy: '1.7'
+  #         - python: '3.12'
+  #           numpy: '1.26.4'
+  #           sympy: '1.12'
+  #     fail-fast: false
+    
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     job_index: 0
+  #     job_name: ${{ matrix.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
 
-    name: Combine coverage
-    needs: merge_coverage
-    runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-    steps:
-      - uses: actions/checkout@v4
+  #     - name: Set up python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: '3.12'
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+  #     - name: Download coverage files
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: results-${{ runner.os }}-latest_dependencies
+  #         path: test_results
 
-      - name: Download coverage files
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage
-          path: coverage
+  #     - name: Download coverage files
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: results-${{ runner.os }}-latest_dependencies
+  #         path: test_results
+    
+  #     - name: Create summary
+  #       run: |
+  #         echo "| **Case** | **mypy** | **pytest** | **coverage** |" >> $GITHUB_STEP_SUMMARY
+  #         echo "| :------- | :------: | :--------: | :----------: |" >> $GITHUB_STEP_SUMMARY
+  #         python .github/test_summary.py linux-latest_dependencies
+
+###################################################################################################
+
+  # merge_coverage:
+
+  #   name: Merge coverage
+  #   needs: test
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+
+  #     - name: Merge coverage
+  #       uses: actions/upload-artifact/merge@v4
+  #       with:
+  #         name: coverage
+  #         pattern: coverage-*
+  #         delete-merged: true
+
+  # combine_coverage:
+
+  #   name: Combine coverage
+  #   needs: merge_coverage
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: '3.11'
+
+  #     - name: Download coverage files
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: coverage
+  #         path: coverage
       
-      - name: Install coverage
-        run: pip install coverage[toml]
+  #     - name: Install coverage
+  #       run: pip install coverage[toml]
       
-      - name: Coverage combine
-        run: coverage combine coverage
+  #     - name: Coverage combine
+  #       run: coverage combine coverage
       
-      - name: Generate combined coverage HTML
-        run: coverage html --show-contexts --title "Coverage for ${{ github.sha }}"
+  #     - name: Generate combined coverage HTML
+  #       run: coverage html --show-contexts --title "Coverage for ${{ github.sha }}"
 
-      - name: Store combined coverage HTML
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage_html
-          path: coverage/htmlcov
+  #     - name: Store combined coverage HTML
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: coverage_html
+  #         path: coverage/htmlcov
 
-  smokeshow_coverage:
+  # smokeshow_coverage:
 
-    name: Smokeshow coverage
-    needs: combine_coverage
-    runs-on: ubuntu-latest
+  #   name: Smokeshow coverage
+  #   needs: combine_coverage
+  #   runs-on: ubuntu-latest
 
-    permissions:
-      statuses: write
+  #   permissions:
+  #     statuses: write
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: '3.11'
 
-      - name: Download coverage HTML
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage_html
-          path: coverage/htmlcov
+  #     - name: Download coverage HTML
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: coverage_html
+  #         path: coverage/htmlcov
       
-      - name: Install smokeshow
-        run: pip install smokeshow
+  #     - name: Install smokeshow
+  #       run: pip install smokeshow
       
-      - name: Smokeshow coverage HTML
-        run: smokeshow upload coverage/htmlcov
-        env:
-          SMOKESHOW_GITHUB_STATUS_DESCRIPTION: Coverage {coverage-percentage}
-          SMOKESHOW_GITHUB_COVERAGE_THRESHOLD: 100
-          SMOKESHOW_GITHUB_CONTEXT: coverage
-          SMOKESHOW_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SMOKESHOW_GITHUB_PR_HEAD_SHA: ${{ github.sha }}
-          SMOKESHOW_AUTH_KEY: ${{ secrets.SMOKESHOW_AUTH_KEY }}
+  #     - name: Smokeshow coverage HTML
+  #       run: smokeshow upload coverage/htmlcov
+  #       env:
+  #         SMOKESHOW_GITHUB_STATUS_DESCRIPTION: Coverage {coverage-percentage}
+  #         SMOKESHOW_GITHUB_COVERAGE_THRESHOLD: 100
+  #         SMOKESHOW_GITHUB_CONTEXT: coverage
+  #         SMOKESHOW_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         SMOKESHOW_GITHUB_PR_HEAD_SHA: ${{ github.sha }}
+  #         SMOKESHOW_AUTH_KEY: ${{ secrets.SMOKESHOW_AUTH_KEY }}

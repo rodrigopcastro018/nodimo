@@ -6,7 +6,7 @@ import json
 import xml.etree.ElementTree as ET
 
 
-test_results_path = 'test_results/'
+test_results_path = 'tests_results/'
 
 
 def get_pytest_status(filename='pytest_result.xml'):

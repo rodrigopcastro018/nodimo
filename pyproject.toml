@@ -93,8 +93,8 @@ legacy_tox_ini = """
         {env:NUMPY}
         {env:SYMPY}
     commands = 
-        pytest -q --junit-xml=test_results/pytest_result.xml
-        coverage json -o test_results/coverage_result.json
+        pytest -q --junit-xml=tests_results/pytest_result.xml
+        coverage json -o tests_results/coverage_result.json
     pass_env = 
         INITIAL_CONTEXT
         NUMPY_VERSION
@@ -111,5 +111,5 @@ legacy_tox_ini = """
     deps = 
         mypy>=1.0
     commands = 
-        mypy --junit-xml test_results/mypy_result.xml
+        mypy --junit-xml tests_results/mypy_result.xml
 """

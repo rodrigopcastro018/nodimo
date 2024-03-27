@@ -10,7 +10,7 @@ on:
 
 jobs:
   
-  test:
+  tests:
     name: Quick test on latest dependencies
     runs-on: ubuntu-latest
 
@@ -45,7 +45,7 @@ jobs:
 
   create_summary:
     name: Table
-    needs: test
+    needs: tests
     runs-on: ubuntu-latest
 
     steps:
