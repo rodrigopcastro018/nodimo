@@ -21,5 +21,5 @@ __pycache__
 # docs
 docs/_build
 
-# TODO: delete this later
+# tox
 tests_results
