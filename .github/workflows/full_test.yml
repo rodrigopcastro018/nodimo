@@ -10,7 +10,7 @@ on:
 
 jobs:
   
-  test:
+  tests:
     strategy:
       matrix:
         os:
@@ -44,7 +44,7 @@ jobs:
       - name: Run tox
         run: tox
         env:
-          INITIAL_CONTEXT: ${{ runner.os }}-py${{ matrix.py.python }}
+          CONTEXT: ${{ runner.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
           NUMPY_VERSION: ${{ matrix.py.numpy }}
           SYMPY_VERSION: ${{ matrix.py.sympy }}
 
@@ -54,10 +54,50 @@ jobs:
           name: coverage-${{ runner.os }}-py${{ matrix.py.python }}
           path: coverage
 
-  merge_coverage:
+      - name: Store results folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ runner.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
+          path: tests_results
 
+  merge_tests_results:
+    name: Merge tests results
+    needs: tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Merge tests results
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: tests_results
+          pattern: results-*
+          delete-merged: true
+
+  create_summary:
+    name: Table
+    needs: merge_tests_results
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download tests results
+        uses: actions/download-artifact@v4
+        with:
+          name: tests_results
+          path: tests_results
+    
+      - name: Create summary
+        run: python3 .github/tests_summary.py
+
+  merge_coverage:
     name: Merge coverage
-    needs: test
+    needs: tests
     runs-on: ubuntu-latest
 
     steps:
@@ -70,7 +110,6 @@ jobs:
           delete-merged: true
 
   combine_coverage:
-
     name: Combine coverage
     needs: merge_coverage
     runs-on: ubuntu-latest
@@ -105,7 +144,6 @@ jobs:
           path: coverage/htmlcov
 
   smokeshow_coverage:
-
     name: Smokeshow coverage
     needs: combine_coverage
     runs-on: ubuntu-latest

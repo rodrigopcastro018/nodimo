@@ -58,8 +58,7 @@ ignore_missing_imports = 'True'
 
 [tool.pytest.ini_options]
 minversion = '6.2'
-addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report=term-missing --junit-xml=pytest_result.xml'
-# addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report=term-missing'
+addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report=term-missing'
 testpaths = ['tests', 'docs/tutorials']
 
 [tool.coverage.run]
@@ -81,8 +80,11 @@ legacy_tox_ini = """
     env_list = 
         pytest-coverage
         type
-    
+
     [testenv:pytest-coverage]
+    skip_install = true
+    ignore_errors = true
+    parallel_show_output = true
     deps = 
         pytest>=6.2
         nbval>=0.11
@@ -91,20 +93,24 @@ legacy_tox_ini = """
         {env:NUMPY}
         {env:SYMPY}
     commands = 
-        pytest
+        pytest -q --junit-xml=tests_results/results-{env:CONTEXT}/pytest_result.xml
+        coverage json -o tests_results/results-{env:CONTEXT}/coverage_result.json
     pass_env = 
-        INITIAL_CONTEXT
+        CONTEXT
         NUMPY_VERSION
         SYMPY_VERSION
     set_env = 
         NUMPY = numpy=={env:NUMPY_VERSION}
         SYMPY = sympy=={env:SYMPY_VERSION}
-        CONTEXT = {env:INITIAL_CONTEXT}-numpy{env:NUMPY_VERSION}-sympy{env:SYMPY_VERSION}
         COVERAGE_FILE = coverage/.coverage.{env:CONTEXT}
 
     [testenv:type]
+    skip_install = true
+    parallel_show_output = true
     deps = 
         mypy>=1.0
-    commands =
-        mypy
+    commands = 
+        mypy --junit-xml tests_results/results-{env:CONTEXT}/mypy_result.xml
+    pass_env = 
+        CONTEXT
 """

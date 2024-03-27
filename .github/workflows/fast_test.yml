@@ -10,7 +10,7 @@ on:
 
 jobs:
   
-  test:
+  tests:
     name: Quick test on latest dependencies
     runs-on: ubuntu-latest
 
@@ -22,11 +22,19 @@ jobs:
         with:
           python-version: '3.12'
       
-      - name: Install Nodimo and test dependencies
+      - name: Install nodimo and test dependencies
         run: python -m pip install -e .[test]
-
-      - name: Run pytest
-        run: pytest
       
-      - name: Run mypy
-        run: mypy
+      - name: Run pytest and save result
+        run: pytest -q --junit-xml=tests_results/results-Linux-latest_dependencies/pytest_result.xml
+      
+      - name: Save coverage result
+        run: coverage json -o tests_results/results-Linux-latest_dependencies/coverage_result.json
+      
+      - name: Run mypy and save result
+        run: mypy --junit-xml tests_results/results-Linux-latest_dependencies/mypy_result.xml
+
+      - name: Create summary
+        run: python3 .github/tests_summary.py
+
+
