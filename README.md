@@ -4,9 +4,8 @@
 
 ---
 
-|             |                                                                               |
-| ----------- | ----------------------------------------------------------------------------- |
 | **Docs**    | [![Docs Status Badge]][Docs Status]                                           |
+| :---------- | :---------------------------------------------------------------------------- |
 | **Tests**   | [![Test Status Badge]][Test Status] [![Coverage Badge]][Coverage]             |
 | **Python**  | [![Python Versions Badge]][Python Versions]                                   |
 | **Version** | [![PyPI Version Badge]][PyPI Version] [![Conda Version Badge]][Conda Version] |

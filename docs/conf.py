@@ -30,6 +30,9 @@ extensions = [
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints']
 
+# nbsphinx
+# added "nbsphinx": "hidden" to the first cell's metadata
+
 # autodoc
 autodoc_inherit_docstrings = False
 autosummary_generate = False
