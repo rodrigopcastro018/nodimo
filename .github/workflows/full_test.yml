@@ -58,7 +58,7 @@ jobs:
       - name: Store results folder
         uses: actions/upload-artifact@v4
         with:
-          name: results-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
+          name: results-${{ runner.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
           path: tests_results
 
   merge_tests_results:
