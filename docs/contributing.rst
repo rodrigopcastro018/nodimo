@@ -37,14 +37,14 @@ From the repository folder, install Nodimo in editable mode with::
 Tests
 -----
 
-Currently, Nodimo's tests are integrated with `GitHub Actions`_. The tests coverage
+Currently, Nodimo tests are integrated with `GitHub Actions`_. The tests coverage
 are published by `smokeshow`_.
 
 Tests status: |Tests status|
 
 Tests coverage: |Tests coverage|
 
-To manually execute Nodimo's tests, follow the instructions in the next subsection.
+To manually execute Nodimo tests, follow the instructions in the next subsection.
 
 Manual testing
 ^^^^^^^^^^^^^^

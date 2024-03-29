@@ -23,7 +23,7 @@ Nodimo applications.
 :ref:`API <classes>`
 --------------------
 
-Nodimo's classes described in detail.
+Nodimo classes described in detail.
 
 :ref:`Contributing <contributing>`
 ----------------------------------
