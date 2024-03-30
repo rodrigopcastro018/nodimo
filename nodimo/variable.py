@@ -96,6 +96,16 @@ class Variable(Symbol):
 
         self._validate_variable()
 
+    # def __str__(self):
+    #     pass
+
+    def __repr__(self):
+        class_name = type(self).__name__
+        return (f"{class_name}"
+                f"('{self.name}', "
+                f"dependent={self.is_dependent}, "
+                f"scaling={self.is_scaling})")
+
     def _validate_variable(self) -> None:
         """Validates variable's arguments.
         

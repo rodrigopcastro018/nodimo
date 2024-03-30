@@ -16,7 +16,6 @@ NonDimensionalModels
 import sympy as sp
 from sympy import Matrix
 from itertools import combinations
-from IPython.display import Math
 
 from nodimo.variable import Variable
 from nodimo.group import VariableGroup
@@ -26,6 +25,9 @@ from nodimo._internal import (_is_running_on_jupyter,
                               _show_object,
                               _print_horizontal_line,
                               _build_dimensional_matrix)
+
+if _is_running_on_jupyter:
+    from IPython.display import Math
 
 
 class NonDimensionalModel(DimensionalModel):
