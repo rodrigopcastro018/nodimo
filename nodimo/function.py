@@ -18,7 +18,7 @@ from typing import Union
 
 from nodimo.variable import Variable
 from nodimo.group import VariableGroup
-from nodimo._internal import _is_running_on_jupyter, _show_object
+from nodimo._internal import _show_object
 
 
 # Aliases for types used in ModelFunction.
@@ -76,21 +76,6 @@ class ModelFunction(Printable):
     >>> h = ModelFunction(F, m, a)
     >>> h.show()
     """
-
-    # def __new__(cls, *variables: VariableOrGroup, name: str = 'f'):
-    #     (
-    #         dependent_variable,
-    #         independent_variables
-    #     ) = cls._separate_variables(*variables)
-
-    #     (
-    #         independent_variables_function
-    #     ) = sp.Function(name)(*independent_variables)
-
-    #     return super().__new__(cls,
-    #                            dependent_variable,
-    #                            independent_variables_function,
-    #                            evaluate=False)
 
     def __init__(self, *variables: VariableOrGroup, name: str = 'f'):
 
