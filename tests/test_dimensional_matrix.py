@@ -29,8 +29,9 @@ def test_dimensions():
 
     assert dmatrix1.dimensions == ['d1', 'd2']
     assert dmatrix2.dimensions == ['d1', 'd2']
-    assert dmatrix1[1,:] == dmatrix3
+    assert dmatrix1.matrix[1,:] == dmatrix3.matrix
     assert dmatrix4.dimensions == ['d1', 'd2']
+
 
 
 def test_matrix():
@@ -48,8 +49,9 @@ def test_matrix():
     dmatrix1 = DimensionalMatrix(var1, var2)
     dmatrix2 = DimensionalMatrix(group)
 
-    assert dmatrix1 == matrix1
-    assert dmatrix2 == matrix2
+    assert dmatrix1.matrix == matrix1
+    assert dmatrix2.matrix == matrix2
+
 
 def test_labeled_matrix():
     var1 = Variable('var1', d1=5, d2=-2, scaling=True)
@@ -80,13 +82,13 @@ def test_rank():
     dmatrix6 = DimensionalMatrix(var1, var2, var3, var4, var5)
     dmatrix7 = DimensionalMatrix(var1, var2, var3, var4, var5, var6)
 
-    assert dmatrix1.rank_ == 0
-    assert dmatrix2.rank_ == 1
-    assert dmatrix3.rank_ == 2
-    assert dmatrix4.rank_ == 3
-    assert dmatrix5.rank_ == 4
-    assert dmatrix6.rank_ == 4
-    assert dmatrix7.rank_ == 4
+    assert dmatrix1.rank == 0
+    assert dmatrix2.rank == 1
+    assert dmatrix3.rank == 2
+    assert dmatrix4.rank == 3
+    assert dmatrix5.rank == 4
+    assert dmatrix6.rank == 4
+    assert dmatrix7.rank == 4
 
 
 def test_matrix_display(capfd):

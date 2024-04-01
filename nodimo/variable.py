@@ -116,7 +116,7 @@ class Variable(Symbol):
                 "A variable can not be both scaling and nondimensional")
 
     def _sympyrepr(self, printer):
-        """Representation string according to Sympy."""
+        """String representation according to Sympy."""
 
         class_name = type(self).__name__
         name_repr = f"'{self.name}'"
