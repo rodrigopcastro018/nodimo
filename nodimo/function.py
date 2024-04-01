@@ -51,6 +51,8 @@ class ModelFunction(Printable):
         Dependent variable or group.
     independent_variables : list[Variable or VariableGroup]
         List of independent variables or groups.
+    function : Equality
+        Sympy expression that represents the model function.
 
     Methods
     -------
