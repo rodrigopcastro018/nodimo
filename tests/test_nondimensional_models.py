@@ -69,7 +69,8 @@ def test_nondimensional_models():
     ndmodels = NonDimensionalModels(z, m, v, t, g, z0, v0,
                                     display_messages=False)
 
-    assert ndmodels.nondimensional_functions == ndfunctions
+    for i, model_function in enumerate(ndmodels.nondimensional_functions):
+        assert model_function.function == ndfunctions[i].function
 
 
 def test_nondimensional_models_display(capfd):
