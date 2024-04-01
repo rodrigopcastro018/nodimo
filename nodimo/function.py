@@ -37,12 +37,14 @@ class ModelFunction(Equality):
     *variables : Variable or VariableGroup
         Variables or groups that constitute the function.
     name : str, default='f'
-        Name that represents the function in symbolic expression.
+        Name of the function, traditionally a single letter.
 
     Attributes
     ----------
     variables : list[Variable or VariableGroup]
         List of variables or groups used in the function.
+    name : str, default='f'
+        Name of the function, traditionally a single letter.
     dependent_variable : Variable or VariableGroup
         Dependent variable or group.
     independent_variables : list[Variable or VariableGroup]
