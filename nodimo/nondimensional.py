@@ -118,14 +118,14 @@ class NonDimensionalModel(DimensionalModel):
             If the scaling variables do not form an independent set.
         """
 
-        if len(self.scaling_variables) != self.dimensional_matrix.rank_:
+        if len(self.scaling_variables) != self.dimensional_matrix.rank:
             raise ValueError(f"The model must have "
-                             f"{self.dimensional_matrix.rank_} "
+                             f"{self.dimensional_matrix.rank} "
                              f"scaling variables.")
 
         A = _build_dimensional_matrix(self.scaling_variables, self.dimensions)
 
-        if A.rank() != self.dimensional_matrix.rank_:
+        if A.rank() != self.dimensional_matrix.rank:
             raise ValueError(
                 "Scaling variables do not form an independent set")
 
@@ -171,24 +171,24 @@ class NonDimensionalModel(DimensionalModel):
                                       self.dimensions)
 
         # In case the dimensional matrix has linear dependent rows.
-        if number_of_dimensions > self.dimensional_matrix.rank_:
+        if number_of_dimensions > self.dimensional_matrix.rank:
             dimensional_matrix = B.row_join(A)
             _, independent_rows = dimensional_matrix.T.rref()
             A, B = A[independent_rows, :], B[independent_rows, :]
 
         # Components to build the matrix of exponents.
-        E11 = sp.eye(number_of_variables - self.dimensional_matrix.rank_)
-        E12 = sp.zeros(number_of_variables - self.dimensional_matrix.rank_,
-                       self.dimensional_matrix.rank_)
+        E11 = sp.eye(number_of_variables - self.dimensional_matrix.rank)
+        E12 = sp.zeros(number_of_variables - self.dimensional_matrix.rank,
+                       self.dimensional_matrix.rank)
         E21 = -A**-1 * B
         E22 = A**-1
 
         E = sp.Matrix([[E11, E12],
                        [E21, E22]])
 
-        Z1 = sp.eye(number_of_variables - self.dimensional_matrix.rank_)
-        Z2 = sp.zeros(self.dimensional_matrix.rank_,
-                      number_of_variables - self.dimensional_matrix.rank_)
+        Z1 = sp.eye(number_of_variables - self.dimensional_matrix.rank)
+        Z2 = sp.zeros(self.dimensional_matrix.rank,
+                      number_of_variables - self.dimensional_matrix.rank)
 
         Z = sp.Matrix([[Z1],
                        [Z2]])
@@ -323,9 +323,9 @@ class NonDimensionalModels(DimensionalModel):
                                       for var in self.dimensional_variables
                                       if not var.is_dependent]
 
-        if len(self.scaling_variables) < self.dimensional_matrix.rank_:
+        if len(self.scaling_variables) < self.dimensional_matrix.rank:
             raise ValueError(f"The model must have at least "
-                             f"{self.dimensional_matrix.rank_} "
+                             f"{self.dimensional_matrix.rank} "
                              f"scaling variables.")
 
     def _build_scaling_groups(self) -> list[list[Variable]]:
@@ -343,14 +343,14 @@ class NonDimensionalModels(DimensionalModel):
         all_scaling_groups = [
             list(group)
             for group in combinations(self.scaling_variables,
-                                      self.dimensional_matrix.rank_)
+                                      self.dimensional_matrix.rank)
         ]
 
         # Find groups that form an independent set.
         for scaling_group in all_scaling_groups:
             A = _build_dimensional_matrix(scaling_group, self.dimensions)
 
-            if A.rank() == self.dimensional_matrix.rank_:
+            if A.rank() == self.dimensional_matrix.rank:
                 scaling_groups.append(scaling_group)
 
         return scaling_groups

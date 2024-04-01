@@ -145,7 +145,7 @@ class ModelFunction(Equality):
         _show_object(self)
 
     def _sympyrepr(self, printer):
-        """Representation string according to Sympy."""
+        """String representation according to Sympy."""
 
         class_name = type(self).__name__
         variables_repr = ', '.join([sp.srepr(var) for var in self.variables])
