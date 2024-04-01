@@ -235,6 +235,16 @@ class DimensionalModel:
     # Alias for show_dimensional_model.
     show = show_dimensional_function
 
+    def _sympyrepr(self, printer):
+        """Representation string according to Sympy."""
+
+        class_name = type(self).__name__
+        variables_repr = ', '.join([sp.srepr(var) for var in self.variables])
+
+        return (f'{class_name}('
+                + variables_repr
+                + ')')
+
 
 # Alias for the class DimensionalModel.
 DimModel = DimensionalModel

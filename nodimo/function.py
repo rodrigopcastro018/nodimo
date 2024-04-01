@@ -91,6 +91,7 @@ class ModelFunction(Equality):
     def __init__(self, *variables: VariableOrGroup, name: str = 'f'):
 
         self.variables: list[VariableOrGroup] = list(variables)
+        self.name: str = name
         self.dependent_variable: VariableOrGroup
         self.independent_variables: list[VariableOrGroup]
 
@@ -140,3 +141,15 @@ class ModelFunction(Equality):
         """Displays the function."""
 
         _show_object(self)
+
+    def _sympyrepr(self, printer):
+        """Representation string according to Sympy."""
+
+        class_name = type(self).__name__
+        variables_repr = ', '.join([sp.srepr(var) for var in self.variables])
+        name_repr = f", name='{self.name}'" if self.name != 'f' else ''
+
+        return (f'{class_name}('
+                + variables_repr
+                + name_repr
+                + ')')

@@ -164,6 +164,24 @@ class DimensionalMatrix(Matrix):
         else:
             _show_object(self.labeled_matrix)
 
+    def _sympyrepr(self, printer):
+        """Representation string according to Sympy."""
+
+        class_name = type(self).__name__
+        variables_repr = ', '.join([sp.srepr(var) for var in self.variables])
+
+        if self.dimensions == _obtain_dimensions(*self.variables):
+            dimensions_repr = ''
+        else:
+            dimensions_repr = f', dimensions=[{', '.join(
+                [f"'{dim}'" for dim in self.dimensions]
+            )}]'
+
+        return (f'{class_name}('
+                + variables_repr
+                + dimensions_repr
+                + ')')
+
 
 # Alias for DimensionalMatrix.
 DimMatrix = DimensionalMatrix

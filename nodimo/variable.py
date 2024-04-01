@@ -96,16 +96,6 @@ class Variable(Symbol):
 
         self._validate_variable()
 
-    # def __str__(self):
-    #     pass
-
-    def __repr__(self):
-        class_name = type(self).__name__
-        return (f"{class_name}"
-                f"('{self.name}', "
-                f"dependent={self.is_dependent}, "
-                f"scaling={self.is_scaling})")
-
     def _validate_variable(self) -> None:
         """Validates variable's arguments.
         
@@ -124,6 +114,33 @@ class Variable(Symbol):
         if self.is_scaling and self.is_nondimensional:
             raise ValueError(
                 "A variable can not be both scaling and nondimensional")
+
+    def _sympyrepr(self, printer):
+        """Representation string according to Sympy."""
+
+        class_name = type(self).__name__
+        name_repr = f"'{self.name}'"
+
+        if self.is_nondimensional:
+            dimensions_repr = ''
+        else:
+            dimensions = []
+
+            for dim_name, dim_exp in self.dimensions.items():
+                if dim_exp != 0:
+                    dimensions.append(f'{dim_name}={dim_exp}')
+            
+            dimensions_repr = ', ' + ', '.join(dimensions)
+        
+        dependent_repr = f', dependent=True' if self.is_dependent else ''
+        scaling_repr = f', scaling=True' if self.is_scaling else ''
+
+        return (f'{class_name}('
+                + name_repr
+                + dimensions_repr
+                + dependent_repr
+                + scaling_repr
+                + ')')
 
 
 # Alias for the class Variable.

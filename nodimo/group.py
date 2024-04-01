@@ -222,6 +222,20 @@ class VariableGroup(Mul):
 
         self.is_nondimensional = dimensions_exponents.is_zero_matrix
 
+    def _sympyrepr(self, printer):
+        """Representation string according to Sympy."""
+
+        class_name = type(self).__name__
+        variables_repr = f'[{', '.join(
+            sp.srepr(var) for var in self.variables
+        )}]'
+        exponents_repr = f', {sp.srepr(self.exponents)}'
+
+        return (f'{class_name}('
+                + variables_repr
+                + exponents_repr
+                + ')')
+
 
 # Alias for VariableGroup.
 VarGroup = VariableGroup
