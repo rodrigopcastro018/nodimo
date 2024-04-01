@@ -41,7 +41,7 @@ def test_nondimensional_model():
     ndfunction = ModelFunction(group1, group2, name='Pi')
     
     assert ndmodel.nondimensional_groups == [group1, group2]
-    assert ndmodel.nondimensional_function == ndfunction
+    assert ndmodel.nondimensional_function.function == ndfunction.function
 
 
 def test_build_of_nondimensional_model():

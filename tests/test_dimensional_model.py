@@ -56,7 +56,7 @@ def test_dimensional_matrix():
                               display_messages=False)
 
     assert dmodel.dimensional_matrix.matrix == dmatrix.matrix[:2,:]
-    assert dmodel.dimensional_function == dfunction
+    assert dmodel.dimensional_function.function == dfunction.function
 
 
 def test_model_creation():

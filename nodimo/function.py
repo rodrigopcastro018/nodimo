@@ -13,11 +13,12 @@ ModelFunction
 
 import sympy as sp
 from sympy import Equality
+from sympy.core._print_helpers import Printable
 from typing import Union
 
 from nodimo.variable import Variable
 from nodimo.group import VariableGroup
-from nodimo._internal import _is_running_on_jupyter, _show_object
+from nodimo._internal import _show_object
 
 
 # Aliases for types used in ModelFunction.
@@ -25,12 +26,13 @@ VariableOrGroup = Union[Variable, VariableGroup]
 SeparatedVariablesTuple = tuple[VariableOrGroup, list[VariableOrGroup]]
 
 
-class ModelFunction(Equality):
+class ModelFunction(Printable):
     """Creates a function that relates a set of variables or groups.
 
     This class states a function that represents a model, that is, it
     expresses a relationship between the variables or variable groups
-    that constitute a model.
+    that constitute a model. It inherits from the Sympy Printable class
+    the ability to be displayed on screen in a pretty format.
 
     Parameters
     ----------
@@ -75,21 +77,6 @@ class ModelFunction(Equality):
     >>> h.show()
     """
 
-    def __new__(cls, *variables: VariableOrGroup, name: str = 'f'):
-        (
-            dependent_variable,
-            independent_variables
-        ) = cls._separate_variables(*variables)
-
-        (
-            independent_variables_function
-        ) = sp.Function(name)(*independent_variables)
-
-        return super().__new__(cls,
-                               dependent_variable,
-                               independent_variables_function,
-                               evaluate=False)
-
     def __init__(self, *variables: VariableOrGroup, name: str = 'f'):
 
         self.variables: list[VariableOrGroup] = list(variables)
@@ -102,7 +89,8 @@ class ModelFunction(Equality):
             self.independent_variables
         ) = self._separate_variables(*self.variables)
 
-    @classmethod
+        self.function: Equality = self._build_function()
+
     def _separate_variables(
         cls, *variables: VariableOrGroup) -> SeparatedVariablesTuple:
         """Splits the list of variables in dependent and independent.
@@ -139,12 +127,36 @@ class ModelFunction(Equality):
 
         return dependent_variable[0], independent_variables
 
+    def _build_function(self) -> Equality:
+        """Builds the function to be displayed on screen.
+        
+        Returns
+        -------
+        function : Equality
+            Sympy expression that represents the model function.
+        """
+
+        (
+            independent_variables_function
+        ) = sp.Function(self.name)(*self.independent_variables)
+
+        function = Equality(self.dependent_variable,
+                            independent_variables_function,
+                            evaluate=False)
+
+        return function
+
     def show(self) -> None:
         """Displays the function."""
 
         _show_object(self)
 
-    def _sympyrepr(self, printer):
+    def _sympystr(self, printer) -> str:
+        """String representation according to Sympy."""
+
+        return sp.pretty(self.function, root_notation=False)
+
+    def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""
 
         class_name = type(self).__name__
@@ -155,3 +167,8 @@ class ModelFunction(Equality):
                 + variables_repr
                 + name_repr
                 + ')')
+
+    def _latex(self, printer) -> str:
+        """Latex representation according to Sympy."""
+
+        return sp.latex(self.function, root_notation=False)
