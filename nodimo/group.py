@@ -222,7 +222,7 @@ class VariableGroup(Mul):
 
         self.is_nondimensional = dimensions_exponents.is_zero_matrix
 
-    def _sympyrepr(self, printer):
+    def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""
 
         class_name = type(self).__name__

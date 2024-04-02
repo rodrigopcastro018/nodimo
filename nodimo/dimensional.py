@@ -13,6 +13,7 @@ DimensionalModel
 
 import numpy as np
 import sympy as sp
+from sympy.core._print_helpers import Printable
 
 from nodimo.variable import Variable
 from nodimo.matrix import DimensionalMatrix
@@ -26,7 +27,7 @@ OrganizedVariablesTuple = tuple[list[Variable], list[Variable],
                                 list[Variable], list[Variable]]
 
 
-class DimensionalModel:
+class DimensionalModel(Printable):
     """Creates a dimensional model from a given set of variables.
 
     This class is a base step in the construction of the nondimensional
@@ -235,7 +236,12 @@ class DimensionalModel:
     # Alias for show_dimensional_model.
     show = show_dimensional_function
 
-    def _sympyrepr(self, printer):
+    def _sympystr(self, printer) -> str:
+        """String representation according to Sympy."""
+
+        return sp.sstr(self.dimensional_function)
+
+    def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""
 
         class_name = type(self).__name__
@@ -244,6 +250,11 @@ class DimensionalModel:
         return (f'{class_name}('
                 + variables_repr
                 + ')')
+
+    def _latex(self, printer) -> str:
+        """Latex representation according to Sympy."""
+
+        return sp.latex(self.dimensional_function)
 
 
 # Alias for the class DimensionalModel.

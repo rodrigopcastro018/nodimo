@@ -87,6 +87,11 @@ class NonDimensionalModel(DimensionalModel):
     >>> t0 = Variable('theta_0')
     >>> ndmodel = NonDimensionalModel(P, m, g, R, t0)
     >>> ndmodel.show()
+
+    References
+    ----------
+    .. [1] Thomas Szirtes, Applied Dimensional Analysis and Modeling
+           (Butterworth-Heinemann, 2007), p. 133.
     """
 
     def __init__(self,
@@ -228,6 +233,16 @@ class NonDimensionalModel(DimensionalModel):
 
     # Alias for the method show_nondimensional_model.
     show = show_nondimensional_function
+
+    def _sympystr(self, printer) -> str:
+        """String representation according to Sympy."""
+
+        return sp.sstr(self.nondimensional_function)
+
+    def _latex(self, printer) -> str:
+        """Latex representation according to Sympy."""
+
+        return sp.latex(self.nondimensional_function)
 
 
 # Alias for the class NonDimensinalModel.
@@ -419,6 +434,16 @@ class NonDimensionalModels(DimensionalModel):
 
     # Alias for the method show_nondimensional_model.
     show = show_nondimensional_functions
+
+    def _sympystr(self, printer) -> str:
+        """String representation according to Sympy."""
+
+        return "Use the 'show' method to display the models"
+
+    def _latex(self, printer) -> str:
+        """Latex representation according to Sympy."""
+
+        return R"\text{Use the \textit{show} method to display the models}"
 
 
 # Alias for the class NonDimensionalModels.
