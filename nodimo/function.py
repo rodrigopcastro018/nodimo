@@ -51,6 +51,8 @@ class ModelFunction(Printable):
         Dependent variable or group.
     independent_variables : list[Variable or VariableGroup]
         List of independent variables or groups.
+    function : Equality
+        Sympy expression that represents the model function.
 
     Methods
     -------
@@ -87,24 +89,18 @@ class ModelFunction(Printable):
         (
             self.dependent_variable,
             self.independent_variables
-        ) = self._separate_variables(*self.variables)
+        ) = self._separate_variables()
 
-        self.function: Equality = self._build_function()
+        self.function: Equality = self._build_model_function()
 
-    def _separate_variables(
-        cls, *variables: VariableOrGroup) -> SeparatedVariablesTuple:
+    def _separate_variables(self) -> SeparatedVariablesTuple:
         """Splits the list of variables in dependent and independent.
-
-        Parameters
-        ----------
-        *variables : Variable or VariableGroup
-            Variables or groups that constitute the function.
 
         Returns
         -------
-        dependent_variable : Variable
+        dependent_variable : Variable or VariableGroup
             Dependent variable or group.
-        independent_variables : list[Variable]
+        independent_variables : list[Variable or VariableGroup]
             List of independent variables or groups.
 
         Raises
@@ -116,7 +112,7 @@ class ModelFunction(Printable):
         dependent_variable = []
         independent_variables = []
 
-        for var in variables:
+        for var in self.variables:
             if var.is_dependent:
                 dependent_variable.append(var)
             else:
@@ -127,9 +123,9 @@ class ModelFunction(Printable):
 
         return dependent_variable[0], independent_variables
 
-    def _build_function(self) -> Equality:
+    def _build_model_function(self) -> Equality:
         """Builds the function to be displayed on screen.
-        
+
         Returns
         -------
         function : Equality
