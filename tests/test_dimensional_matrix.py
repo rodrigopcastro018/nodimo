@@ -105,3 +105,27 @@ def test_matrix_display(capfd):
                    '⎢              ⎥\n'
                    '⎣d₂   3     -2 ⎦\n'
                    '\n')
+
+
+def test_dimensional_matrix_repr():
+    var1 = Variable('var1', d1=1, d2=-2, dependent=True)
+    var2 = Variable('var2', d1=-1, scaling=False)
+
+    dmatrix1 = DimensionalMatrix(var1, var2)
+    dmatrix2 = DimensionalMatrix(var1, var2, dimensions=['d2', 'd1'])
+
+    assert eval(sp.srepr(dmatrix1)) == dmatrix1
+    assert eval(sp.srepr(dmatrix2)) == dmatrix2
+
+
+def test_dimensional_matrix_eq():
+    var1 = Variable('var1', d1=1, d2=-2, dependent=True)
+    var2 = Variable('var2', d1=-1, scaling=False)
+
+    dmatrix1 = DimensionalMatrix(var1, var2)
+    dmatrix2 = 'DummyDimensionalMatrix'
+    dmatrix3 = DimensionalMatrix(var1, var2, var2)
+
+    assert dmatrix1 == dmatrix1
+    assert dmatrix1 != dmatrix2
+    assert dmatrix1 != dmatrix3

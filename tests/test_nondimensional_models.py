@@ -1,4 +1,5 @@
 import pytest
+import sympy as sp
 from nodimo import Variable, NonDimensionalModel, NonDimensionalModels
 
 
@@ -118,3 +119,19 @@ def test_nondimensional_models_display(capfd):
                    '      ⎝          v₀  ⎠\n'
                    '\n'
                    + '-' * 78 + '\n')
+
+
+
+def test_nondimensional_models_repr():
+    z = Variable('z', L=1, dependent=True)
+    m = Variable('m', M=1)
+    v = Variable('v', L=1, T=-1)
+    g = Variable('g', L=1, T=-2, scaling=True)
+    t = Variable('t', T=1)
+    z0 = Variable('z_0', L=1, scaling=True)
+    v0 = Variable('v_0', L=1, T=-1, scaling=True)
+
+    ndmodels = NonDimensionalModels(z, m, v, g, t, z0, v0,
+                                    display_messages=False)
+    
+    assert eval(sp.srepr(ndmodels)) == ndmodels

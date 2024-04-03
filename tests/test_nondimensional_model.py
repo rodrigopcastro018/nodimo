@@ -1,4 +1,5 @@
 import pytest
+import sympy as sp
 from sympy.matrices.common import NonInvertibleMatrixError
 from nodimo import Variable, VariableGroup, ModelFunction, NonDimensionalModel
 
@@ -109,3 +110,15 @@ def test_nondimensional_model_display(capfd):
                    ' 2  2      ⎝D⋅U⋅ρ⎠\n'
                    'D ⋅U ⋅ρ           \n'
                    '\n')
+
+
+def test_nondimensional_model_repr():
+    F = Variable('F', M=1, L=1, T=-2, dependent=True)
+    rho = Variable('rho', M=1, L=-3, T=0, scaling=True)
+    U = Variable('U', M=0, L=1, T=-1, scaling=True)
+    mu = Variable('mu', M=1, L=-1, T=-1)
+    D = Variable('D', M=0, L=1, T=0, scaling=True)
+
+    ndmodel = NonDimensionalModel(F, rho, U, mu, D, display_message=False)
+
+    assert eval(sp.srepr(ndmodel)) == ndmodel

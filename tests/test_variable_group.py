@@ -1,5 +1,6 @@
 from nodimo import Variable, VariableGroup
 import sympy as sp
+from sympy import MutableDenseMatrix, Integer
 import pytest
 
 
@@ -146,3 +147,15 @@ def test_nondimensional():
     assert group4.is_nondimensional
     assert not group5.is_nondimensional
     assert not group6.is_nondimensional
+
+def test_group_repr():
+    var1 = Variable('var1', d1=1, d2=-3, d3=0)
+    var2 = Variable('var2', d1=0, d2=1, d3=-1)
+    var3 = Variable('var3', d1=0, d2=1, d3=0)
+    var4 = Variable('var4', d1=1, d2=-1, d3=-1)
+
+    exponents_list = [2, 5, -3, -1]
+
+    group = VariableGroup([var1, var2, var3, var4], exponents_list)
+    
+    assert eval(sp.srepr(group)) == group

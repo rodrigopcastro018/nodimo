@@ -1,4 +1,5 @@
 import pytest
+import sympy as sp
 from nodimo import Variable, DimensionalMatrix, ModelFunction, DimensionalModel
 
 
@@ -92,3 +93,17 @@ def test_dimensional_model_display(capfd):
                    '\n'
                    'P = π(g, R, θ₀)\n'
                    '\n')
+
+
+def test_dimensional_model_repr():
+    var1 = Variable('var1', d1=1, d2=-1, dependent=True)
+    var2 = Variable('var2')
+    var3 = Variable('var3', d1=3, d3=-4)
+    var4 = Variable('var4', d1=-1, d2=2, scaling=True)
+    var5 = Variable('var5', d1=0, d3=0)
+    var6 = Variable('var6', d2=1, scaling=True)
+
+    dmodel = DimensionalModel(var1, var2, var3, var4, var5, var6,
+                              display_messages=False)
+    
+    assert eval(sp.srepr(dmodel)) == dmodel

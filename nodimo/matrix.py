@@ -14,6 +14,7 @@ DimensionalMatrix
 import sympy as sp
 from sympy import Matrix
 from sympy.core._print_helpers import Printable
+# from sympy.printing.pretty.pretty import PrettyPrinter  # TODO: try to implement the _pretty method.
 from typing import Union
 
 from nodimo.variable import Variable
@@ -152,10 +153,28 @@ class DimensionalMatrix(Printable):
 
         _show_object(self)
 
+    def __eq__(self, other) -> bool:
+
+        if self is other:
+            return True
+        
+        if not isinstance(other, DimensionalMatrix):
+            return False
+        
+        if self.labeled_matrix == other.labeled_matrix:
+            return True
+        else:
+            return False
+
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""
 
         return sp.pretty(self.labeled_matrix, root_notation=False)
+
+    # def _pretty(self, printer=PrettyPrinter) -> str:  # TODO: try to implement the _pretty method.
+    #     """String representation according to Sympy."""
+
+    #     return printer._print(self)
 
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""

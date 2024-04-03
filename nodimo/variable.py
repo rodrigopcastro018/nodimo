@@ -141,6 +141,29 @@ class Variable(Symbol):
                 + dependent_repr
                 + scaling_repr
                 + ')')
+    
+    # def __eq__(self, other):
+    #     if self is other:
+    #         return True
+        
+    #     if not isinstance(other, Variable):
+    #         return False
+        
+    #     if (self.name == other.name and
+    #         self.dimensions == other.dimensions and
+    #         self.is_dependent == other.is_dependent and
+    #         self.is_scaling == other.is_scaling):
+    #         return True
+    #     else:
+    #         return False
+
+    # __hash__ = Symbol.__hash__
+    # __hash__ : Callable[[object], int] = <ParentClass>.__hash__
+
+    # def _hashable_content(self):
+    #     symbol_tuple = (self.name,) + tuple(sorted(self.assumptions0.items()))
+    #     scaling_tuple = (('scaling', self.is_scaling),)
+    #     return symbol_tuple + scaling_tuple
 
 
 # Alias for the class Variable.

@@ -1,5 +1,6 @@
 from nodimo import Variable
 import pytest
+import sympy as sp
 
 
 def test_name():
@@ -60,3 +61,17 @@ def test_dependent_and_scaling():
 def test_scaling_and_nondimensional():
     with pytest.raises(ValueError):
         var = Variable('var', scaling=True)
+
+
+def test_variable_repr():
+    var1 = Variable('var1', d1=0, d2=1)
+    var2 = Variable('var2', d1=2, d2=-1, dependent=True)
+    var3 = Variable('var3', d1=2, d2=-1, scaling=True)
+    var4 = Variable('var4', dependent=True)
+    var5 = Variable('var5')
+
+    assert eval(sp.srepr(var1)) == var1
+    assert eval(sp.srepr(var2)) == var2
+    assert eval(sp.srepr(var3)) == var3
+    assert eval(sp.srepr(var4)) == var4
+    assert eval(sp.srepr(var5)) == var5

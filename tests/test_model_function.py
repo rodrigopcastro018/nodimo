@@ -1,3 +1,4 @@
+import sympy as sp
 import pytest
 from nodimo import Variable, VariableGroup, ModelFunction
 
@@ -62,3 +63,18 @@ def test_function_display(capfd):
                    'var₂ = f⎜var₁, ─────⎟\n'
                    '        ⎝       var₃⎠\n'
                    '\n')
+
+
+def test_model_function_repr():
+    var1 = Variable('var1', d1=1, d2=-2, dependent=True)
+    var2 = Variable('var2', d1=0, d2=3, scaling=True)
+    var3 = Variable('var3', d1=-1, d2=0)
+
+    group1 = VariableGroup([var1, var2], [2, -1])
+    group2 = VariableGroup([var2, var3], [-5, 3])
+
+    function1 = ModelFunction(var1, var2, var3)
+    function2 = ModelFunction(group1, group2, var2)
+
+    assert eval(sp.srepr(function1)) == function1
+    assert eval(sp.srepr(function2)) == function2
