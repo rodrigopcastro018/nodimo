@@ -96,6 +96,28 @@ def _print_horizontal_line() -> None:
         print(78 * '-')
 
 
+def _remove_duplicates(original_list: list) -> list:
+    """Removes duplicates from a list, keeping the order.
+
+    Parameters
+    ----------
+    original_list : list
+        List to be checked for duplicates.
+
+    Returns
+    -------
+    new_list : list
+        List with duplicates removed.
+    """
+
+    new_list = []
+    for e in original_list:
+        if e not in new_list:
+            new_list.append(e)
+
+    return new_list
+
+
 def _obtain_dimensions(*variables: Variable) -> list[str]:
     """Obtains the dimensions' names from the given variables.
 

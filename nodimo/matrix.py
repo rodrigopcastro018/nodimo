@@ -20,6 +20,7 @@ from typing import Union
 from nodimo.variable import Variable
 from nodimo.group import VariableGroup
 from nodimo._internal import (_show_object,
+                              _remove_duplicates,
                               _obtain_dimensions,
                               _build_dimensional_matrix)
 
@@ -86,9 +87,9 @@ class DimensionalMatrix(Printable):
             dimensions = _obtain_dimensions(*variables)
 
         self.dimensions: list[str] = dimensions
-        self.variables: list[Variable] = list(variables)
-        self.matrix: Matrix = _build_dimensional_matrix(list(variables),
-                                                        dimensions)
+        self.variables: list[Variable] = _remove_duplicates(list(variables))
+        self.matrix: Matrix = _build_dimensional_matrix(self.variables,
+                                                        self.dimensions)
         self.labeled_matrix: Matrix = self._build_labeled_matrix()
         self.latex: str = self._build_latex_representation()
         self.rank: int = self.matrix.rank()
@@ -157,14 +158,12 @@ class DimensionalMatrix(Printable):
 
         if self is other:
             return True
-        
-        if not isinstance(other, DimensionalMatrix):
+        elif not isinstance(other, type(self)):
+            return False
+        elif set(self.variables) != set(other.variables):
             return False
         
-        if self.labeled_matrix == other.labeled_matrix:
-            return True
-        else:
-            return False
+        return True
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""

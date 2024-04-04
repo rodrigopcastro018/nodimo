@@ -18,8 +18,10 @@ from sympy.core._print_helpers import Printable
 from nodimo.variable import Variable
 from nodimo.matrix import DimensionalMatrix
 from nodimo.function import ModelFunction
-from nodimo._internal import _build_dimensional_matrix, _obtain_dimensions
-from nodimo._internal import color_warning, color_end
+from nodimo._internal import (color_warning, color_end,
+                              _remove_duplicates,
+                              _build_dimensional_matrix,
+                              _obtain_dimensions)
 
 
 # Alias for type used in DimensionalModel.
@@ -101,7 +103,7 @@ class DimensionalModel(Printable):
                  check_variables: bool = True,
                  display_messages: bool = True):
 
-        self.variables: list[Variable] = list(variables)
+        self.variables: list[Variable] = _remove_duplicates(list(variables))
         self.dimensions: list[str] = _obtain_dimensions(*variables)
 
         self.dimensional_variables: list[Variable]
@@ -235,6 +237,17 @@ class DimensionalModel(Printable):
 
     # Alias for show_dimensional_model.
     show = show_dimensional_function
+
+    def __eq__(self, other) -> bool:
+        
+        if self is other:
+            return True
+        elif not isinstance(other, type(self)):
+            return False
+        elif set(self.variables) != set(other.variables):
+            return False
+        
+        return True
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""

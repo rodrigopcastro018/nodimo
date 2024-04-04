@@ -121,11 +121,13 @@ def test_dimensional_matrix_repr():
 def test_dimensional_matrix_eq():
     var1 = Variable('var1', d1=1, d2=-2, dependent=True)
     var2 = Variable('var2', d1=-1, scaling=False)
+    group = VariableGroup([var1, var2], [1, 1])
 
     dmatrix1 = DimensionalMatrix(var1, var2)
-    dmatrix2 = 'DummyDimensionalMatrix'
-    dmatrix3 = DimensionalMatrix(var1, var2, var2)
+    dmatrix2 = DimensionalMatrix(var2, var1, dimensions=['d2', 'd1'])
+    dmatrix3 = 'DummyDimensionalMatrix'
+    dmatrix4 = DimensionalMatrix(var1, var2, group)
 
-    assert dmatrix1 == dmatrix1
-    assert dmatrix1 != dmatrix2
+    assert dmatrix1 == dmatrix2
     assert dmatrix1 != dmatrix3
+    assert dmatrix1 != dmatrix4

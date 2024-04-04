@@ -18,7 +18,7 @@ from typing import Union
 
 from nodimo.variable import Variable
 from nodimo.group import VariableGroup
-from nodimo._internal import _show_object
+from nodimo._internal import _show_object, _remove_duplicates
 
 
 # Aliases for types used in ModelFunction.
@@ -81,7 +81,8 @@ class ModelFunction(Printable):
 
     def __init__(self, *variables: VariableOrGroup, name: str = 'f'):
 
-        self.variables: list[VariableOrGroup] = list(variables)
+        self.variables: list[VariableOrGroup]
+        self.variables = _remove_duplicates(list(variables))
         self.name: str = name
         self.dependent_variable: VariableOrGroup
         self.independent_variables: list[VariableOrGroup]
@@ -146,6 +147,17 @@ class ModelFunction(Printable):
         """Displays the function."""
 
         _show_object(self)
+
+    def __eq__(self, other) -> bool:
+
+        if self is other:
+            return True
+        elif not isinstance(other, type(self)):
+            return False
+        elif set(self.variables) != set(other.variables):
+            return False
+        
+        return True
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""

@@ -119,6 +119,6 @@ def test_nondimensional_model_repr():
     mu = Variable('mu', M=1, L=-1, T=-1)
     D = Variable('D', M=0, L=1, T=0, scaling=True)
 
-    ndmodel = NonDimensionalModel(F, rho, U, mu, D, display_message=False)
+    ndmodel = NonDimensionalModel(F, rho, U, mu, D, display_messages=False)
 
     assert eval(sp.srepr(ndmodel)) == ndmodel
