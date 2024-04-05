@@ -37,6 +37,7 @@ jobs:
         run: mypy --junit-xml tests_results/results-Linux-latest_dependencies/mypy_result.xml
 
       - name: Create summary
+        if: always()
         run: python3 .github/tests_summary.py
 
 
