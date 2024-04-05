@@ -229,7 +229,7 @@ class NonDimensionalModel(DimensionalModel):
     def show_nondimensional_function(self) -> None:
         """Displays the nondimensional function."""
 
-        self.nondimensional_function.show()
+        self.nondimensional_function.show()  # FIXME: This could be _show_object(self)
 
     # Alias for the method show_nondimensional_model.
     show = show_nondimensional_function
@@ -433,7 +433,7 @@ class NonDimensionalModels(DimensionalModel):
             _print_horizontal_line()
 
     # Alias for the method show_nondimensional_model.
-    show = show_nondimensional_functions
+    show = show_nondimensional_functions  # FIXME: show method must be overwritten here
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""

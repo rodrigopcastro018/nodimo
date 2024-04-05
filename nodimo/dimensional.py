@@ -234,7 +234,7 @@ class DimensionalModel(Printable):
     def show_dimensional_function(self) -> None:
         """Displays the dimensional function."""
 
-        self.dimensional_function.show()
+        self.dimensional_function.show()  # FIXME: This could be _show_object(self)
 
     # Alias for show_dimensional_model.
     show = show_dimensional_function

@@ -15,6 +15,8 @@ _show_object(obj)
     Prints object in shell.
 _print_horizontal_line()
     Prints a horizontal line.
+_remove_duplicates(original_list)
+    Removes duplicates from a list, keeping the order.
 _obtain_dimensions(*variables)
     Obtains the dimensions' names from the given variables.
 _build_dimensional_matrix(variables, dimensions=[])
@@ -186,3 +188,41 @@ def _build_dimensional_matrix(variables: list[Variable],
                                       rational=True).as_mutable()
 
     return dimensional_matrix
+
+
+class Basic(Printable):
+    """Base class for some of the Nodimo's classes.
+
+    This base class groups some common attributes and methods used by
+    some Nodimo's classes. It inherits from the Sympy Printable class
+    the ability to display mathematical expressions in a pretty format.
+
+    Parameters
+    ----------
+    *variables : Variable or VariableGroup
+        Variables or groups that constitute the Basic class.
+    dimensions : list[str], default=[]
+        List with dimensions' names of the given variables or groups.
+
+    Attributes
+    ----------
+    variables : list[Variable or VariableGroup]
+        List of variables or groups used by the Basic class.
+    dimensions : list[str]
+        List with dimensions' names of the given variables or groups.
+    """
+
+    def __init__(self,
+                 *variables: VariableOrGroup,
+                 dimensions: list[str] = []):
+        
+        if dimensions == []:
+            dimensions = _obtain_dimensions(*variables)
+
+        self.dimensions: list[str] = dimensions
+        self.variables: VariableOrGroup = _remove_duplicates(list(variables))
+    
+    def show(self):
+        """Displays the object."""
+
+        _show_object(self)
