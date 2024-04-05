@@ -14,7 +14,7 @@ DimensionalMatrix
 import sympy as sp
 from sympy import Matrix
 from sympy.core._print_helpers import Printable
-# from sympy.printing.pretty.pretty import PrettyPrinter  # TODO: try to implement the _pretty method.
+# from sympy.printing.pretty.pretty import PrettyPrinter
 from typing import Union
 
 from nodimo.variable import Variable
@@ -58,7 +58,7 @@ class DimensionalMatrix(Printable):
         Dimensional matrix labeled with variables and dimensions.
     latex : str
         String that represents the labeled dimensional matrix in latex.
-    rank_ : int
+    rank : int
         The rank of the dimensional matrix.
 
     Methods
@@ -170,10 +170,14 @@ class DimensionalMatrix(Printable):
 
         return sp.pretty(self.labeled_matrix, root_notation=False)
 
-    # def _pretty(self, printer=PrettyPrinter) -> str:  # TODO: try to implement the _pretty method.
-    #     """String representation according to Sympy."""
+    # def _pretty(self, printer) -> str:
+    #     """Pretty string representation according to Sympy."""
 
-    #     return printer._print(self)
+    #     return PrettyPrinter(
+    #         settings={'root_notation': False}
+    #     )._print(self.labeled_matrix)
+
+    # _sympystr = _pretty
 
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""

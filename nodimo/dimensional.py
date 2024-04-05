@@ -14,6 +14,7 @@ DimensionalModel
 import numpy as np
 import sympy as sp
 from sympy.core._print_helpers import Printable
+from sympy.printing.pretty.pretty import PrettyPrinter
 
 from nodimo.variable import Variable
 from nodimo.matrix import DimensionalMatrix
@@ -254,6 +255,15 @@ class DimensionalModel(Printable):
 
         return sp.sstr(self.dimensional_function)
 
+    # def _pretty(self, printer) -> str:
+    #     """Pretty string representation according to Sympy."""
+
+    #     return PrettyPrinter(
+    #         settings={'root_notation': False}  # TODO: Check if this setting is really necessary
+    #     )._print(self.dimensional_function)
+
+    # _sympystr = _pretty
+
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""
 
@@ -268,6 +278,7 @@ class DimensionalModel(Printable):
         """Latex representation according to Sympy."""
 
         return sp.latex(self.dimensional_function)
+        # return printer._print(self.dimensional_function)
 
 
 # Alias for the class DimensionalModel.
