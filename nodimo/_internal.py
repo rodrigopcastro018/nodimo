@@ -140,7 +140,8 @@ def _obtain_dimensions(*variables: Variable) -> list[str]:
         dimensions += list(var.dimensions.keys())
 
     # Eliminate duplicates but keep order.
-    dimensions = sorted(set(dimensions), key=dimensions.index)
+    # dimensions = sorted(set(dimensions), key=dimensions.index)  # TODO: remove this line and the comment above later
+    dimensions = _remove_duplicates(dimensions)
 
     return dimensions
 
@@ -201,8 +202,6 @@ class Basic(Printable):
     ----------
     *variables : Variable or VariableGroup
         Variables or groups that constitute the Basic class.
-    dimensions : list[str], default=[]
-        List with dimensions' names of the given variables or groups.
 
     Attributes
     ----------
@@ -212,17 +211,43 @@ class Basic(Printable):
         List with dimensions' names of the given variables or groups.
     """
 
-    def __init__(self,
-                 *variables: VariableOrGroup,
-                 dimensions: list[str] = []):
-        
-        if dimensions == []:
-            dimensions = _obtain_dimensions(*variables)
+    def __init__(self, *variables: VariableOrGroup):
 
-        self.dimensions: list[str] = dimensions
         self.variables: VariableOrGroup = _remove_duplicates(list(variables))
+        self.dimensions: list[str] = _obtain_dimensions(*variables)
     
     def show(self):
-        """Displays the object."""
+        """Displays the object in pretty format."""
 
         _show_object(self)
+
+    def __eq__(self, other) -> bool:
+
+        if self is other:
+            return True
+        elif not isinstance(other, type(self)):
+            return False
+        elif set(self.variables) != set(other.variables):
+            return False
+        
+        return True
+    
+    def _sympystr(self, printer) -> str:
+        """String representation according to Sympy."""
+
+        return "'_sympystr' method not implemented yet"
+
+    def _sympyrepr(self, printer) -> str:
+        """String representation according to Sympy."""
+
+        class_name = type(self).__name__
+        variables_repr = ', '.join([sp.srepr(var) for var in self.variables])
+
+        return (f'{class_name}('
+                + variables_repr
+                + ')')
+
+    def _latex(self, printer) -> str:
+        """Latex representation according to Sympy."""
+
+        return R"\text{\textit{_latex} method not implemented yet}"
