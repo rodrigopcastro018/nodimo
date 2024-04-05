@@ -13,6 +13,7 @@ jobs:
   tests:
     name: Quick test on latest dependencies
     runs-on: ubuntu-latest
+    if: always()
 
     steps:
       - uses: actions/checkout@v4
