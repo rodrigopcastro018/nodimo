@@ -27,10 +27,9 @@ ListOrMatrix = Union[list, Matrix]
 class VariableGroup(BasicVariable, Mul):
     """Creates a product of variables, each raised to an exponent.
 
-    A VariableGroup consists of a product of instances of the class
-    Variable, each instance raised to a particular exponent. The
-    dimensional characteristics of this group of variables are evaluated
-    and stored as attributes.
+    A VariableGroup consists of a product of variables, each raised to a
+    particular exponent. The dimensional characteristics of this group
+    of variables are evaluated and stored as attributes.
 
     Parameters
     ----------

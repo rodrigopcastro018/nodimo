@@ -13,11 +13,8 @@ DimensionalModel
 
 import numpy as np
 import sympy as sp
-from typing import Union
 
-from nodimo.basic import Basic
-from nodimo.variable import Variable
-from nodimo.group import VariableGroup
+from nodimo.basic import BasicVariable, Basic
 from nodimo.matrix import DimensionalMatrix
 from nodimo.function import ModelFunction
 from nodimo._internal import (color_warning, color_end,
@@ -26,9 +23,8 @@ from nodimo._internal import (color_warning, color_end,
 
 
 # Alias for type used in DimensionalModel.
-VariableOrGroup = Union[Variable, VariableGroup]
-OrganizedVariablesTuple = tuple[list[Variable], list[Variable],
-                                list[Variable], list[Variable]]
+OrganizedVariablesTuple = tuple[list[BasicVariable], list[BasicVariable],
+                                list[BasicVariable], list[BasicVariable]]
 
 
 class DimensionalModel(Basic):
@@ -72,8 +68,8 @@ class DimensionalModel(Basic):
         Builds the main characteristics of the dimensional model.
     search_extra_variables_and_dimensions(display_messages=True)
         Searchs for extra variables and dimensions.
-    show_dimensional_function() = show()
-        Displays the dimensional function.
+    show_dimensional_model() = show()
+        Displays the dimensional model.
 
     Raises
     ------
@@ -101,18 +97,18 @@ class DimensionalModel(Basic):
     """
 
     def __init__(self,
-                 *variables: VariableOrGroup,
+                 *variables: BasicVariable,
                  check_variables: bool = True,
                  display_messages: bool = True):
 
-        self.variables: list[VariableOrGroup]
+        self.variables: list[BasicVariable]
         self.dimensions: list[str]
         super().__init__(*variables)
 
-        self.dimensional_variables: list[Variable]
-        self.nondimensional_variables: list[Variable]
-        self.scaling_variables: list[Variable]
-        self.nonscaling_variables: list[Variable]
+        self.dimensional_variables: list[BasicVariable]
+        self.nondimensional_variables: list[BasicVariable]
+        self.scaling_variables: list[BasicVariable]
+        self.nonscaling_variables: list[BasicVariable]
 
         self.dimensional_matrix: DimensionalMatrix
         self.dimensional_function: ModelFunction
@@ -233,13 +229,12 @@ class DimensionalModel(Basic):
                 scaling_variables,
                 nonscaling_variables)
 
-    def show_dimensional_function(self) -> None:
-        """Displays the dimensional function."""
+    # Created this method so the dimensional model can be displayed from
+    # the nondimensional models.
+    def show_dimensional_model(self) -> None:
+        """Displays the dimensional model."""
 
-        _show_object(self)
-
-    # Alias for show_dimensional_model.
-    show = show_dimensional_function
+        self.dimensional_function.show()
 
     def __eq__(self, other) -> bool:
         

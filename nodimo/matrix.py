@@ -13,19 +13,12 @@ DimensionalMatrix
 
 import sympy as sp
 from sympy import Matrix
-from typing import Union
 
-from nodimo.basic import Basic
+from nodimo.basic import BasicVariable, Basic
 from nodimo.variable import Variable
-from nodimo.group import VariableGroup
 from nodimo._internal import (_show_object,
                               _obtain_dimensions,
                               _build_dimensional_matrix)
-
-
-# Aliases for types used in ModelFunction.
-VariableOrGroup = Union[Variable, VariableGroup]
-SeparatedVariablesTuple = tuple[VariableOrGroup, list[VariableOrGroup]]
 
 
 class DimensionalMatrix(Basic):
@@ -79,9 +72,9 @@ class DimensionalMatrix(Basic):
     >>> dmatrix.show()
     """
 
-    def __init__(self, *variables: VariableOrGroup, dimensions: list[str] = []):
+    def __init__(self, *variables: BasicVariable, dimensions: list[str] = []):
 
-        self.variables: list[VariableOrGroup]
+        self.variables: list[BasicVariable]
         self.dimensions: list[str] = dimensions
         super().__init__(*variables, get_dimensions=not bool(dimensions))
 

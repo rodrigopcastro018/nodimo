@@ -3,34 +3,29 @@
 Basic (:mod:`nodimo.basic`)
 ===========================
 
-This module contains the base class for some of Nodimo's classes.
+This module contains base classes for Nodimo.
 
 Classes
 -------
+BasicVariable
+    Base class for classes that represent variables.
 Basic
-    Base class for some of the Nodimo's classes.
+    Base class for classes created with variables.
 """
 
 from sympy import srepr
 from sympy.core._print_helpers import Printable
-# from typing import Union
 
-# from nodimo.variable import Variable
-# from nodimo.group import VariableGroup
 from nodimo._internal import (_show_object,
                               _remove_duplicates,
                               _obtain_dimensions)
 
 
-# VariableOrGroup = Union[Variable, VariableGroup]
-
-
 class BasicVariable:
-    """Creates a basic variable.
+    """Base class for classes that represent variables.
 
-    This is the most basic element as it is part of all the other
-    classes in Nodimo. It contains a few attributes that are useful in
-    describing dimensional properties.
+    Most basic type of variable, with a few attributes that are useful
+    in describing its dimensional properties.
 
     Parameters  
     ----------
@@ -94,11 +89,12 @@ class BasicVariable:
 
 
 class Basic(Printable):
-    """Base class for some of the Nodimo's classes.
+    """Base class for classes created with variables.
 
     This base class groups some common attributes and methods used by
-    some Nodimo's classes. It inherits from the Sympy Printable class
-    the ability to display mathematical expressions in a pretty format.
+    classes that are created with variables. It inherits from the Sympy
+    Printable class the ability to display mathematical expressions in a
+    pretty format.
 
     Parameters
     ----------

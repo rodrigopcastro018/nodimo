@@ -1,4 +1,4 @@
-"""This module contains functions that are used internally.
+"""This module contains variables and functions for internal use.
 
 Variables
 ---------
@@ -24,8 +24,6 @@ _build_dimensional_matrix(variables, dimensions=[])
 """
 
 import sympy as sp
-from sympy import Matrix
-from typing import Any
 
 try:
     from IPython import get_ipython
@@ -43,7 +41,7 @@ color_warning: str = '\033[93m'
 color_end: str = '\033[0m'
 
 
-def _custom_display(obj: Any) -> None:
+def _custom_display(obj):
     """Displays object using a custom CSS style.
 
     This custom display function was created to avoid vertical scrolling
@@ -63,7 +61,7 @@ def _custom_display(obj: Any) -> None:
     display(HTML(css_style + f'${obj._repr_latex_()}$'))
 
 
-def _show_object(obj: Any, use_custom_css: bool = True) -> None:
+def _show_object(obj, use_custom_css=True):
     """Prints object in shell.
 
     Parameters
@@ -83,7 +81,7 @@ def _show_object(obj: Any, use_custom_css: bool = True) -> None:
         print('\n' + sp.pretty(obj, root_notation=False) + '\n')
 
 
-def _print_horizontal_line() -> None:
+def _print_horizontal_line():
     """Prints a horizontal line."""
 
     if _is_running_on_jupyter:
@@ -92,7 +90,7 @@ def _print_horizontal_line() -> None:
         print(78 * '-')
 
 
-def _remove_duplicates(original_list: list) -> list:
+def _remove_duplicates(original_list):
     """Removes duplicates from a list, keeping the order.
 
     Parameters

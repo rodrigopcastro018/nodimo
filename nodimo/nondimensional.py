@@ -17,7 +17,7 @@ import sympy as sp
 from sympy import Matrix
 from itertools import combinations
 
-from nodimo.variable import Variable
+from nodimo.basic import BasicVariable
 from nodimo.group import VariableGroup
 from nodimo.function import ModelFunction
 from nodimo.dimensional import DimensionalModel
@@ -58,8 +58,10 @@ class NonDimensionalModel(DimensionalModel):
     -------
     build_nondimensional_model() = build()
         Builds the main characteristics of the nondimensional model.
-    show_nondimensional_function() = show()
-        Displays the nondimensional function.
+    show_dimensional_model()
+        Displays the dimensional model.
+    show_nondimensional_model() = show()
+        Displays the nondimensional model.
 
     Raises
     ------
@@ -95,7 +97,7 @@ class NonDimensionalModel(DimensionalModel):
     """
 
     def __init__(self,
-                 *variables: Variable,
+                 *variables: BasicVariable,
                  build_now: bool = True,
                  display_messages: bool = True):
 
@@ -226,13 +228,8 @@ class NonDimensionalModel(DimensionalModel):
 
         return nondimensional_groups
 
-    def show_nondimensional_function(self) -> None:
-        """Displays the nondimensional function."""
-
-        _show_object(self)
-
-    # Alias for the method show_nondimensional_model.
-    show = show_nondimensional_function
+    # Alias for the show method.
+    show_nondimensional_model = DimensionalModel.show
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""
@@ -273,6 +270,8 @@ class NonDimensionalModels(DimensionalModel):
 
     Methods
     -------
+    show_dimensional_model()
+        Displays the dimensional model.
     show_nondimensional_functions() = show()
         Displays scaling groups and respective nondimensional functions.
 
@@ -305,15 +304,18 @@ class NonDimensionalModels(DimensionalModel):
     >>> ndmodels.show()
     """
 
-    def __init__(self, *variables: Variable, display_messages: bool = True):
+    def __init__(self,
+                 *variables: BasicVariable,
+                 display_messages: bool = True):
 
         super().__init__(*variables, display_messages=display_messages)
-
         self._validate_scaling_variables()
-        self.scaling_groups: list[list[Variable]] = self._build_scaling_groups()
-        self.nondimensional_functions: list[ModelFunction] = (
-            self._build_nondimensional_functions()
-        )
+        
+        self.scaling_groups: list[list[BasicVariable]]
+        self.nondimensional_functions: list[ModelFunction]
+
+        self.scaling_groups = self._build_scaling_groups()
+        self.nondimensional_functions = self._build_nondimensional_functions()
 
     def _validate_scaling_variables(self) -> None:
         """Validates the starting set of scaling variables.
@@ -343,7 +345,7 @@ class NonDimensionalModels(DimensionalModel):
                              f"{self.dimensional_matrix.rank} "
                              f"scaling variables.")
 
-    def _build_scaling_groups(self) -> list[list[Variable]]:
+    def _build_scaling_groups(self) -> list[list[BasicVariable]]:
         """Builds scaling groups from the initial scaling variables.
 
         Returns

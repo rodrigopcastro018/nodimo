@@ -3,7 +3,7 @@
 Variable (:mod:`nodimo.variable`)
 =================================
 
-This module contains the class to create a variable.
+This module contains the class to create a symbolic variable.
 
 Classes
 -------
@@ -18,8 +18,9 @@ from nodimo.basic import BasicVariable
 class Variable(BasicVariable, Symbol):
     """Creates a symbolic variable.
 
-    It inherits from the sympy Symbol class the ability to be used in
-    mathematical expressions.
+    This class inherits the dimensional properties of BasicVariable and
+    adds to it, by inheriting from sympy.Symbol, the ability to be used
+    in symbolic mathematical expressions.
 
     Parameters  
     ----------

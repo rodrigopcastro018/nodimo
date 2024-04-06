@@ -13,17 +13,13 @@ ModelFunction
 
 import sympy as sp
 from sympy import Equality
-from typing import Union
 
-from nodimo.basic import Basic
-from nodimo.variable import Variable
-from nodimo.group import VariableGroup
+from nodimo.basic import BasicVariable, Basic
 from nodimo._internal import _show_object, _remove_duplicates
 
 
-# Aliases for types used in ModelFunction.
-VariableOrGroup = Union[Variable, VariableGroup]
-SeparatedVariablesTuple = tuple[VariableOrGroup, list[VariableOrGroup]]
+# Alias for type used in ModelFunction.
+SeparatedVariablesTuple = tuple[BasicVariable, list[BasicVariable]]
 
 
 class ModelFunction(Basic):
@@ -79,13 +75,13 @@ class ModelFunction(Basic):
     >>> h.show()
     """
 
-    def __init__(self, *variables: VariableOrGroup, name: str = 'f'):
+    def __init__(self, *variables: BasicVariable, name: str = 'f'):
 
-        self.variables: list[VariableOrGroup]
+        self.variables: list[BasicVariable]
         self.variables = _remove_duplicates(list(variables))
         self.name: str = name
-        self.dependent_variable: VariableOrGroup
-        self.independent_variables: list[VariableOrGroup]
+        self.dependent_variable: BasicVariable
+        self.independent_variables: list[BasicVariable]
 
         (
             self.dependent_variable,
