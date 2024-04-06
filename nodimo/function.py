@@ -13,10 +13,9 @@ ModelFunction
 
 import sympy as sp
 from sympy import Equality
-from sympy.core._print_helpers import Printable
-# from sympy.printing.pretty.pretty import PrettyPrinter  # See comments on the _pretty method
 from typing import Union
 
+from nodimo.basic import Basic
 from nodimo.variable import Variable
 from nodimo.group import VariableGroup
 from nodimo._internal import _show_object, _remove_duplicates
@@ -27,7 +26,7 @@ VariableOrGroup = Union[Variable, VariableGroup]
 SeparatedVariablesTuple = tuple[VariableOrGroup, list[VariableOrGroup]]
 
 
-class ModelFunction(Printable):
+class ModelFunction(Basic):
     """Creates a function that relates a set of variables or groups.
 
     This class states a function that represents a model, that is, it
@@ -165,17 +164,6 @@ class ModelFunction(Printable):
 
         return sp.pretty(self.function, root_notation=False)
 
-    # I was defining _pretty as below and making _sympystr = _pretty.
-    # It works, but it looks so wrong. 
-    # def _pretty(self, printer) -> str:
-    #     """Pretty string representation according to Sympy."""
-
-    #     return PrettyPrinter(
-    #         settings={'root_notation': False}
-    #     )._print(self.function)
-
-    # _sympystr = _pretty
-
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""
 
@@ -191,5 +179,4 @@ class ModelFunction(Printable):
     def _latex(self, printer) -> str:
         """Latex representation according to Sympy."""
 
-        # return printer._print(self.function)  # Perhaps, this is the correct way of doing it, but i'm afraid i'll lose the root_notation setting (issue #33)
         return sp.latex(self.function, root_notation=False)

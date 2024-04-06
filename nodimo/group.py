@@ -16,7 +16,7 @@ import sympy as sp
 from sympy import Mul, Matrix
 from typing import Union
 
-from nodimo.variable import Variable
+from nodimo.basic import BasicVariable
 from nodimo._internal import _obtain_dimensions, _build_dimensional_matrix
 
 
@@ -24,7 +24,7 @@ from nodimo._internal import _obtain_dimensions, _build_dimensional_matrix
 ListOrMatrix = Union[list, Matrix]
 
 
-class VariableGroup(Mul):
+class VariableGroup(BasicVariable, Mul):
     """Creates a product of variables, each raised to an exponent.
 
     A VariableGroup consists of a product of instances of the class
@@ -85,8 +85,9 @@ class VariableGroup(Mul):
     """
 
     def __new__(cls,
-                variables: list[Variable],
+                variables: list[BasicVariable],
                 exponents: ListOrMatrix,
+                scaling: bool = False,
                 check_inputs: bool = True,
                 check_dimensions: bool = True):
 
@@ -107,14 +108,15 @@ class VariableGroup(Mul):
         return super().__new__(cls, *terms)
 
     def __init__(self,
-                 variables: list[Variable],
+                 variables: list[BasicVariable],
                  exponents: ListOrMatrix,
+                 scaling: bool = False,
                  check_inputs: bool = True,
                  check_dimensions: bool = True):
 
-        super().__init__()
-        self.variables: list[Variable] = list(variables)
+        self.variables: list[BasicVariable] = list(variables)
         self.exponents: Matrix = self._convert_exponents(exponents)
+        self.is_scaling: bool = scaling
 
         # The group is dependent if it contains a dependent variable
         # with exponent.
@@ -173,7 +175,7 @@ class VariableGroup(Mul):
 
     @classmethod
     def _validate_variables_and_exponents(cls,
-                                          variables: list[Variable],
+                                          variables: list[BasicVariable],
                                           exponents: Matrix) -> None:
         """Validates provided variables and exponents.
 
@@ -196,7 +198,7 @@ class VariableGroup(Mul):
             If the exponents are not in a row matrix.
         """
         
-        if not all(isinstance(var, Variable) for var in variables):
+        if not all(isinstance(var, BasicVariable) for var in variables):
             raise TypeError("All variables must be of type Variable")
         elif len(set(variables)) < 2:
             raise ValueError("Group must have at least two distinct variables")

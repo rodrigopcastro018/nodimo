@@ -13,24 +13,25 @@ DimensionalModel
 
 import numpy as np
 import sympy as sp
-from sympy.core._print_helpers import Printable
-from sympy.printing.pretty.pretty import PrettyPrinter
+from typing import Union
 
+from nodimo.basic import Basic
 from nodimo.variable import Variable
+from nodimo.group import VariableGroup
 from nodimo.matrix import DimensionalMatrix
 from nodimo.function import ModelFunction
 from nodimo._internal import (color_warning, color_end,
-                              _remove_duplicates,
-                              _build_dimensional_matrix,
-                              _obtain_dimensions)
+                              _show_object,
+                              _build_dimensional_matrix)
 
 
 # Alias for type used in DimensionalModel.
+VariableOrGroup = Union[Variable, VariableGroup]
 OrganizedVariablesTuple = tuple[list[Variable], list[Variable],
                                 list[Variable], list[Variable]]
 
 
-class DimensionalModel(Printable):
+class DimensionalModel(Basic):
     """Creates a dimensional model from a given set of variables.
 
     This class is a base step in the construction of the nondimensional
@@ -100,12 +101,13 @@ class DimensionalModel(Printable):
     """
 
     def __init__(self,
-                 *variables: Variable,
+                 *variables: VariableOrGroup,
                  check_variables: bool = True,
                  display_messages: bool = True):
 
-        self.variables: list[Variable] = _remove_duplicates(list(variables))
-        self.dimensions: list[str] = _obtain_dimensions(*variables)
+        self.variables: list[VariableOrGroup]
+        self.dimensions: list[str]
+        super().__init__(*variables)
 
         self.dimensional_variables: list[Variable]
         self.nondimensional_variables: list[Variable]
@@ -234,7 +236,7 @@ class DimensionalModel(Printable):
     def show_dimensional_function(self) -> None:
         """Displays the dimensional function."""
 
-        self.dimensional_function.show()  # FIXME: This could be _show_object(self)
+        _show_object(self)
 
     # Alias for show_dimensional_model.
     show = show_dimensional_function
@@ -255,15 +257,6 @@ class DimensionalModel(Printable):
 
         return sp.sstr(self.dimensional_function)
 
-    # def _pretty(self, printer) -> str:
-    #     """Pretty string representation according to Sympy."""
-
-    #     return PrettyPrinter(
-    #         settings={'root_notation': False}  # TODO: Check if this setting is really necessary
-    #     )._print(self.dimensional_function)
-
-    # _sympystr = _pretty
-
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""
 
@@ -278,7 +271,6 @@ class DimensionalModel(Printable):
         """Latex representation according to Sympy."""
 
         return sp.latex(self.dimensional_function)
-        # return printer._print(self.dimensional_function)
 
 
 # Alias for the class DimensionalModel.

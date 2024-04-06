@@ -13,14 +13,12 @@ DimensionalMatrix
 
 import sympy as sp
 from sympy import Matrix
-from sympy.core._print_helpers import Printable
-# from sympy.printing.pretty.pretty import PrettyPrinter
 from typing import Union
 
+from nodimo.basic import Basic
 from nodimo.variable import Variable
 from nodimo.group import VariableGroup
 from nodimo._internal import (_show_object,
-                              _remove_duplicates,
                               _obtain_dimensions,
                               _build_dimensional_matrix)
 
@@ -30,7 +28,7 @@ VariableOrGroup = Union[Variable, VariableGroup]
 SeparatedVariablesTuple = tuple[VariableOrGroup, list[VariableOrGroup]]
 
 
-class DimensionalMatrix(Printable):
+class DimensionalMatrix(Basic):
     """Creates a dimensional matrix from a given set of variables.
 
     A DimensionalMatrix is a matrix with one column for each variable,
@@ -81,13 +79,12 @@ class DimensionalMatrix(Printable):
     >>> dmatrix.show()
     """
 
-    def __init__(self, *variables: Variable, dimensions: list[str] = []):
+    def __init__(self, *variables: VariableOrGroup, dimensions: list[str] = []):
 
-        if dimensions == []:
-            dimensions = _obtain_dimensions(*variables)
-
+        self.variables: list[VariableOrGroup]
         self.dimensions: list[str] = dimensions
-        self.variables: list[Variable] = _remove_duplicates(list(variables))
+        super().__init__(*variables, get_dimensions=not bool(dimensions))
+
         self.matrix: Matrix = _build_dimensional_matrix(self.variables,
                                                         self.dimensions)
         self.labeled_matrix: Matrix = self._build_labeled_matrix()
@@ -169,15 +166,6 @@ class DimensionalMatrix(Printable):
         """String representation according to Sympy."""
 
         return sp.pretty(self.labeled_matrix, root_notation=False)
-
-    # def _pretty(self, printer) -> str:
-    #     """Pretty string representation according to Sympy."""
-
-    #     return PrettyPrinter(
-    #         settings={'root_notation': False}
-    #     )._print(self.labeled_matrix)
-
-    # _sympystr = _pretty
 
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""

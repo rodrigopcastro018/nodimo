@@ -12,15 +12,14 @@ Variable
 """
 
 from sympy import Symbol
+from nodimo.basic import BasicVariable
 
 
-class Variable(Symbol):
+class Variable(BasicVariable, Symbol):
     """Creates a symbolic variable.
 
-    This is the most basic element that is used to build all the other
-    classes in this package. It inherits from the sympy Symbol class the
-    ability to be used in mathematical expressions, and adds to it a few
-    attributes that are useful in describing its dimensional properties.
+    It inherits from the sympy Symbol class the ability to be used in
+    mathematical expressions.
 
     Parameters  
     ----------
@@ -72,6 +71,7 @@ class Variable(Symbol):
     >>> a = Variable('alpha')
     """
 
+    # See issue #32 before removing this method.
     def __new__(cls,
                 name: str,
                 dependent: bool = False,
@@ -86,34 +86,7 @@ class Variable(Symbol):
                  scaling: bool = False,
                  **dimensions: int):
 
-        super().__init__()
-        self.dimensions: dict[str, int] = dimensions
-
-        self.is_dependent: bool = dependent
-        self.is_scaling: bool = scaling
-        self.is_nondimensional: bool = all(dim == 0
-                                           for dim in self.dimensions.values())
-
-        self._validate_variable()
-
-    def _validate_variable(self) -> None:
-        """Validates variable's arguments.
-        
-        Raises
-        ------
-        ValueError
-            If the variable is set as both dependent and scaling.
-        ValueError
-            If the variable is set as scaling, but with no dimensions.
-        """
-
-        if self.is_dependent and self.is_scaling:
-            raise ValueError(
-                "A variable can not be both dependent and scaling")
-
-        if self.is_scaling and self.is_nondimensional:
-            raise ValueError(
-                "A variable can not be both scaling and nondimensional")
+        super().__init__(dependent, scaling, **dimensions)
 
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""
@@ -141,29 +114,6 @@ class Variable(Symbol):
                 + dependent_repr
                 + scaling_repr
                 + ')')
-    
-    # def __eq__(self, other):
-    #     if self is other:
-    #         return True
-        
-    #     if not isinstance(other, Variable):
-    #         return False
-        
-    #     if (self.name == other.name and
-    #         self.dimensions == other.dimensions and
-    #         self.is_dependent == other.is_dependent and
-    #         self.is_scaling == other.is_scaling):
-    #         return True
-    #     else:
-    #         return False
-
-    # __hash__ = Symbol.__hash__
-    # __hash__ : Callable[[object], int] = <ParentClass>.__hash__
-
-    # def _hashable_content(self):
-    #     symbol_tuple = (self.name,) + tuple(sorted(self.assumptions0.items()))
-    #     scaling_tuple = (('scaling', self.is_scaling),)
-    #     return symbol_tuple + scaling_tuple
 
 
 # Alias for the class Variable.

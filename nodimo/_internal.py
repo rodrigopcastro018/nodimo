@@ -27,10 +27,6 @@ import sympy as sp
 from sympy import Matrix
 from typing import Any
 
-from nodimo.variable import Variable
-
-_is_running_on_jupyter: bool
-
 try:
     from IPython import get_ipython
 
@@ -84,9 +80,7 @@ def _show_object(obj: Any, use_custom_css: bool = True) -> None:
         else:
             display(obj)
     else:
-        print()
-        sp.pprint(obj, root_notation=False)
-        print()
+        print('\n' + sp.pretty(obj, root_notation=False) + '\n')
 
 
 def _print_horizontal_line() -> None:
@@ -120,7 +114,7 @@ def _remove_duplicates(original_list: list) -> list:
     return new_list
 
 
-def _obtain_dimensions(*variables: Variable) -> list[str]:  # FIXME: The input type should be VariableOrGroup.
+def _obtain_dimensions(*variables):
     """Obtains the dimensions' names from the given variables.
 
     Parameters
@@ -139,15 +133,12 @@ def _obtain_dimensions(*variables: Variable) -> list[str]:  # FIXME: The input t
     for var in variables:
         dimensions += list(var.dimensions.keys())
 
-    # Eliminate duplicates but keep order.
-    # dimensions = sorted(set(dimensions), key=dimensions.index)  # TODO: remove this line and the comment above later
     dimensions = _remove_duplicates(dimensions)
 
     return dimensions
 
 
-def _build_dimensional_matrix(variables: list[Variable],  # FIXME: The input type should be VariableOrGroup.
-                              dimensions: list[str] = []) -> Matrix:
+def _build_dimensional_matrix(variables, dimensions=[]):
     """Builds a basic dimensional matrix.
 
     A basic dimensional matrix contains only numbers, no labels.

@@ -229,7 +229,7 @@ class NonDimensionalModel(DimensionalModel):
     def show_nondimensional_function(self) -> None:
         """Displays the nondimensional function."""
 
-        self.nondimensional_function.show()  # FIXME: This could be _show_object(self)
+        _show_object(self)
 
     # Alias for the method show_nondimensional_model.
     show = show_nondimensional_function
