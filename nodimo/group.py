@@ -218,9 +218,7 @@ class VariableGroup(BasicVariable, Mul):
         """String representation according to Sympy."""
 
         class_name = type(self).__name__
-        variables_repr = f'[{', '.join(
-            sp.srepr(var) for var in self.variables
-        )}]'
+        variables_repr = f"[{', '.join(sp.srepr(var) for var in self.variables)}]"
 
         exponents_repr_list = []
         for e in self.exponents.tolist()[0]:
@@ -229,7 +227,7 @@ class VariableGroup(BasicVariable, Mul):
             else:
                 exponents_repr_list.append(sp.srepr(e))
 
-        exponents_repr = ", [" + ', '.join(exponents_repr_list) + "]"
+        exponents_repr = ', [' + ', '.join(exponents_repr_list) + ']'
         dependent_repr = f', dependent=True' if self.is_dependent else ''
         scaling_repr = f', scaling=True' if self.is_scaling else ''
 

@@ -55,7 +55,7 @@ testpaths = ['tests', 'docs/tutorials']
 
 [tool.coverage.run]
 source = ['nodimo']
-data_file = 'coverage/.coverage'
+data_file = '.coverage/.coverage'
 context = '${CONTEXT}'
 relative_files = 'true'
 
@@ -63,7 +63,7 @@ relative_files = 'true'
 source = ['nodimo']
 
 [tool.coverage.html]
-directory = 'coverage/htmlcov'
+directory = '.coverage/htmlcov'
 
 [tool.tox]
 legacy_tox_ini = """
@@ -91,7 +91,7 @@ legacy_tox_ini = """
         SYMPY_VERSION
     set_env = 
         SYMPY = sympy=={env:SYMPY_VERSION}
-        COVERAGE_FILE = coverage/.coverage.{env:CONTEXT}
+        COVERAGE_FILE = .coverage/.coverage.{env:CONTEXT}
 
     [testenv:type]
     skip_install = true
