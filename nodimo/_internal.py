@@ -136,49 +136,6 @@ def _obtain_dimensions(*variables):
     return dimensions
 
 
-# def _build_dimensional_matrix(variables, dimensions=[]):
-#     """Builds a basic dimensional matrix.
-
-#     A basic dimensional matrix contains only numbers, no labels.
-
-#     Parameters
-#     ----------
-#     variables : list[Variable]
-#         List with the variables used to build the dimensional matrix.
-#     dimensions : list[str], default=[]
-#         List with the dimensions' names of the given variables. If not
-#         provided, this list is obtained from the variables.
-
-#     Returns
-#     -------
-#     dimensional_matrix : Matrix
-#         Matrix with one column for each variable, one row for each
-#         dimension, and every entry represents the dimension's exponent
-#         of a particular variable.
-#     """
-
-#     if len(variables) > 0 and dimensions == []:
-#         dimensions = _obtain_dimensions(*variables)
-
-#     raw_dimensional_matrix = []
-
-#     for dim in dimensions:
-#         dimension_exponents = []
-
-#         for var in variables:
-#             if dim in var.dimensions.keys():
-#                 dimension_exponents.append(var.dimensions[dim])
-#             else:
-#                 dimension_exponents.append(0)
-
-#         raw_dimensional_matrix.append(dimension_exponents)
-
-#     dimensional_matrix = sp.Matrix(raw_dimensional_matrix)
-#     dimensional_matrix = sp.nsimplify(dimensional_matrix,
-#                                       rational=True).as_mutable()
-
-#     return dimensional_matrix
-
 def _build_dimensional_matrix(variables, dimensions=[], return_raw=False):
     """Builds a basic dimensional matrix.
 

@@ -11,7 +11,6 @@ DimensionalModel
     Creates a dimensional model from a given set of variables.
 """
 
-import numpy as np
 import sympy as sp
 
 from nodimo.basic import BasicVariable, Basic
@@ -138,55 +137,6 @@ class DimensionalModel(Basic):
 
     # Alias for build_dimensional_model.
     build = build_dimensional_model
-
-    # def search_extra_variables_and_dimensions(
-    #         self, display_messages: bool = True) -> None:
-    #     """Searchs for extra variables and dimensions.
-
-    #     Parameters
-    #     ----------
-    #     display_messages : bool, default=True
-    #         If ``True``, extra variables and dimensions are displayed.
-    #     """
-
-    #     dimensional_matrix_sp = _build_dimensional_matrix(self.variables,
-    #                                                       self.dimensions)
-        
-    #     dimensional_matrix_bool = np.array(dimensional_matrix_sp, dtype=bool)
-
-    #     extra_variables = []
-    #     extra_dimensions = []
-
-    #     for dim, row in zip(self.dimensions, dimensional_matrix_bool):
-    #         if np.sum(row) == 1:
-    #             var = self.variables[np.where(row == 1)[0][0]]
-    #             extra_variables.append(var)
-    #             extra_dimensions.append(dim)
-    #         if np.sum(row) == 0:
-    #             extra_dimensions.append(dim)
-
-    #     for var in extra_variables:
-    #         self.variables.remove(var)
-
-    #     for dim in extra_dimensions:
-    #         self.dimensions.remove(dim)
-
-    #     if display_messages:
-    #         if len(extra_variables) > 0:
-    #             print(color_warning
-    #                   + "Variables that can not be part of the model:"
-    #                   + color_end)
-    #             print(color_warning
-    #                   + '    ' + sp.pretty(extra_variables)[1:-1]
-    #                   + color_end)
-
-    #         if len(extra_dimensions) > 0:
-    #             print(color_warning
-    #                   + "Dimensions that can not be part of the model:"
-    #                   + color_end)
-    #             print(color_warning
-    #                   + '    ' + sp.pretty(extra_dimensions)[1:-1]
-    #                   + color_end)
 
     def search_extra_variables_and_dimensions(
             self, display_messages: bool = True) -> None:
