@@ -223,7 +223,7 @@ class VariableGroup(BasicVariable, Mul):
         )}]'
 
         exponents_repr_list = []
-        for e in self.exponents:
+        for e in self.exponents.tolist()[0]:
             if e.is_Integer or e.is_Rational:
                 exponents_repr_list.append(str(e))
             else:
