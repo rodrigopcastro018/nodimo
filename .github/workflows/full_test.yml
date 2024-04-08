@@ -19,14 +19,12 @@ jobs:
           - macos-latest
         py:
           - python: '3.9'
-            numpy: '1.20.0'
             sympy: '1.7'
           - python: '3.12'
-            numpy: '1.26.4'
             sympy: '1.12'
       fail-fast: false
 
-    name: ${{ matrix.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
+    name: ${{ matrix.os }}-py${{ matrix.py.python }}-sp${{ matrix.py.sympy }}
     
     runs-on: ${{ matrix.os }}
 
@@ -44,8 +42,7 @@ jobs:
       - name: Run tox
         run: tox
         env:
-          CONTEXT: ${{ runner.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
-          NUMPY_VERSION: ${{ matrix.py.numpy }}
+          CONTEXT: ${{ runner.os }}-py${{ matrix.py.python }}-sp${{ matrix.py.sympy }}
           SYMPY_VERSION: ${{ matrix.py.sympy }}
 
       - name: Store coverage files
@@ -57,7 +54,7 @@ jobs:
       - name: Store results folder
         uses: actions/upload-artifact@v4
         with:
-          name: results-${{ runner.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
+          name: results-${{ runner.os }}-py${{ matrix.py.python }}-sp${{ matrix.py.sympy }}
           path: tests_results
 
   merge_tests_results:
@@ -120,7 +117,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Download coverage files
         uses: actions/download-artifact@v4
@@ -157,7 +154,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Download coverage HTML
         uses: actions/download-artifact@v4
