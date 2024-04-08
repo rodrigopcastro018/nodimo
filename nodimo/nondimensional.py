@@ -213,11 +213,10 @@ class NonDimensionalModel(DimensionalModel):
         nondimensional_groups = []
 
         for j in range(len(self.nonscaling_variables)):
-
-            nondimensional_groups.append(
-                VariableGroup(self.dimensional_variables,
-                              exponents_matrix.col(j).T)
-            )
+            group = VariableGroup(self.dimensional_variables,
+                                  exponents_matrix.col(j).T)
+            group._set_dependent_from_variables()
+            nondimensional_groups.append(group)
 
         return nondimensional_groups
 

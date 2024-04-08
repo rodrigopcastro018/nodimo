@@ -100,8 +100,11 @@ def test_dependent():
     var3 = Variable('var3', d2=3, d3=-1)
 
     group1 = VariableGroup([var2, var3], [-10, 15])
+    group1._set_dependent_from_variables()
     group2 = VariableGroup([var1, var2, var3], [1, 5, -1])
+    group2._set_dependent_from_variables()
     group3 = VariableGroup([var1, var1, var2, var3], [3, -2, -1, 6])
+    group3._set_dependent_from_variables()
 
     assert not group1.is_dependent
     assert group2.is_dependent

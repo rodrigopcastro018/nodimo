@@ -37,7 +37,9 @@ def test_nondimensional_model():
     ndmodel = NonDimensionalModel(F, rho, U, mu, D)
 
     group1 = VariableGroup([F, mu, rho, U, D], [1, 0, -1, -2, -2])
+    group1._set_dependent_from_variables()
     group2 = VariableGroup([F, mu, rho, U, D], [0, 1, -1, -1, -1])
+    group2._set_dependent_from_variables()
 
     ndfunction = ModelFunction(group1, group2, name='Pi')
     

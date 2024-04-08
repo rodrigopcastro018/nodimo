@@ -178,3 +178,26 @@ def _build_dimensional_matrix(variables, dimensions=[]):
                                       rational=True).as_mutable()
 
     return dimensional_matrix
+
+
+# I think I don't need this TODO: deleter this later
+# def _rowmatrix_to_binarylist(row_matrix):
+#     """Converts a row matrix to a binary list.
+
+#     Parameters
+#     ----------
+#     row_matrix : Matrix
+#         Row matrix.
+
+#     Returns
+#     -------
+#     binary_list : list[int]
+#         List containing the boolean 
+
+#     """
+
+#     binary_list = []
+#     for element in row_matrix:
+#         binary_list.append(int(bool(element)))
+
+#     return binary_list

@@ -11,7 +11,6 @@ VariableGroup
     Creates a product of variables, each raised to an exponent.
 """
 
-import numpy as np
 import sympy as sp
 from sympy import Mul, Matrix
 from typing import Union
@@ -84,11 +83,12 @@ class VariableGroup(BasicVariable, Mul):
     def __new__(cls,
                 variables: list[BasicVariable],
                 exponents: ListOrMatrix,
+                dependent: bool = False,
                 scaling: bool = False):
 
         exponents = cls._convert_exponents(exponents)
         cls._validate_variables_and_exponents(variables, exponents)
-        
+
         exponents_list = exponents.tolist()[0]
         terms = [var**exp for var, exp in zip(variables, exponents_list)]
 
@@ -97,6 +97,7 @@ class VariableGroup(BasicVariable, Mul):
     def __init__(self,
                  variables: list[BasicVariable],
                  exponents: ListOrMatrix,
+                 dependent: bool = False,
                  scaling: bool = False):
 
         super().__init__()
@@ -113,14 +114,7 @@ class VariableGroup(BasicVariable, Mul):
         else:
             self._get_dimensions()
     
-        # The group is dependent if it contains a dependent variable
-        # with exponent.
-        is_dependent = [var.is_dependent for var in variables]
-        has_exponent = np.array(exponents, dtype=bool).reshape(-1)
-        self.is_dependent: bool = any(
-            np.logical_and(is_dependent, has_exponent)
-        )
-
+        self.is_dependent = dependent
         self.is_scaling = scaling        
     
     @classmethod
@@ -207,6 +201,19 @@ class VariableGroup(BasicVariable, Mul):
         # Third, combine names and exponents.
         self.dimensions = dict(zip(dimensions_names, dimensions_exponents))
 
+    def _set_dependent_from_variables(self) -> None:
+        """Set is_dependent property from component variables.
+
+        The group is dependent if it contains a dependent variable with
+        exponent.
+        """
+
+        is_dependent = [var.is_dependent for var in self.variables]
+        has_exponent = list(map(bool, self.exponents.tolist()[0]))
+        self.is_dependent = any(
+            [dep and exp for (dep,exp) in zip(is_dependent, has_exponent)]
+        )
+
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""
 
@@ -214,11 +221,23 @@ class VariableGroup(BasicVariable, Mul):
         variables_repr = f'[{', '.join(
             sp.srepr(var) for var in self.variables
         )}]'
-        exponents_repr = f', {sp.srepr(self.exponents)}'
+
+        exponents_repr_list = []
+        for e in self.exponents:
+            if e.is_Integer or e.is_Rational:
+                exponents_repr_list.append(str(e))
+            else:
+                exponents_repr_list.append(sp.srepr(e))
+
+        exponents_repr = ", [" + ', '.join(exponents_repr_list) + "]"
+        dependent_repr = f', dependent=True' if self.is_dependent else ''
+        scaling_repr = f', scaling=True' if self.is_scaling else ''
 
         return (f'{class_name}('
                 + variables_repr
                 + exponents_repr
+                + dependent_repr
+                + scaling_repr
                 + ')')
 
 

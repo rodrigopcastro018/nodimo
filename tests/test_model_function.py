@@ -10,7 +10,9 @@ def test_dependent_and_independent_variables():
     var3 = Variable('var3', d1=-1, d2=0)
 
     group1 = VariableGroup([var1, var2], [2, -1])
+    group1._set_dependent_from_variables()
     group2 = VariableGroup([var2, var3], [-5, 3])
+    group2._set_dependent_from_variables()
 
     function1 = ModelFunction(var1, var2, var3)
     function2 = ModelFunction(group1, group2, var2)
@@ -72,6 +74,7 @@ def test_model_function_repr():
     var3 = Variable('var3', d1=-1, d2=0)
 
     group1 = VariableGroup([var1, var2], [2, -1])
+    group1._set_dependent_from_variables()
     group2 = VariableGroup([var2, var3], [-5, 3])
 
     function1 = ModelFunction(var1, var2, var3)
