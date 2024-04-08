@@ -169,9 +169,8 @@ class DimensionalMatrix(Basic):
         if self.dimensions == _obtain_dimensions(*self.variables):
             dimensions_repr = ''
         else:
-            dimensions_repr = f', dimensions=[{', '.join(
-                [f"'{dim}'" for dim in self.dimensions]
-            )}]'
+            dimensions_repr_list = ', '.join([f"'{dim}'" for dim in self.dimensions])
+            dimensions_repr = f', dimensions=[{dimensions_repr_list}]'
 
         return (f'{class_name}('
                 + variables_repr

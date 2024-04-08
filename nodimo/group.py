@@ -227,7 +227,7 @@ class VariableGroup(BasicVariable, Mul):
             else:
                 exponents_repr_list.append(sp.srepr(e))
 
-        exponents_repr = ', [' + ', '.join(exponents_repr_list) + ']'
+        exponents_repr = f", [{', '.join(exponents_repr_list)}]"
         dependent_repr = f', dependent=True' if self.is_dependent else ''
         scaling_repr = f', scaling=True' if self.is_scaling else ''
 

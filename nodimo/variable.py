@@ -104,7 +104,7 @@ class Variable(BasicVariable, Symbol):
                 if dim_exp != 0:
                     dimensions.append(f'{dim_name}={dim_exp}')
             
-            dimensions_repr = ', ' + ', '.join(dimensions)
+            dimensions_repr = f", {', '.join(dimensions)}"
         
         dependent_repr = f', dependent=True' if self.is_dependent else ''
         scaling_repr = f', scaling=True' if self.is_scaling else ''
