@@ -15,6 +15,7 @@ Basic
 
 from sympy import srepr
 from sympy.core._print_helpers import Printable
+from typing import Optional
 
 from nodimo._internal import (_show_object,
                               _remove_duplicates,
@@ -27,7 +28,7 @@ class BasicVariable:
     Most basic type of variable, with a few attributes that are useful
     in describing its dimensional properties.
 
-    Parameters  
+    Parameters
     ----------
     dependent : bool, default=False
         If ``True``, the variable is dependent.
@@ -55,37 +56,72 @@ class BasicVariable:
         If the variable is set as scaling, but with no dimensions.
     """
 
-    def __init__(self,
-                 dependent: bool = False,
-                 scaling: bool = False,
-                 **dimensions: int):
+    def __init__(
+        self, dependent: bool = False, scaling: bool = False, **dimensions: int
+    ):
 
-        self.dimensions: dict[str, int] = dimensions
-        self.is_dependent: bool = dependent
-        self.is_scaling: bool = scaling
-        self.is_nondimensional: bool = all(dim == 0
-                                           for dim in self.dimensions.values())
+        self._is_dependent: bool = dependent
+        self._is_scaling: bool = scaling
+        self._dimensions: dict[str, int] = dimensions
+        self._is_nondimensional: bool = all(
+            dim == 0 for dim in self._dimensions.values()
+        )
 
-        self._validate_variable()
+        self._validate_properties()
 
-    def _validate_variable(self) -> None:
-        """Validates variable's arguments.
-        
-        Raises
-        ------
-        ValueError
-            If the variable is set as both dependent and scaling.
-        ValueError
-            If the variable is set as scaling, but with no dimensions.
-        """
+    @property
+    def is_dependent(self) -> bool:
+        return self._is_dependent
 
-        if self.is_dependent and self.is_scaling:
-            raise ValueError(
-                "A variable can not be both dependent and scaling")
-        
-        elif self.is_scaling and self.is_nondimensional:
-            raise ValueError(
-                "A variable can not be both scaling and nondimensional")
+    @is_dependent.setter
+    def is_dependent(self, dependent: bool) -> None:
+        self._validate_properties(is_dependent=dependent)
+        self._is_dependent = dependent
+
+    @property
+    def is_scaling(self) -> bool:
+        return self._is_scaling
+
+    @is_scaling.setter
+    def is_scaling(self, scaling: bool) -> None:
+        self._validate_properties(is_scaling=scaling)
+        self._is_scaling = scaling
+
+    @property
+    def dimensions(self) -> dict[str, int]:
+        return self._dimensions
+
+    @dimensions.setter
+    def dimensions(self, dimensions: dict[str, int]) -> None:
+        self._validate_properties(dimensions=dimensions)
+        self._dimensions = dimensions
+        self._is_nondimensional = all(dim == 0 for dim in dimensions.values())
+
+    @property
+    def is_nondimensional(self) -> bool:
+        return self._is_nondimensional
+
+    def _validate_properties(
+        self,
+        is_dependent: Optional[bool] = None,
+        is_scaling: Optional[bool] = None,
+        dimensions: Optional[dict[str, int]] = None,
+    ) -> None:
+
+        if is_dependent is None:
+            is_dependent = self._is_dependent
+        if is_scaling is None:
+            is_scaling = self._is_scaling
+        if dimensions is None:
+            dimensions = self._dimensions
+            is_nondimensional = self._is_nondimensional
+        else:
+            is_nondimensional = all(dim == 0 for dim in dimensions.values())
+
+        if is_dependent and is_scaling:
+            raise ValueError("A variable can not be both dependent and scaling")
+        elif is_scaling and is_nondimensional:
+            raise ValueError("A variable can not be both scaling and nondimensional")
 
 
 class Basic(Printable):

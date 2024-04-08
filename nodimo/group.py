@@ -39,8 +39,6 @@ class VariableGroup(BasicVariable, Mul):
         List or matrix containing each variable's exponent.
     check_inputs : bool, default=True
         If ``True``, variables and exponents are validated.
-    check_dimensions : bool, default=True
-        If ``True``, dimensional properties are evaluated.
 
     Attributes
     ----------
@@ -110,13 +108,22 @@ class VariableGroup(BasicVariable, Mul):
                  variables: list[BasicVariable],
                  exponents: ListOrMatrix,
                  scaling: bool = False,
-                 check_inputs: bool = True,
-                 check_dimensions: bool = True):
+                 check_inputs: bool = True):
 
+        super().__init__()
         self.variables: list[BasicVariable] = list(variables)
         self.exponents: Matrix = self._convert_exponents(exponents)
-        self.is_scaling: bool = scaling
 
+        # If all variables are nondimensional, there is no need to
+        # determine the dimensional properties.
+        self._is_nondimensional = all(var.is_nondimensional
+                                      for var in self.variables)
+        
+        if self.is_nondimensional:
+            self.dimensions = dict()
+        else:
+            self._get_dimensions()
+    
         # The group is dependent if it contains a dependent variable
         # with exponent.
         is_dependent = [var.is_dependent for var in variables]
@@ -125,18 +132,8 @@ class VariableGroup(BasicVariable, Mul):
             np.logical_and(is_dependent, has_exponent)
         )
 
-        self.dimensions: dict[str, int] = dict()
-        self.is_nondimensional: bool = True
-
-        if check_dimensions:
-            self.is_nondimensional = all(var.is_nondimensional
-                                         for var in self.variables)
-
-            # If all variables are nondimensional, there is no need to
-            # determine the dimensional properties.
-            if not self.is_nondimensional:
-                self._get_dimensions()
-
+        self.is_scaling = scaling        
+    
     @classmethod
     def _convert_exponents(cls, exponents: ListOrMatrix) -> Matrix:
         """Converts a container of type ``list`` to the type ``Matrix``.
@@ -220,8 +217,6 @@ class VariableGroup(BasicVariable, Mul):
 
         # Third, combine names and exponents.
         self.dimensions = dict(zip(dimensions_names, dimensions_exponents))
-
-        self.is_nondimensional = dimensions_exponents.is_zero_matrix
 
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""

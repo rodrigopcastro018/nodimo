@@ -9,4 +9,4 @@ NonDimensionalModels
 
 .. autoclass:: NonDimensionalModels
    :members:
-   :exclude-members: show_nondimensional_functions, show
+   :exclude-members: show_nondimensional_models, show

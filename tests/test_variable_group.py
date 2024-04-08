@@ -112,11 +112,12 @@ def test_dimensions():
     var1 = Variable('var1', d1=11, d2=-5, d3=7)
     var2 = Variable('var2', d1=2, d4=3)
     var3 = Variable('var3')
+    var4 = Variable('var4', d1=0, d3=0)
 
     group1 = VariableGroup([var1, var2], [1, 1])
     group2 = VariableGroup([var2, var3], [3, 2])
     group3 = VariableGroup([var1, var2, var3], [-1, 2, -3])
-    group4 = VariableGroup([var1, var2], [1, 2], check_dimensions=False)
+    group4 = VariableGroup([var3, var4], [1, 2])
 
     assert group1.dimensions == {'d1':13, 'd2':-5, 'd3':7, 'd4':3}
     assert group2.dimensions == {'d1':6, 'd4':9}
@@ -136,17 +137,14 @@ def test_nondimensional():
     group1 = VariableGroup([var1, var2, var3, var4], [1, 1, 1, -1])
     group2 = VariableGroup([var1, var2, var3, var4, var5], [1, 1, 1, -1, 1])
     group3 = VariableGroup([var5, var6, var7], [-1, 2, -3])
-    group4 = VariableGroup([var5, var6, var7], [-1, 2, -3],
-                           check_dimensions=False)
-    group5 = VariableGroup([var1, var2, var3], [1, 1, 1])
-    group6 = VariableGroup([var1, var2, var3, var5], [1, 1, 1, -9])
+    group4 = VariableGroup([var1, var2, var3], [1, 1, 1])
+    group5 = VariableGroup([var1, var2, var3, var5], [1, 1, 1, -9])
 
     assert group1.is_nondimensional
     assert group2.is_nondimensional
     assert group3.is_nondimensional
-    assert group4.is_nondimensional
+    assert not group4.is_nondimensional
     assert not group5.is_nondimensional
-    assert not group6.is_nondimensional
 
 def test_group_repr():
     var1 = Variable('var1', d1=1, d2=-3, d3=0)

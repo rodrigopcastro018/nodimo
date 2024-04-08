@@ -89,11 +89,6 @@ class NonDimensionalModel(DimensionalModel):
     >>> t0 = Variable('theta_0')
     >>> ndmodel = NonDimensionalModel(P, m, g, R, t0)
     >>> ndmodel.show()
-
-    References
-    ----------
-    .. [1] Thomas Szirtes, Applied Dimensional Analysis and Modeling
-           (Butterworth-Heinemann, 2007), p. 133.
     """
 
     def __init__(self,
@@ -222,8 +217,7 @@ class NonDimensionalModel(DimensionalModel):
             nondimensional_groups.append(
                 VariableGroup(self.dimensional_variables,
                               exponents_matrix.col(j).T,
-                              check_inputs=False,
-                              check_dimensions=False)
+                              check_inputs=False)
             )
 
         return nondimensional_groups
@@ -272,8 +266,8 @@ class NonDimensionalModels(DimensionalModel):
     -------
     show_dimensional_model()
         Displays the dimensional model.
-    show_nondimensional_functions() = show()
-        Displays scaling groups and respective nondimensional functions.
+    show_nondimensional_models() = show()
+        Displays scaling groups and respective nondimensional models.
 
     Raises
     ------
@@ -412,7 +406,7 @@ class NonDimensionalModels(DimensionalModel):
 
         return nondimensional_functions
 
-    def show_nondimensional_functions(self) -> None:
+    def show_nondimensional_models(self) -> None:
         """Displays scaling groups and nondimensional functions."""
 
         for i, function in enumerate(self.nondimensional_functions):
@@ -435,7 +429,7 @@ class NonDimensionalModels(DimensionalModel):
             _print_horizontal_line()
 
     # Alias for the method show_nondimensional_model.
-    show = show_nondimensional_functions  # FIXME: show method must be overwritten here
+    show = show_nondimensional_models  # FIXME: show method must be overwritten here
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""

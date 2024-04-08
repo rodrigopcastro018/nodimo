@@ -25,6 +25,7 @@ extensions = [
     'nbsphinx',  # This extension requires pandoc and IPython
     'numpydoc',
     'sphinx.ext.linkcode',
+    'sphinx_copybutton',
 ]
 
 templates_path = ['_templates']
@@ -56,6 +57,9 @@ def linkcode_resolve(domain, info):
         return None
     filename = info['module'].replace('.', '/')
     return f'{branch_url}/{filename}.py'
+
+# sphinx-copybutton
+copybutton_prompt_text = ">>> "
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

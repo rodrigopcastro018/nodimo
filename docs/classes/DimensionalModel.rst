@@ -12,4 +12,4 @@ DimensionalModel
    :exclude-members:
       build_dimensional_model, build,
       search_extra_variables_and_dimensions,
-      show_dimensional_function, show
+      show_dimensional_model, show

@@ -12,6 +12,7 @@ Development Environment
 
 Git and GitHub
 ^^^^^^^^^^^^^^
+
 Nodimo is available on `GitHub`_ and uses `Git`_ for source control.
 
 To get the source code from GitHub run::
