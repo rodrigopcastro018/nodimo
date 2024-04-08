@@ -1,6 +1,5 @@
 from nodimo import Variable, VariableGroup
 import sympy as sp
-from sympy import MutableDenseMatrix, Integer
 import pytest
 
 
