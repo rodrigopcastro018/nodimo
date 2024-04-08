@@ -216,8 +216,7 @@ class NonDimensionalModel(DimensionalModel):
 
             nondimensional_groups.append(
                 VariableGroup(self.dimensional_variables,
-                              exponents_matrix.col(j).T,
-                              check_inputs=False)
+                              exponents_matrix.col(j).T)
             )
 
         return nondimensional_groups

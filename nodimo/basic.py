@@ -60,14 +60,24 @@ class BasicVariable:
         self, dependent: bool = False, scaling: bool = False, **dimensions: int
     ):
 
+        self._dimensions: dict[str, int] = dimensions
         self._is_dependent: bool = dependent
         self._is_scaling: bool = scaling
-        self._dimensions: dict[str, int] = dimensions
         self._is_nondimensional: bool = all(
             dim == 0 for dim in self._dimensions.values()
         )
 
         self._validate_properties()
+
+    @property
+    def dimensions(self) -> dict[str, int]:
+        return self._dimensions
+
+    @dimensions.setter
+    def dimensions(self, dimensions: dict[str, int]) -> None:
+        self._validate_properties(dimensions=dimensions)
+        self._dimensions = dimensions
+        self._is_nondimensional = all(dim == 0 for dim in dimensions.values())
 
     @property
     def is_dependent(self) -> bool:
@@ -86,16 +96,6 @@ class BasicVariable:
     def is_scaling(self, scaling: bool) -> None:
         self._validate_properties(is_scaling=scaling)
         self._is_scaling = scaling
-
-    @property
-    def dimensions(self) -> dict[str, int]:
-        return self._dimensions
-
-    @dimensions.setter
-    def dimensions(self, dimensions: dict[str, int]) -> None:
-        self._validate_properties(dimensions=dimensions)
-        self._dimensions = dimensions
-        self._is_nondimensional = all(dim == 0 for dim in dimensions.values())
 
     @property
     def is_nondimensional(self) -> bool:

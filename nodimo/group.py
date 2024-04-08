@@ -84,31 +84,20 @@ class VariableGroup(BasicVariable, Mul):
     def __new__(cls,
                 variables: list[BasicVariable],
                 exponents: ListOrMatrix,
-                scaling: bool = False,
-                check_inputs: bool = True,
-                check_dimensions: bool = True):
+                scaling: bool = False):
 
         exponents = cls._convert_exponents(exponents)
-
-        if check_inputs:
-            cls._validate_variables_and_exponents(variables, exponents)
-
-        # Flattening exponents_list.
-        exponents_list = cls._convert_exponents(exponents).tolist()
-        exponents_list = [exp
-                          for explist in exponents_list
-                          for exp in explist]
-
-        terms = [var**exp
-                 for var, exp in zip(variables, exponents_list)]
+        cls._validate_variables_and_exponents(variables, exponents)
+        
+        exponents_list = exponents.tolist()[0]
+        terms = [var**exp for var, exp in zip(variables, exponents_list)]
 
         return super().__new__(cls, *terms)
 
     def __init__(self,
                  variables: list[BasicVariable],
                  exponents: ListOrMatrix,
-                 scaling: bool = False,
-                 check_inputs: bool = True):
+                 scaling: bool = False):
 
         super().__init__()
         self.variables: list[BasicVariable] = list(variables)
