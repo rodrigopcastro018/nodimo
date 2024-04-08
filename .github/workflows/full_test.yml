@@ -50,7 +50,7 @@ jobs:
       - name: Store coverage files
         uses: actions/upload-artifact@v4
         with:
-          name: .coverage-${{ runner.os }}-py${{ matrix.py.python }}
+          name: coverage-${{ runner.os }}-py${{ matrix.py.python }}
           path: .coverage
 
       - name: Store results folder
@@ -104,8 +104,8 @@ jobs:
       - name: Merge coverage
         uses: actions/upload-artifact/merge@v4
         with:
-          name: .coverage
-          pattern: .coverage-*
+          name: coverage
+          pattern: coverage-*
           delete-merged: true
 
   combine_coverage:
@@ -124,7 +124,7 @@ jobs:
       - name: Download coverage files
         uses: actions/download-artifact@v4
         with:
-          name: .coverage
+          name: coverage
           path: .coverage
       
       - name: Install coverage
