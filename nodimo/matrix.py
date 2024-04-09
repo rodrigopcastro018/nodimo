@@ -26,9 +26,7 @@ class DimensionalMatrix(Basic):
 
     A DimensionalMatrix is a matrix with one column for each variable,
     one row for each dimension, and every element represents the
-    dimension's exponent of a particular variable. It inherits from the
-    Sympy Printable class the ability to be displayed on screen in a
-    pretty format.
+    dimension's exponent of a particular variable.
 
     Parameters
     ----------
@@ -83,6 +81,7 @@ class DimensionalMatrix(Basic):
         self.labeled_matrix: Matrix = self._build_labeled_matrix()
         self.latex: str = self._build_latex_representation()
         self.rank: int = self.matrix.rank()
+        self.independent_rows: tuple[int] = self._get_independent_rows()
 
     def _build_labeled_matrix(self) -> Matrix:
         """Builds the labeled dimensional matrix.
@@ -138,11 +137,22 @@ class DimensionalMatrix(Basic):
         latex_representation += R'\end{array}'
 
         return latex_representation
-    
-    def show(self) -> None:
-        """Displays the labeled dimensional matrix."""
 
-        _show_object(self)
+    def _get_independent_rows(self) -> tuple[int]:
+        """Gets the indexes of the independent rows.
+
+        Returns
+        -------
+        independent_rows : tuple[int]
+            Tuple contaning the indexes of the independent rows.
+        """
+        
+        if len(self.dimensions) > self.rank:
+            _, independent_rows = self.matrix.T.rref()
+        else:
+            independent_rows = tuple(range(len(self.dimensions)))
+        
+        return independent_rows
 
     def __eq__(self, other) -> bool:
 

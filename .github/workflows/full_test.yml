@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - basic-class
   pull_request:
     branches:
       - main
-      - basic-class
 
 jobs:
   
