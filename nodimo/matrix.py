@@ -49,6 +49,8 @@ class DimensionalMatrix(Basic):
         String that represents the labeled dimensional matrix in latex.
     rank : int
         The rank of the dimensional matrix.
+    independent_rows : tuple[int]
+        Indexes of the dimensional matrix independent rows.
 
     Methods
     -------
@@ -139,12 +141,12 @@ class DimensionalMatrix(Basic):
         return latex_representation
 
     def _get_independent_rows(self) -> tuple[int]:
-        """Gets the indexes of the independent rows.
+        """Gets the indexes of the dimensional matrix independent rows.
 
         Returns
         -------
         independent_rows : tuple[int]
-            Tuple contaning the indexes of the independent rows.
+            Indexes of the dimensional matrix independent rows.
         """
         
         if len(self.dimensions) > self.rank:

@@ -51,9 +51,9 @@ def test_obtain_dimensions():
     dimensions2 = _obtain_dimensions(group)
     dimensions3 = _obtain_dimensions(group, var3, var1, var2, var4)
 
-    assert dimensions1 == ['d1', 'e1', 'e2', 'd2', 'c2', 'd3', 'c1']
-    assert dimensions2 == ['d1', 'e1', 'e2', 'd2', 'c2', 'd3', 'c1']
-    assert dimensions3 == ['d1', 'e1', 'e2', 'd2', 'c2', 'd3', 'c1']
+    assert dimensions1 == ['d1', 'e1', 'd2', 'd3']
+    assert dimensions2 == ['d2', 'd3']
+    assert dimensions3 == ['d2', 'd3', 'd1', 'e1']
 
 
 def test_build_dimensional_matrix():

@@ -60,7 +60,7 @@ class BasicVariable:
         self, dependent: bool = False, scaling: bool = False, **dimensions: int
     ):
 
-        self._dimensions: dict[str, int] = dimensions
+        self._dimensions: dict[str, int] = self._clear_null_dimensions(dimensions)
         self._is_dependent: bool = dependent
         self._is_scaling: bool = scaling
         self._is_nondimensional: bool = all(
@@ -76,8 +76,8 @@ class BasicVariable:
     @dimensions.setter
     def dimensions(self, dimensions: dict[str, int]) -> None:
         self._validate_properties(dimensions=dimensions)
-        self._dimensions = dimensions
-        self._is_nondimensional = all(dim == 0 for dim in dimensions.values())
+        self._dimensions = self._clear_null_dimensions(dimensions)
+        self._is_nondimensional = all(dim == 0 for dim in self._dimensions.values())
 
     @property
     def is_dependent(self) -> bool:
@@ -101,12 +101,34 @@ class BasicVariable:
     def is_nondimensional(self) -> bool:
         return self._is_nondimensional
 
+    def _clear_null_dimensions(self, dimensions: dict[str, int]):
+        """Removes dimensions with exponent zero.
+
+        Parameters
+        ----------
+        dimensions : dict[int]
+            Raw dictionary with dimensions' names and exponents.
+
+        Returns
+        -------
+        clear_dimensions : dict[int]
+            Dictionary with null dimensions removed.
+        """
+
+        clear_dimensions = dimensions.copy()
+        for dim, exp in dimensions.items():
+            if exp == 0:
+                del clear_dimensions[dim]
+
+        return clear_dimensions
+
     def _validate_properties(
         self,
         is_dependent: Optional[bool] = None,
         is_scaling: Optional[bool] = None,
         dimensions: Optional[dict[str, int]] = None,
     ) -> None:
+        """Validates variable's properties."""
 
         if is_dependent is None:
             is_dependent = self._is_dependent
@@ -140,20 +162,15 @@ class Basic(Printable):
     Attributes
     ----------
     variables : list[Variable or VariableGroup]
-        List of variables or groups used by the Basic class.
+        List of variables used.
     dimensions : list[str]
-        List with dimensions' names of the given variables or groups.
+        List with dimensions' names of the given variables.
     """
 
-    def __init__(self,
-                 *variables: BasicVariable,
-                 get_dimensions: bool = True):
+    def __init__(self, *variables: BasicVariable):
 
-        self.variables: list[BasicVariable]
-        self.variables = _remove_duplicates(list(variables))
-
-        if get_dimensions:
-            self.dimensions: list[str] = _obtain_dimensions(*variables)
+        self.variables: list[BasicVariable] = _remove_duplicates(list(variables))
+        self.dimensions: list[str] = _obtain_dimensions(*variables)
     
     def show(self) -> None:
         """Displays the object in pretty format."""
@@ -190,25 +207,3 @@ class Basic(Printable):
         """Latex representation according to Sympy."""
 
         return R"\text{\textit{\_latex} method not implemented yet}"
-
-    # From the the function module. I'll leave here for a moment
-    # and delete when i'm done with this part of the code.
-    #
-    # from sympy.printing.pretty.pretty import PrettyPrinter
-    #
-    # I was defining _pretty as below and making _sympystr = _pretty.
-    # It works, but it looks so wrong.
-    #
-    # def _pretty(self, printer) -> str:
-    #     """Pretty string representation according to Sympy."""
-
-    #     return PrettyPrinter(
-    #         settings={'root_notation': False}
-    #     )._print(self.function)
-
-    # _sympystr = _pretty
-
-    # In the _latex method:
-    # Perhaps, this is the correct way of doing it, but i'm afraid i'll
-    # lose the root_notation setting (issue #33)
-    # return printer._print(self.function)
