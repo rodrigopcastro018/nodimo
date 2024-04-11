@@ -167,11 +167,13 @@ class Basic(Printable):
         List with dimensions' names of the given variables.
     """
 
-    def __init__(self, *variables: BasicVariable):
+    def __init__(self, *variables: BasicVariable, get_dimensions: bool = True):  # TODO: try to find a way to avoid this get_dimensions input
 
         self.variables: list[BasicVariable] = _remove_duplicates(list(variables))
-        self.dimensions: list[str] = _obtain_dimensions(*variables)
-    
+
+        if get_dimensions:
+            self.dimensions: list[str] = _obtain_dimensions(*variables)
+
     def show(self) -> None:
         """Displays the object in pretty format."""
 

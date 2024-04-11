@@ -4,10 +4,6 @@ Variables
 ---------
 _is_running_on_jupyter : bool
     If ``True``, the package in running on jupyter notebooks.
-color_warning : str
-    ANSI code for the warning message color.
-color_end : str
-    ANSI code to reset the color.
 
 Functions
 ---------
@@ -15,6 +11,8 @@ _show_object(obj)
     Prints object in shell.
 _print_horizontal_line()
     Prints a horizontal line.
+_print_warning(message)
+    Prints a message with warning colors.
 _remove_duplicates(original_list)
     Removes duplicates from a list, keeping the order.
 _obtain_dimensions(*variables)
@@ -34,11 +32,6 @@ try:
     from IPython.display import display, Markdown, HTML
 except:
     _is_running_on_jupyter = False
-
-
-# ANSI color codes
-color_warning: str = '\033[93m'
-color_end: str = '\033[0m'
 
 
 def _custom_display(obj):
@@ -88,6 +81,12 @@ def _print_horizontal_line():
         display(Markdown('<hr>'))
     else:
         print(78 * '-')
+
+
+def _print_warning(message: str):
+    """Prints a message with warning colors."""
+
+    print(f'\033[93m{message}\033[0m')
 
 
 def _remove_duplicates(original_list):
