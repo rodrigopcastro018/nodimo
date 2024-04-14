@@ -12,11 +12,14 @@ DimensionalModel
 """
 
 import sympy as sp
+import warnings
 
 from nodimo.basic import BasicVariable, Basic
 from nodimo.matrix import DimensionalMatrix
 from nodimo.function import ModelFunction
-from nodimo._internal import _print_warning, _build_dimensional_matrix
+from nodimo._internal import (_build_dimensional_matrix,
+                              ExtraVariablesWarning,
+                              _show_warning)
 
 
 # Alias for type used in DimensionalModel.
@@ -72,7 +75,7 @@ class DimensionalModel(Basic):
     ------
     ValueError
         If the number of effective variables is lower than two.
-        
+        Variables and dimensions that can not be part of the model.
     Examples
     --------
     * Simple Pendulum
@@ -157,22 +160,22 @@ class DimensionalModel(Basic):
             row_bool = [bool(exp) for exp in row]
             if sum(row_bool) == 1:
                 var = self.variables[row_bool.index(True)]
-                extra_variables.append(var)
+                if var not in extra_variables:
+                    extra_variables.append(var)
                 extra_dimensions.append(dim)
 
-        for var in extra_variables:
-            self.variables.remove(var)
+        if len(extra_variables) > 0:
+            for var in extra_variables:
+                self.variables.remove(var)
+            for dim in extra_dimensions:
+                self.dimensions.remove(dim)
 
-        for dim in extra_dimensions:
-            self.dimensions.remove(dim)
-
-        if display_messages:
-            if len(extra_variables) > 0:
-                _print_warning("Variables that can not be part of the model:")
-                _print_warning(f'    {sp.pretty(extra_variables)[1:-1]}')
-
-                _print_warning("Dimensions that can not be part of the model:")
-                _print_warning(f'    {sp.pretty(extra_dimensions)[1:-1]}')
+            _show_warning(f"Variables that can not be part of the model"
+                          f" → {sp.pretty(extra_variables)[1:-1]}",
+                          ExtraVariablesWarning)
+            _show_warning(f"Dimensions that can not be part of the model"
+                          f" → {sp.pretty(extra_dimensions)[1:-1]}",
+                          ExtraVariablesWarning)
 
     def _organize_variables(self) -> OrganizedVariablesTuple:
         """Organizes the variables according to their types.

@@ -22,6 +22,7 @@ _build_dimensional_matrix(variables, dimensions=[])
 """
 
 import sympy as sp
+import warnings
 
 try:
     from IPython import get_ipython
@@ -81,12 +82,6 @@ def _print_horizontal_line():
         display(Markdown('<hr>'))
     else:
         print(78 * '-')
-
-
-def _print_warning(message: str):
-    """Prints a message with warning colors."""
-
-    print(f'\033[93m{message}\033[0m')
 
 
 def _remove_duplicates(original_list):
@@ -182,3 +177,30 @@ def _build_dimensional_matrix(variables, dimensions=[], return_raw=False):
         return raw_dimensional_matrix
     else:
         return dimensional_matrix
+
+
+class UnrelatedVariableWarning(Warning):
+    """Unrelated variable warning.
+    
+    Issued when a variable can not be used and, therefore, is discarded.
+    """
+
+    pass
+
+
+warnings.simplefilter('always', UnrelatedVariableWarning)
+
+
+def custom_formatwarning(message, category, filename, lineno, line=None):
+    """Custom format for warning messages."""
+
+    return f'{category.__name__}: \033[93m{message}\033[0m\n'
+
+
+warnings.formatwarning = custom_formatwarning
+
+
+def _show_warning(message: str, category: Warning):
+    """Displays a message with warning colors."""
+
+    warnings.warn(message, category)
