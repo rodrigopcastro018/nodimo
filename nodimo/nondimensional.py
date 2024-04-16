@@ -17,9 +17,8 @@ import sympy as sp
 from sympy import Matrix
 from itertools import combinations
 
-from nodimo.basic import BasicVariable
-from nodimo.group import VariableGroup
-from nodimo.function import ModelFunction
+from nodimo.variable import BasicVariable, VariableProduct
+from nodimo.relation import VariableRelation
 from nodimo.dimensional import DimensionalModel
 from nodimo._internal import (_is_running_on_jupyter,
                               _show_object,
@@ -102,8 +101,8 @@ class NonDimensionalModel(DimensionalModel):
         # avoid the validation of the scaling variables.
         self._check_scaling_variables: bool = True
 
-        self.nondimensional_groups: list[VariableGroup]
-        self.nondimensional_function: ModelFunction
+        self.nondimensional_groups: list[VariableProduct]
+        self.nondimensional_function: VariableRelation
 
         if build_now:
             self._validate_scaling_variables()
@@ -139,7 +138,7 @@ class NonDimensionalModel(DimensionalModel):
 
         self.nondimensional_groups = self._build_nondimensional_groups()
 
-        self.nondimensional_function = ModelFunction(
+        self.nondimensional_function = VariableRelation(
             *self.nondimensional_variables,
             *self.nondimensional_groups,
             name='Pi'
@@ -199,7 +198,7 @@ class NonDimensionalModel(DimensionalModel):
 
         return exponents_matrix
 
-    def _build_nondimensional_groups(self) -> list[VariableGroup]:
+    def _build_nondimensional_groups(self) -> list[VariableProduct]:
         """Builds nondimensional groups.
 
         Returns
@@ -213,7 +212,7 @@ class NonDimensionalModel(DimensionalModel):
         nondimensional_groups = []
 
         for j in range(len(self.nonscaling_variables)):
-            group = VariableGroup(self.dimensional_variables,
+            group = VariableProduct(self.dimensional_variables,
                                   exponents_matrix.col(j).T)
             group._set_dependent_from_variables()
             nondimensional_groups.append(group)
@@ -304,7 +303,7 @@ class NonDimensionalModels(DimensionalModel):
         self._validate_scaling_variables()
         
         self.scaling_groups: list[list[BasicVariable]]
-        self.nondimensional_functions: list[ModelFunction]
+        self.nondimensional_functions: list[VariableRelation]
 
         self.scaling_groups = self._build_scaling_groups()
         self.nondimensional_functions = self._build_nondimensional_functions()
@@ -364,7 +363,7 @@ class NonDimensionalModels(DimensionalModel):
 
         return scaling_groups
 
-    def _build_nondimensional_functions(self) -> list[ModelFunction]:
+    def _build_nondimensional_functions(self) -> list[VariableRelation]:
         """Builds one nondimensional function for each scaling group.
 
         Returns

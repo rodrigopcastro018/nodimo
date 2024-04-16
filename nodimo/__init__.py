@@ -74,10 +74,8 @@ parameters, redefine it as scaling, and all nondimensional models
 
 # from sympy import init_printing
 
-from nodimo.variable import Variable, Var
-from nodimo.group import VariableGroup, VarGroup
+from nodimo.variable import Variable, Var, VariableProduct, VarProduct
 from nodimo.matrix import DimensionalMatrix, DimMatrix
-from nodimo.function import ModelFunction
 from nodimo.dimensional import DimensionalModel, DimModel
 from nodimo.nondimensional import (NonDimensionalModel, NonDimModel,
                                     NonDimensionalModels, NonDimModels)
@@ -85,9 +83,9 @@ from nodimo.nondimensional import (NonDimensionalModel, NonDimModel,
 # init_printing(root_notation=False)
 
 __all__ = ['Variable', 'Var',
-           'VariableGroup', 'VarGroup',
+           'VariableProduct', 'VarGroup',
            'DimensionalMatrix', 'DimMatrix',
-           'ModelFunction',
+           'VariableRelation',
            'DimensionalModel', 'DimModel',
            'NonDimensionalModel', 'NonDimModel',
            'NonDimensionalModels', 'NonDimModels']

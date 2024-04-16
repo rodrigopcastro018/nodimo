@@ -12,13 +12,13 @@ DimensionalModel
 """
 
 import sympy as sp
-import warnings
 
-from nodimo.basic import BasicVariable, Basic
+from nodimo.variable import BasicVariable
+from nodimo.group import Group
 from nodimo.matrix import DimensionalMatrix
-from nodimo.function import ModelFunction
+from nodimo.relation import VariableRelation
 from nodimo._internal import (_build_dimensional_matrix,
-                              ExtraVariablesWarning,
+                              UnrelatedVariableWarning,
                               _show_warning)
 
 
@@ -27,7 +27,7 @@ OrganizedVariablesTuple = tuple[list[BasicVariable], list[BasicVariable],
                                 list[BasicVariable], list[BasicVariable]]
 
 
-class DimensionalModel(Basic):
+class DimensionalModel(Group):
     """Creates a dimensional model from a given set of variables.
 
     This class is a base step in the construction of the nondimensional
@@ -111,7 +111,7 @@ class DimensionalModel(Basic):
         self.nonscaling_variables: list[BasicVariable]
 
         self.dimensional_matrix: DimensionalMatrix
-        self.dimensional_function: ModelFunction
+        self.dimensional_function: VariableRelation
 
         if check_variables:
             self.search_extra_variables_and_dimensions(display_messages)
@@ -134,7 +134,7 @@ class DimensionalModel(Basic):
         self.dimensional_matrix = DimensionalMatrix(*self.variables,
                                                     dimensions=self.dimensions)
         
-        self.dimensional_function = ModelFunction(*self.variables, name='pi')
+        self.dimensional_function = VariableRelation(*self.variables, name='pi')
 
     # Alias for build_dimensional_model.
     build = build_dimensional_model
@@ -172,10 +172,10 @@ class DimensionalModel(Basic):
 
             _show_warning(f"Variables that can not be part of the model"
                           f" → {sp.pretty(extra_variables)[1:-1]}",
-                          ExtraVariablesWarning)
+                          UnrelatedVariableWarning)
             _show_warning(f"Dimensions that can not be part of the model"
                           f" → {sp.pretty(extra_dimensions)[1:-1]}",
-                          ExtraVariablesWarning)
+                          UnrelatedVariableWarning)
 
     def _organize_variables(self) -> OrganizedVariablesTuple:
         """Organizes the variables according to their types.

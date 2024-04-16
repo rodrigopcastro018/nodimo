@@ -193,8 +193,8 @@ warnings.simplefilter('always', UnrelatedVariableWarning)
 
 def custom_formatwarning(message, category, filename, lineno, line=None):
     """Custom format for warning messages."""
-
-    return f'{category.__name__}: \033[93m{message}\033[0m\n'
+    
+    return f'\033[93m{category.__name__}\033[0m: {message}\n'
 
 
 warnings.formatwarning = custom_formatwarning

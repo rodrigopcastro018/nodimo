@@ -3,50 +3,148 @@
 Matrix (:mod:`nodimo.matrix`)
 =============================
 
-This module contains the class to create a dimensional matrix.
+This module contains the classes to create a dimensional matrix.
 
 Classes
 -------
+BasicDimensionalMatrix
+    Creates a basic dimensional matrix from a group of variables.
 DimensionalMatrix
-    Creates a dimensional matrix from a given set of variables.
+    Creates a dimensional matrix from a group of variables.
 """
 
 import sympy as sp
-from sympy import Matrix
+from sympy import ImmutableDenseMatrix
+from typing import Optional
 
-from nodimo.basic import BasicVariable, Basic
-from nodimo.variable import Variable
-from nodimo._internal import (_show_object,
-                              _obtain_dimensions,
-                              _build_dimensional_matrix)
+from nodimo.variable import BasicVariable
+from nodimo.group import Group
 
 
-class DimensionalMatrix(Basic):
-    """Creates a dimensional matrix from a given set of variables.
+class BasicDimensionalMatrix(Group):
+    """Creates a basic dimensional matrix from a group of variables.
 
-    A DimensionalMatrix is a matrix with one column for each variable,
-    one row for each dimension, and every element represents the
-    dimension's exponent of a particular variable.
+    A BasicDimensionalMatrix is a matrix with one column for each
+    variable, one row for each dimension, and every element represents
+    the dimension's exponent of a particular variable.
 
     Parameters
     ----------
-    *variables : Variable
+    *variables : BasicVariable
         Variables that constitute the dimensional matrix.
-    dimensions : list[str], default=[]
-        List with the dimensions' names of the given variables.
+    dimensions : tuple[str], default=None
+        List with the dimensions to be used in the dimensional matrix.
 
     Attributes
     ----------
-    variables : list[Variable]
+    variables : tuple[BasicVariable]
         List with the variables used to build the dimensional matrix.
-    dimensions : list[str]
-        List with the dimensions' names of the given variables.
-    matrix : Matrix
+    dimensions : tuple[str]
+        List with the dimensions used in the dimensional matrix.
+    matrix : ImmutableDenseMatrix
         Dimensional matrix containing only the dimensions' exponents.
-    labeled_matrix : Matrix
+
+    Methods
+    -------
+    show()
+        Displays the basic dimensional matrix.
+    """
+
+    def __init__(
+        self,
+        *variables: BasicVariable,
+        dimensions: Optional[tuple[str]] = None
+    ):
+
+        super().__init__(*variables)
+        self._raw_matrix: list[list[int]]
+        self._matrix: ImmutableDenseMatrix
+
+        if dimensions is not None:
+            self.dimensions = dimensions
+
+    @Group.variables.setter
+    def variables(self, variables: tuple[BasicVariable]):
+        self._variables = variables
+        super()._set_properties()
+        self._build_matrix()
+
+    @Group.dimensions.setter
+    def dimensions(self, dimensions: tuple[str]):
+        self._dimensions = dimensions
+        self._build_matrix()
+
+    @property
+    def matrix(self) -> ImmutableDenseMatrix:
+        return self._matrix
+
+    def _build_matrix(self):
+        """Builds a dimensional matrix from the variables."""
+    
+        raw_matrix = []
+    
+        for dim in self._dimensions:
+            dim_exponents = []
+            for var in self._variables:
+                if dim in var.dimensions.keys():
+                    dim_exponents.append(var.dimensions[dim])
+                else:
+                    dim_exponents.append(0)
+            raw_matrix.append(dim_exponents)
+
+        self._raw_matrix = raw_matrix
+        self._matrix = sp.nsimplify(sp.Matrix(raw_matrix), rational=True)
+
+    def _sympystr(self, printer) -> str:
+        """String representation according to Sympy."""
+
+        return sp.pretty(self._matrix, root_notation=False)
+
+    def _sympyrepr(self, printer) -> str:
+        """String representation according to Sympy."""
+
+        class_name = type(self).__name__
+        variables_repr = sp.srepr(self._variables)[1:-1]
+
+        if self._dimensions == Group(*self._variables)._dimensions:
+            dimensions_repr = ''
+        else:
+            dimensions_repr = f', dimensions={self._dimensions}'
+
+        return (f'{class_name}('
+                + variables_repr
+                + dimensions_repr
+                + ')')
+
+    def _latex(self, printer) -> str:
+        """Latex representation according to Sympy."""
+
+        return sp.latex(self._matrix, root_notation=False)
+
+
+class DimensionalMatrix(BasicDimensionalMatrix):
+    """Creates a dimensional matrix from a group of variables.
+
+    Similar to a BasicDimensionalMatrix, but with labels at the side and
+    at the top of the matrix to display the dimensions and variables.
+
+    Parameters
+    ----------
+    *variables : BasicVariable
+        Variables that constitute the dimensional matrix.
+    dimensions : tuple[str], default=None
+        List with the dimensions to be used in the dimensional matrix.
+
+    Attributes
+    ----------
+    variables : tuple[BasicVariable]
+        List with the variables used to build the dimensional matrix.
+    dimensions : tuple[str]
+        List with the dimensions used in the dimensional matrix.
+    matrix : ImmutableDenseMatrix
+        Dimensional matrix containing only the dimensions' exponents.
+    labeled_matrix : ImmutableDenseMatrix
         Dimensional matrix labeled with variables and dimensions.
-    latex : str
-        String that represents the labeled dimensional matrix in latex.
     rank : int
         The rank of the dimensional matrix.
     independent_rows : tuple[int]
@@ -72,127 +170,109 @@ class DimensionalMatrix(Basic):
     >>> dmatrix.show()
     """
 
-    def __init__(self, *variables: BasicVariable, dimensions: list[str] = []):
+    def __init__(
+        self,
+        *variables: BasicVariable,
+        dimensions: Optional[tuple[str]] = None
+    ):
 
-        self.variables: list[BasicVariable]
-        self.dimensions: list[str] = dimensions
-        super().__init__(*variables, get_dimensions=not bool(dimensions))
+        super().__init__(*variables, dimensions=dimensions)
+        self._labeled_matrix: ImmutableDenseMatrix
+        self._latex_repr: str
+        self._rank: int
+        self._independent_rows: tuple[int]
 
-        self.matrix: Matrix = _build_dimensional_matrix(self.variables,
-                                                        self.dimensions)
-        self.labeled_matrix: Matrix = self._build_labeled_matrix()
-        self.latex: str = self._build_latex_representation()
-        self.rank: int = self.matrix.rank()
-        self.independent_rows: tuple[int] = self._get_independent_rows()
+    @BasicDimensionalMatrix.variables.setter
+    def variables(self, variables: tuple[BasicVariable]):
+        self._variables = variables
+        super(BasicDimensionalMatrix, self)._set_properties()
+        self._set_properties()
 
-    def _build_labeled_matrix(self) -> Matrix:
-        """Builds the labeled dimensional matrix.
+    @BasicDimensionalMatrix.dimensions.setter
+    def dimensions(self, dimensions: list[str]):
+        self._dimensions = dimensions
+        self._set_properties()
 
-        Returns
-        -------
-        labeled_matrix : Matrix
-            Dimensional matrix labeled with the constitutive variables
-            on the top row and the dimensions on the left column.
-        """
+    @property
+    def labeled_matrix(self) -> ImmutableDenseMatrix:
+        return self._labeled_matrix
 
-        labeled_matrix = self.matrix.copy()
-        dimensions_matrix = sp.Matrix(self.dimensions)
-        variables_matrix = sp.Matrix([Variable('')] + self.variables).T
+    @property
+    def rank(self) -> int:
+        return self._rank
+
+    @property
+    def independent_rows(self) -> tuple[int]:
+        return self._independent_rows
+
+    def _set_properties(self):
+        """Sets dimensional matrix properties."""
+
+        self._build_matrix()
+        self._build_labeled_matrix()
+        self._build_latex_repr()
+        self._rank = self._matrix.rank()
+        self._set_independent_rows()
+
+    def _build_labeled_matrix(self):
+        """Builds the labeled dimensional matrix."""
+
+        labeled_matrix = self._matrix.as_mutable()
+        dimensions_matrix = sp.Matrix(self._dimensions)
+        variables_matrix = sp.Matrix([sp.Symbol('')] + list(self._variables)).T
         labeled_matrix = labeled_matrix.col_insert(0, dimensions_matrix)
         labeled_matrix = labeled_matrix.row_insert(0, variables_matrix)
 
-        return labeled_matrix
+        self._labeled_matrix = labeled_matrix.as_immutable()
 
-    def _build_latex_representation(self) -> str:
-        """Builds the labeled dimensional matrix in latex.
+    def _build_latex_repr(self):
+        """Builds the labeled dimensional matrix in latex format.
 
-        Returns
-        -------
-        latex_representation : str
-            Latex string that represents the dimensional matrix labeled
-            with the constitutive variables on the top row and the
-            dimensions on the left column.
+        Notes
+        -----
+        Do not confuse the private attribute _latex_repr with the method
+        _latex_repr_ inherited from the sympy Printable class.
         """
 
-        latex_representation = R'\begin{array}'
-        latex_representation += '{r|' + 'r' * len(self.variables) + '} & '
-        latex_representation += ' & '.join([sp.latex(var)
-                                            for var in self.variables])
-        latex_representation += R'\\ \hline '
+        latex_repr = R'\begin{array}'
+        latex_repr += '{r|' + 'r' * len(self._variables) + '} & '
+        latex_repr += ' & '.join([sp.latex(var) for var in self._variables])
+        latex_repr += R'\\ \hline '
 
-        for i, dim in enumerate(self.dimensions):
-            dimension_latex = [sp.latex(dim)]
-
-            exponents_latex = []
-            for exp in self.matrix[i, :]:
+        for i, dim in enumerate(self._dimensions):
+            dim_latex = [sp.latex(dim)]
+            exp_latex = []
+            for exp in self._matrix[i, :]:
                 if exp < 0:
-                    exponents_latex.append(sp.latex(exp))
+                    exp_latex.append(sp.latex(exp))
                 else:
                     # Mimic the minus sign to preserve column width.
-                    exponents_latex.append(R'\phantom{-}' + sp.latex(exp))
+                    exp_latex.append(R'\phantom{-}' + sp.latex(exp))
+            dim_and_exp_latex = ' & '.join(dim_latex + exp_latex)
+            latex_repr += dim_and_exp_latex + R'\\'
+        latex_repr += R'\end{array}'
 
-            dimension_and_exponents_latex = ' & '.join(dimension_latex
-                                                       + exponents_latex)
-
-            latex_representation += dimension_and_exponents_latex + R'\\'
-
-        latex_representation += R'\end{array}'
-
-        return latex_representation
-
-    def _get_independent_rows(self) -> tuple[int]:
-        """Gets the indexes of the dimensional matrix independent rows.
-
-        Returns
-        -------
-        independent_rows : tuple[int]
-            Indexes of the dimensional matrix independent rows.
-        """
+        self._latex_repr = latex_repr
         
-        if len(self.dimensions) > self.rank:
-            _, independent_rows = self.matrix.T.rref()
+    def _set_independent_rows(self):
+        """Gets the indexes of the dimensional matrix independent rows."""
+        
+        if len(self._dimensions) > self._rank:
+            _, independent_rows = self._matrix.T.rref()
         else:
-            independent_rows = tuple(range(len(self.dimensions)))
+            independent_rows = tuple(range(len(self._dimensions)))
         
-        return independent_rows
-
-    def __eq__(self, other) -> bool:
-
-        if self is other:
-            return True
-        elif not isinstance(other, type(self)):
-            return False
-        elif set(self.variables) != set(other.variables):
-            return False
-        
-        return True
+        self._independent_rows = independent_rows
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""
 
-        return sp.pretty(self.labeled_matrix, root_notation=False)
-
-    def _sympyrepr(self, printer) -> str:
-        """String representation according to Sympy."""
-
-        class_name = type(self).__name__
-        variables_repr = ', '.join([sp.srepr(var) for var in self.variables])
-
-        if self.dimensions == _obtain_dimensions(*self.variables):
-            dimensions_repr = ''
-        else:
-            dimensions_repr_list = ', '.join([f"'{dim}'" for dim in self.dimensions])
-            dimensions_repr = f', dimensions=[{dimensions_repr_list}]'
-
-        return (f'{class_name}('
-                + variables_repr
-                + dimensions_repr
-                + ')')
+        return sp.pretty(self._labeled_matrix, root_notation=False)
 
     def _latex(self, printer) -> str:
         """Latex representation according to Sympy."""
 
-        return self.latex
+        return self._latex_repr
 
 
 # Alias for DimensionalMatrix.

@@ -14,7 +14,8 @@ ModelFunction
 import sympy as sp
 from sympy import Equality
 
-from nodimo.basic import BasicVariable, Basic
+from nodimo.variable import BasicVariable
+from nodimo.group import Group
 from nodimo._internal import _show_object, _remove_duplicates
 
 
@@ -22,7 +23,7 @@ from nodimo._internal import _show_object, _remove_duplicates
 SeparatedVariablesTuple = tuple[BasicVariable, list[BasicVariable]]
 
 
-class ModelFunction(Basic):
+class VariableRelation(Group):
     """Creates a function that relates a set of variables or groups.
 
     This class states a function that represents a model, that is, it
