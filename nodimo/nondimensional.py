@@ -17,7 +17,8 @@ import sympy as sp
 from sympy import Matrix
 from itertools import combinations
 
-from nodimo.variable import BasicVariable, VariableProduct
+from nodimo.variable import BasicVariable
+from nodimo.product import VariableProduct
 from nodimo.relation import VariableRelation
 from nodimo.dimensional import DimensionalModel
 from nodimo._internal import (_is_running_on_jupyter,

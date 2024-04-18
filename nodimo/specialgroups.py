@@ -91,13 +91,13 @@ class HomogeneousGroup(Group):
             self._variables = tuple(clear_variables)
 
 
-class ScalingGroup(HomogeneousGroup):  # FIXME: The name ScalingGroup doesn't fit so well with the class purpose.
+class TransformableGroup(HomogeneousGroup):
     """Homogeneous group that can be transformed into another group.
 
-    A ScalingGroup is a group that can be transformed into another group
-    by using its scaling variables as tranformation parameters. Every
-    variable of the new group is a product between one nonscaling
-    variable and the set of scaling variables.
+    A TransformableGroup can be transformed into another group by using
+    its scaling variables as tranformation parameters. Every variable of
+    the new group is a product between one nonscaling variable and the
+    set of scaling variables.
 
     Parameters
     ----------
@@ -167,6 +167,7 @@ class ScalingGroup(HomogeneousGroup):  # FIXME: The name ScalingGroup doesn't fi
                 self._scaling_variables.append(var)
             else:
                 self._nonscaling_variables.append(var)
+        self._variables = tuple(self._nonscaling_variables + self._scaling_variables)
 
     def _build_matrices(self):
         self._dimensional_matrix = DimensionalMatrix(*self.variables)
@@ -208,11 +209,80 @@ class ScalingGroup(HomogeneousGroup):  # FIXME: The name ScalingGroup doesn't fi
 
 
 class NonDimensionalGroup(Group):  # When DimensionalGroup is implemented, this should inherit from it.
+    """Blablabla.
 
-    def __init__(self, scaling_group: ScalingGroup):
+    blablabla.
 
-        pass
+    Parameters
+    ----------
+    *scaling_group : ScalingGroup
+        Variables that constitute the group.
+
+    Attributes
+    ----------
+    variables : tuple[BasicVariable]
+        Tuple with the variables.
+    dimensions : tuple[str]
+        Tuple with the dimensions' names.
+
+    Methods
+    -------
+    show()
+        Displays the group in a pretty format.
+    """
+    
+    def __init__(self, transformable_group: TransformableGroup):
+
+        self._transformable_group: TransformableGroup = transformable_group
+        self._variables: BasicVariable
+        self._separate_variables()
+        self._calculate_exponents()
+    
+    @property
+    def transformable_group(self) -> TransformableGroup:
+        return self._transformable_group
+
+    def _separate_variables(self):
+        """."""
         
-        # TODO
-        # First build the nondimensional products, then set them as the
-        # variables of the group. clean!
+        dimensional_variables = []
+        nondimensional_variables = []
+        for var in self._transformable_group.variables:
+            if var.is_nondimensional:
+                nondimensional_variables.append(var)
+            else:
+                dimensional_variables.append(var)
+
+        self._transformable_group.variables = tuple(dimensional_variables)
+        self._variables = tuple(nondimensional_variables)
+
+    def _calculate_exponents(self):
+        """Determines the exponents to build the nondimensional products.
+
+        References
+        ----------
+        .. [1] Thomas Szirtes, Applied Dimensional Analysis and Modeling
+               (Butterworth-Heinemann, 2007), p. 133.
+        """
+
+        nvars = len(self._transformable_group.variables)
+        rank = self._transformable_group._dimensional_matrix.rank
+
+        A = self.transformable_group._scaling_matrix
+        B = self.transformable_group._nonscaling_matrix
+
+        E11 = sp.eye(nvars - rank)
+        E12 = sp.zeros(nvars - rank, rank)
+        E21 = -A**-1 * B
+        E22 = A**-1
+        E = sp.Matrix([[E11, E12],
+                       [E21, E22]])
+
+        Z1 = sp.eye(nvars - rank)
+        Z2 = sp.zeros(rank, nvars - rank)
+        Z = sp.Matrix([[Z1],
+                       [Z2]])
+
+        exponents = E * Z
+        
+        self._exponents = exponents.as_immutable()

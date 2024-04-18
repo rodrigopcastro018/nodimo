@@ -93,7 +93,7 @@ class BasicDimensionalMatrix(Group):
             raw_matrix.append(dim_exponents)
 
         self._raw_matrix = raw_matrix
-        self._matrix = sp.nsimplify(sp.Matrix(raw_matrix), rational=True)
+        self._matrix = sp.nsimplify(sp.Matrix(raw_matrix), rational=True)  # TODO: after converting the dimensions exponents to sympy.Rational, this step can be simplified to ImmutableDenseMatrix(_raw_matrix)
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""
