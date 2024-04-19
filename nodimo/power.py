@@ -68,12 +68,10 @@ class BasicPower(BasicVariable):
         self.is_dependent = dependent
         self.is_scaling = scaling
 
-    # Removing the dimensions.setter method
-    @BasicVariable.dimensions.setter
-    def dimensions(self, dimensions: dict[str, int]):
-        raise AttributeError(
-            f"property 'dimensions' of '{type(self).__name__}' object has no setter"
-        )
+    # Redefining dimensions as a read-only property
+    @property
+    def dimensions(self) -> dict[str, int]:
+        return self._dimensions
     
     def _set_dimensions(self):
         """Evaluates the dimensions of the power."""
