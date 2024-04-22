@@ -18,7 +18,7 @@ from sympy import Matrix
 from itertools import combinations
 
 from nodimo.variable import BasicVariable
-from nodimo.product import VariableProduct
+from nodimo.product import Product
 from nodimo.relation import VariableRelation
 from nodimo.dimensional import DimensionalModel
 from nodimo._internal import (_is_running_on_jupyter,
@@ -102,7 +102,7 @@ class NonDimensionalModel(DimensionalModel):
         # avoid the validation of the scaling variables.
         self._check_scaling_variables: bool = True
 
-        self.nondimensional_groups: list[VariableProduct]
+        self.nondimensional_groups: list[Product]
         self.nondimensional_function: VariableRelation
 
         if build_now:
@@ -199,7 +199,7 @@ class NonDimensionalModel(DimensionalModel):
 
         return exponents_matrix
 
-    def _build_nondimensional_groups(self) -> list[VariableProduct]:
+    def _build_nondimensional_groups(self) -> list[Product]:
         """Builds nondimensional groups.
 
         Returns
@@ -213,7 +213,7 @@ class NonDimensionalModel(DimensionalModel):
         nondimensional_groups = []
 
         for j in range(len(self.nonscaling_variables)):
-            group = VariableProduct(self.dimensional_variables,
+            group = Product(self.dimensional_variables,
                                   exponents_matrix.col(j).T)
             group._set_dependent_from_variables()
             nondimensional_groups.append(group)

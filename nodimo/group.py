@@ -41,7 +41,7 @@ class BasicGroup:
 
         self._variables: tuple[BasicVariable] = variables
         self._dimensions: tuple[str]
-        self.variables = self._variables  # First check in
+        self._set_basicgroup_properties()
 
     @property
     def variables(self) -> tuple[BasicVariable]:
@@ -50,13 +50,13 @@ class BasicGroup:
     @variables.setter
     def variables(self, variables: tuple[BasicVariable]):
         self._variables = variables
-        self._set_properties()
+        self._set_basicgroup_properties()
 
     @property
     def dimensions(self) -> tuple[str]:
         return self._dimensions
 
-    def _set_properties(self):
+    def _set_basicgroup_properties(self):
         """Sets the group properties."""
 
         self._remove_duplicate_variables()

@@ -13,17 +13,14 @@ Product
     Creates a symbolic product of variables.
 """
 
-import sympy as sp
-from sympy import Mul, Matrix
-from typing import Union
+from sympy import Mul, srepr
 
 from nodimo.variable import BasicVariable
 from nodimo.matrix import BasicDimensionalMatrix
-from nodimo._internal import _build_dimensional_matrix, _obtain_dimensions
 
 
-# Alias for type used in VariableGroup.
-ListOrMatrix = Union[list, Matrix]
+# # Alias for type used in VariableGroup.
+# ListOrMatrix = Union[list, Matrix]
 
 
 class BasicProduct(BasicVariable):
@@ -107,12 +104,12 @@ class BasicProduct(BasicVariable):
             self._dimensions = var1.dimensions
         else:
             dimensional_matrix = BasicDimensionalMatrix(var1, var2)
-            dimensions_exponents = []
+            exponents = []
             for row in dimensional_matrix._raw_matrix:
-                dimensions_exponents.append(sum(row))
+                exponents.append(sum(row))
             
-            dimensions = dict(zip(dimensional_matrix.dimensions, dimensions_exponents))
-            self._dimensions = self._clear_null_dimensions(dimensions)
+            self._dimensions = dict(zip(dimensional_matrix.dimensions, exponents))
+            self._clear_null_dimensions()
 
         self._is_nondimensional = all(dim == 0 for dim in self._dimensions.values())
 
@@ -159,10 +156,7 @@ class Product(BasicProduct, Mul):
         scaling: bool = False
     ):
 
-        if len(variables) <= 1:
-            return super().__new__(cls, *variables)
-        else:
-            return Mul.__new__(cls, *variables)
+        return Mul.__new__(cls, *variables)
 
     def __init__(
         self,
@@ -190,7 +184,8 @@ class Product(BasicProduct, Mul):
     def _latex(self, printer) -> str:
         """Latex representation according to Sympy.
         
-        This method is necessary to avoid the calling of LatexPrinter._print_Product, which corresponds to sympy.Product.
+        This method is necessary to avoid the calling of
+        LatexPrinter._print_Product, which corresponds to sympy.Product.
         """
 
         return printer._print_Mul(self)

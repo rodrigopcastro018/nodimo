@@ -22,6 +22,8 @@ _build_dimensional_matrix(variables, dimensions=[])
 """
 
 import sympy as sp
+from sympy import Rational
+from typing import Union
 import warnings
 
 try:
@@ -82,6 +84,50 @@ def _print_horizontal_line():
         display(Markdown('<hr>'))
     else:
         print(78 * '-')
+
+
+def _sympify_number(number: Union[int, str, tuple]) -> Rational:
+    """Converts a number representation into a Sympy number.
+
+    This method is roughly a wrapper for Sympy.sympify, but it only
+    accepts and returns number objects. A workaround was implemented to
+    allow the creation of rational numbers from tuples.
+
+    Parameters
+    ----------
+    number : Union[int, str, tuple]
+        Any expression that represents a number.
+
+    Returns
+    -------
+    number_sp : Number
+        The input number converted to a Sympy number.
+
+    Raises
+    ------
+    ValueError
+        If the input could not be converted into a Sympy number.
+    
+    Examples
+    --------
+
+    >>> from nodimo._internal import _sympify_number as spnum
+    >>> import sympy as sp
+    >>> spnum(5) == spnum('5') == sp.Integer(5)
+    True
+    >>> spnum((2,3)) == spnum('2/3') == sp.Rational(2,3)
+    True
+    """
+
+    number_sp = sp.sympify(number)
+
+    if number_sp.is_number:
+        return number_sp
+    elif isinstance(number, tuple) and len(number) in {1,2}:
+        if all(obj.is_number for obj in number_sp):
+            return sp.Rational(*number_sp)
+
+    raise ValueError(f"'{number}' could not be converted to a Sympy number")
 
 
 def _remove_duplicates(original_list):

@@ -76,6 +76,7 @@ class DimensionalModel(Group):
     ValueError
         If the number of effective variables is lower than two.
         Variables and dimensions that can not be part of the model.
+
     Examples
     --------
     * Simple Pendulum

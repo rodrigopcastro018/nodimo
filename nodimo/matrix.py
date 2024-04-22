@@ -59,24 +59,42 @@ class BasicDimensionalMatrix(Group):
         super().__init__(*variables)
         self._raw_matrix: list[list[int]]
         self._matrix: ImmutableDenseMatrix
+        self._rank: int
+        self._independent_rows: tuple[int]
+        self._submatrices: dict[BasicVariable, ImmutableDenseMatrix] = {}
 
         if dimensions is not None:
             self.dimensions = dimensions
 
+        self._set_basicmatrix_properties()
+
     @Group.variables.setter
     def variables(self, variables: tuple[BasicVariable]):
         self._variables = variables
-        super()._set_properties()
-        self._build_matrix()
+        self._set_basicgroup_properties
+        self._set_basicmatrix_properties()
 
     @Group.dimensions.setter
     def dimensions(self, dimensions: tuple[str]):
         self._dimensions = dimensions
-        self._build_matrix()
+        self._set_basicmatrix_properties()
 
     @property
     def matrix(self) -> ImmutableDenseMatrix:
         return self._matrix
+
+    @property
+    def rank(self) -> int:
+        return self._rank
+
+    @property
+    def independent_rows(self) -> tuple[int]:
+        return self._independent_rows
+
+    def _set_basicmatrix_properties(self):
+        """Sets dimensional matrix properties."""
+
+        self._build_matrix()
 
     def _build_matrix(self):
         """Builds a dimensional matrix from the variables."""
@@ -89,11 +107,60 @@ class BasicDimensionalMatrix(Group):
                 if dim in var.dimensions.keys():
                     dim_exponents.append(var.dimensions[dim])
                 else:
-                    dim_exponents.append(0)
+                    dim_exponents.append(sp.S.Zero)
             raw_matrix.append(dim_exponents)
 
         self._raw_matrix = raw_matrix
-        self._matrix = sp.nsimplify(sp.Matrix(raw_matrix), rational=True)  # TODO: after converting the dimensions exponents to sympy.Rational, this step can be simplified to ImmutableDenseMatrix(_raw_matrix)
+        self._matrix = ImmutableDenseMatrix(raw_matrix)
+
+    def _set_independent_rows(self):
+        """Gets the indexes of the dimensional matrix independent rows."""
+
+        self._rank = self._matrix.rank()
+        
+        if len(self._dimensions) > self._rank:
+            _, independent_rows = self._matrix.T.rref()
+        else:
+            independent_rows = tuple(range(len(self._dimensions)))
+        
+        self._independent_rows = independent_rows
+
+    def _build_submatrices(self):
+        """Builds one column matrix for each variable."""
+
+        submatrices = []
+        for i, var in enumerate(self._variables):
+            submatrices.append((var, self._matrix.col(i)))
+
+        self._submatrices = dict(submatrices)
+
+    def _get_submatrix(self, *variables) -> ImmutableDenseMatrix:
+        """Combines the variables submatrices into one submatrix.
+
+        Parameters
+        ----------
+        *variables : BasicVariable
+            Variables used to build the submatrix.
+
+        Returns
+        -------
+        submatrix : ImmutableDenseMatrix
+            The submatrix built from the given variables.
+
+        Raises
+        ValueError
+            If the given variables are not all part of the dimensional matrix.
+        """
+
+        if not set(variables).issubset(set(self._variables)):
+            raise ValueError(f"'{variables}' is not a subset of '{self._variables}'")
+        elif self._submatrices == {}:
+            self._build_submatrices()
+
+        submatrices = [self._submatrices[var] for var in variables]
+        submatrix = ImmutableDenseMatrix.hstack(*submatrices)
+
+        return submatrix
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""
@@ -179,39 +246,26 @@ class DimensionalMatrix(BasicDimensionalMatrix):
         super().__init__(*variables, dimensions=dimensions)
         self._labeled_matrix: ImmutableDenseMatrix
         self._latex_repr: str
-        self._rank: int
-        self._independent_rows: tuple[int]
+        self._set_matrix_properties()
 
     @BasicDimensionalMatrix.variables.setter
     def variables(self, variables: tuple[BasicVariable]):
         self._variables = variables
-        super(BasicDimensionalMatrix, self)._set_properties()
-        self._set_properties()
+        self._set_basicgroup_properties()
+        self._set_basicmatrix_properties()
+        self._set_matrix_properties()
 
     @BasicDimensionalMatrix.dimensions.setter
     def dimensions(self, dimensions: list[str]):
         self._dimensions = dimensions
-        self._set_properties()
+        self._set_basicmatrix_properties()
+        self._set_matrix_properties()
 
-    @property
-    def labeled_matrix(self) -> ImmutableDenseMatrix:
-        return self._labeled_matrix
-
-    @property
-    def rank(self) -> int:
-        return self._rank
-
-    @property
-    def independent_rows(self) -> tuple[int]:
-        return self._independent_rows
-
-    def _set_properties(self):
+    def _set_matrix_properties(self):
         """Sets dimensional matrix properties."""
 
-        self._build_matrix()
         self._build_labeled_matrix()
         self._build_latex_repr()
-        self._rank = self._matrix.rank()
         self._set_independent_rows()
 
     def _build_labeled_matrix(self):
@@ -253,16 +307,6 @@ class DimensionalMatrix(BasicDimensionalMatrix):
         latex_repr += R'\end{array}'
 
         self._latex_repr = latex_repr
-        
-    def _set_independent_rows(self):
-        """Gets the indexes of the dimensional matrix independent rows."""
-        
-        if len(self._dimensions) > self._rank:
-            _, independent_rows = self._matrix.T.rref()
-        else:
-            independent_rows = tuple(range(len(self._dimensions)))
-        
-        self._independent_rows = independent_rows
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""

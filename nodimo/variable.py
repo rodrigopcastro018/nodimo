@@ -16,6 +16,8 @@ Variable
 from sympy import Symbol
 from typing import Optional
 
+from nodimo._internal import _sympify_number
+
 
 class BasicVariable:
     """Base class for variables.
@@ -55,23 +57,27 @@ class BasicVariable:
         self, dependent: bool = False, scaling: bool = False, **dimensions: int
     ):
 
-        self._dimensions: dict[str, int] = self._clear_null_dimensions(dimensions)
-        self._is_dependent: bool = dependent
-        self._is_scaling: bool = scaling
+        self._dimensions: dict[str, int] = dimensions
+        self._is_dependent: bool = bool(dependent)
+        self._is_scaling: bool = bool(scaling)
         self._is_nondimensional: bool = all(
             dim == 0 for dim in self._dimensions.values()
         )
 
         self._validate_properties()
+        self._sympify_exponents()
+        self._clear_null_dimensions()
 
     @property
     def dimensions(self) -> dict[str, int]:
         return self._dimensions
 
-    @dimensions.setter  # TODO: convert dimensions exponents to sympy.Rational numbers (the limit_denominator parameter can be include in the future global settings)
+    @dimensions.setter
     def dimensions(self, dimensions: dict[str, int]):
         self._validate_properties(dimensions=dimensions)
-        self._dimensions = self._clear_null_dimensions(dimensions)  # TODO: make _clear_null_dimensions return no value (in_place operator)
+        self._dimensions = dimensions
+        self._sympify_exponents()
+        self._clear_null_dimensions()
         self._is_nondimensional = all(dim == 0 for dim in self._dimensions.values())
 
     @property
@@ -81,7 +87,7 @@ class BasicVariable:
     @is_dependent.setter
     def is_dependent(self, dependent: bool):
         self._validate_properties(is_dependent=dependent)
-        self._is_dependent = dependent
+        self._is_dependent = bool(dependent)
 
     @property
     def is_scaling(self) -> bool:
@@ -90,32 +96,24 @@ class BasicVariable:
     @is_scaling.setter
     def is_scaling(self, scaling: bool):
         self._validate_properties(is_scaling=scaling)
-        self._is_scaling = scaling
+        self._is_scaling = bool(scaling)
 
     @property
     def is_nondimensional(self) -> bool:
         return self._is_nondimensional
 
-    def _clear_null_dimensions(self, dimensions: dict[str, int]):
-        """Removes dimensions with exponent zero.
+    def _clear_null_dimensions(self):
+        """Removes dimensions with exponent zero."""
 
-        Parameters
-        ----------
-        dimensions : dict[int]
-            Raw dictionary with dimensions' names and exponents.
-
-        Returns
-        -------
-        clear_dimensions : dict[int]
-            Dictionary with null dimensions removed.
-        """
-
-        clear_dimensions = dimensions.copy()
-        for dim, exp in dimensions.items():
+        for dim, exp in self._dimensions.copy().items():
             if exp == 0:
-                del clear_dimensions[dim]
+                del self._dimensions[dim]
 
-        return clear_dimensions
+    def _sympify_exponents(self):
+        """Converts the dimensions' exponents to Sympy numbers."""
+
+        for dim, exp in self._dimensions.items():
+            self._dimensions[dim] = _sympify_number(exp)
 
     def _validate_properties(
         self,
@@ -213,7 +211,7 @@ class Variable(BasicVariable, Symbol):
                  scaling: bool = False,
                  **dimensions: int):
 
-        super().__init__(dependent, scaling, **dimensions)
+        super().__init__(dependent=dependent, scaling=scaling, **dimensions)
 
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""
