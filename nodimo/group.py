@@ -11,15 +11,15 @@ BasicGroup
     Base class for classes created with variables.
 """
 
-from sympy import srepr
+from sympy import sstr, srepr
 from sympy.core._print_helpers import Printable
 
 from nodimo.variable import BasicVariable
-from nodimo._internal import _show_object
+from nodimo._internal import _show_object, _repr
 
 
-class BasicGroup:
-    """Basic group of variables.
+class Group:  # TODO: Maybe make this inherit from tuple. Or make it work like an iterable object.
+    """Group of variables.
 
     This class contains common attributes and methods that are used by
     classes created with a group of variables.
@@ -91,18 +91,43 @@ class BasicGroup:
             return True
         elif not isinstance(other, type(self)):
             return False
-        elif set(self.variables) != set(other.variables):
+        elif set(self._variables) != set(other.variables):
             return False
         
         return True
 
+    def __contains__(self, item) -> bool:
 
-class Group(BasicGroup, Printable):
-    """Group of variables.
+        return item in self._variables
 
-    Equivalent to BasicGroup, but it inherits from the Sympy Printable
-    class the ability to display mathematical expressions in a pretty
-    format.
+    def __len__(self) -> int:
+
+        return len(self._variables)
+
+    def __iter__(self) -> tuple:
+
+        return self._variables
+
+    def __str__(self) -> str:
+
+        class_name = type(self).__name__
+        variables_str = sstr(self._variables)
+
+        return f'{class_name}{variables_str}'
+
+    def __repr__(self) -> str:
+
+        class_name = type(self).__name__
+        variables_repr = _repr(self._variables)
+
+        return f'{class_name}{variables_repr}'
+
+
+class PrintableGroup(Printable, Group):
+    """Printable group of variables.
+
+    Equivalent to Group, but it inherits from the Sympy Printable class
+    the ability to be displayed in a pretty format.
 
     Parameters
     ----------
@@ -132,21 +157,21 @@ class Group(BasicGroup, Printable):
         _show_object(self)
     
     def _sympystr(self, printer) -> str:
-        """String representation according to Sympy."""
+        """User string representation according to Sympy."""
 
-        return "'_sympystr' method not implemented yet"
+        return Group.__str__(self)
 
     def _sympyrepr(self, printer) -> str:
-        """String representation according to Sympy."""
+        """Developer string representation according to Sympy."""
 
-        class_name = type(self).__name__
-        variables_repr = srepr(self._variables)[1:-1]
+        return Group.__repr__(self)
 
-        return (f'{class_name}('
-                + variables_repr
-                + ')')
+    def _pretty(self, printer) -> str:
+        """Pretty representation according to Sympy."""
+
+        return printer._print("'_pretty' method not implemented")
 
     def _latex(self, printer) -> str:
         """Latex representation according to Sympy."""
 
-        return R"\text{\textit{\_latex} method not implemented yet}"
+        return R"\text{\textit{\_latex} method not implemented}"

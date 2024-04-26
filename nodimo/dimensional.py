@@ -14,9 +14,9 @@ DimensionalModel
 import sympy as sp
 
 from nodimo.variable import BasicVariable
-from nodimo.group import Group
+from nodimo.group import PrintableGroup
 from nodimo.matrix import DimensionalMatrix
-from nodimo.relation import VariableRelation
+from nodimo.relation import Relation
 from nodimo._internal import (_build_dimensional_matrix,
                               UnrelatedVariableWarning,
                               _show_warning)
@@ -27,7 +27,7 @@ OrganizedVariablesTuple = tuple[list[BasicVariable], list[BasicVariable],
                                 list[BasicVariable], list[BasicVariable]]
 
 
-class DimensionalModel(Group):
+class DimensionalModel(PrintableGroup):
     """Creates a dimensional model from a given set of variables.
 
     This class is a base step in the construction of the nondimensional
@@ -112,7 +112,7 @@ class DimensionalModel(Group):
         self.nonscaling_variables: list[BasicVariable]
 
         self.dimensional_matrix: DimensionalMatrix
-        self.dimensional_function: VariableRelation
+        self.dimensional_function: Relation
 
         if check_variables:
             self.search_extra_variables_and_dimensions(display_messages)
@@ -135,7 +135,7 @@ class DimensionalModel(Group):
         self.dimensional_matrix = DimensionalMatrix(*self.variables,
                                                     dimensions=self.dimensions)
         
-        self.dimensional_function = VariableRelation(*self.variables, name='pi')
+        self.dimensional_function = Relation(*self.variables, name='pi')
 
     # Alias for build_dimensional_model.
     build = build_dimensional_model

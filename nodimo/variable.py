@@ -14,9 +14,10 @@ Variable
 """
 
 from sympy import Symbol
+from sympy.core.numbers import One
 from typing import Optional
 
-from nodimo._internal import _sympify_number
+from nodimo._internal import _sympify_number, _repr
 
 
 class BasicVariable:
@@ -27,6 +28,8 @@ class BasicVariable:
 
     Parameters
     ----------
+    name : Optional[str], default=None
+        The name that will be displayed in symbolic expressions.
     dependent : bool, default=False
         If ``True``, the variable is dependent.
     scaling : bool, default=False
@@ -36,6 +39,8 @@ class BasicVariable:
 
     Attributes
     ----------
+    name : Optional[str]
+        The name that will be displayed in symbolic expressions.
     dimensions : dict[str, int]
         Dictionary containing dimensions' names and exponents.
     is_dependent : bool
@@ -54,9 +59,14 @@ class BasicVariable:
     """
 
     def __init__(
-        self, dependent: bool = False, scaling: bool = False, **dimensions: int
+        self,
+        name: Optional[str] = None,  # TODO: Turn name attribute mandatory. Keep it optional on Product and Power.
+        dependent: bool = False,
+        scaling: bool = False,
+        **dimensions: int,
     ):
 
+        self.name: Optional[str] = name
         self._dimensions: dict[str, int] = dimensions
         self._is_dependent: bool = bool(dependent)
         self._is_scaling: bool = bool(scaling)
@@ -138,8 +148,58 @@ class BasicVariable:
         elif is_scaling and is_nondimensional:
             raise ValueError("A variable can not be both scaling and nondimensional")
 
+    def __eq__(self, other) -> bool:  # TODO: Implement this method for all childs of this class
 
-class Variable(BasicVariable, Symbol):
+        if self is other:
+            return True
+        elif not isinstance(other, type(self)):
+            return False
+        elif self.name != other.name:
+            return False
+        elif self._is_dependent and not other.is_dependent:
+            return False
+        elif self._is_scaling and not other.is_scaling:
+            return False
+        elif self._is_nondimensional and not other.is_nondimensional:
+            return False
+        elif self._dimensions != other.dimensions:
+            return False
+
+        return True
+
+    def __hash__(self) -> int:  # TODO: Create hash method
+
+        pass
+
+    def __str__(self) -> str:
+
+        return self.name
+
+    def __repr__(self) -> str:
+
+        class_name = type(self).__name__
+        name_repr = f"'{self.name}'" if self.name is not None else ''
+
+        if self._is_nondimensional:
+            dimensions_repr = ''
+        else:
+            dimensions = []
+            for dim_name, dim_exp in self.dimensions.items():
+                dimensions.append(f'{dim_name}={dim_exp}')
+            dimensions_repr = f", {', '.join(dimensions)}"
+        
+        dependent_repr = f', dependent=True' if self._is_dependent else ''
+        scaling_repr = f', scaling=True' if self._is_scaling else ''
+
+        return (f'{class_name}('
+                + name_repr
+                + dimensions_repr
+                + dependent_repr
+                + scaling_repr
+                + ')')
+
+
+class Variable(Symbol, BasicVariable):
     """Creates a symbolic variable.
 
     This class inherits the dimensional properties of BasicVariable and
@@ -211,35 +271,181 @@ class Variable(BasicVariable, Symbol):
                  scaling: bool = False,
                  **dimensions: int):
 
-        super().__init__(dependent=dependent, scaling=scaling, **dimensions)
+        super().__init__(name=name, dependent=dependent, scaling=scaling, **dimensions)
 
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""
 
-        class_name = type(self).__name__
-        name_repr = f"'{self.name}'"
-
-        if self.is_nondimensional:
-            dimensions_repr = ''
-        else:
-            dimensions = []
-
-            for dim_name, dim_exp in self.dimensions.items():
-                if dim_exp != 0:
-                    dimensions.append(f'{dim_name}={dim_exp}')
-            
-            dimensions_repr = f", {', '.join(dimensions)}"
-        
-        dependent_repr = f', dependent=True' if self.is_dependent else ''
-        scaling_repr = f', scaling=True' if self.is_scaling else ''
-
-        return (f'{class_name}('
-                + name_repr
-                + dimensions_repr
-                + dependent_repr
-                + scaling_repr
-                + ')')
+        return BasicVariable.__repr__(self)
 
 
 # Alias for the class Variable.
 Var = Variable
+
+
+class OneVar(BasicVariable, One):
+    """Nondimensional number one.
+
+    This is the identity element for the Product operator and the result
+    of the Power operator when the zero exponent is given.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    @property
+    def dimensions(self) -> dict[str, int]:
+        return self._dimensions
+
+    @property
+    def is_dependent(self) -> bool:
+        return self._is_dependent
+    
+    @property
+    def is_scaling(self) -> bool:
+        return self._is_scaling
+
+
+class BasicCombinedVariable(BasicVariable):
+    """Base class for combined variables.
+
+    A combined variable substitutes an object of the type BasicPower or
+    BasicProduct by a single variable with a simpler representation. All
+    properties of the original variable are preserved.
+    
+    Parameters
+    ----------
+    variable : BasicVariable
+        The variable to be combined.
+    name : Optional[str], default=None
+        The name that represents the combined variable.
+
+    Attributes
+    ----------
+    name : Optional[str]
+        The name that will be displayed in symbolic expressions.
+    dimensions : dict[str, int]
+        Dictionary containing dimensions' names and exponents.
+    is_dependent : bool
+        If ``True``, the variable is dependent.
+    is_scaling : bool
+        If ``True``, the variable can be used as scaling parameter.
+    is_nondimensional : bool
+        If ``True``, the variable is nondimensional.
+
+    Methods
+    -------
+    uncombine()
+        Retuns the original variable.
+
+    Raises
+    ------
+    ValueError
+        If the variable is set as both dependent and scaling.
+    ValueError
+        If the variable is set as scaling, but with no dimensions.
+    """
+
+    def __init__(self, variable: BasicVariable, name: Optional[str] = None):
+
+        name = name if name is not None else variable.name
+        
+        self._variable: BasicVariable = variable
+        super().__init__(
+            name=name,
+            dependent=variable.is_dependent,
+            scaling=variable.is_scaling,
+            **variable.dimensions,
+        )
+
+    # Redefining dimensions as a read-only property
+    @property
+    def dimensions(self) -> dict[str, int]:
+        return self._dimensions
+    
+    def uncombine(self) -> BasicVariable:
+        """Retuns the original variable."""
+
+        return self._variable
+
+    def __repr__(self) -> str:
+
+        class_name = type(self).__name__
+        variable_repr = _repr(self._variable)
+        if self.name == self._variable.name:
+            name_repr = ''
+        else:
+            name_repr = f", name='{self.name}'"
+
+        return (f'{class_name}('
+                + variable_repr
+                + name_repr
+                + ')')
+
+
+class CombinedVariable(Variable, BasicCombinedVariable):
+    """Creates a symbolic combined variable.
+
+    A combined variable substitutes an object of the type Power or
+    Product by a single variable with a simpler representation. All
+    properties of the original variable are preserved.
+
+    Parameters
+    ----------
+    variable : BasicVariable
+        The variable to be combined.
+    name : Optional[str], default=None
+        The name that represents the combined variable.
+
+    Attributes
+    ----------
+    name : Optional[str]
+        The name that will be displayed in symbolic expressions.
+    dimensions : dict[str, int]
+        Dictionary containing dimensions' names and exponents.
+    is_dependent : bool
+        If ``True``, the variable is dependent.
+    is_scaling : bool
+        If ``True``, the variable can be used as scaling parameter.
+    is_nondimensional : bool
+        If ``True``, the variable is nondimensional.
+
+    Methods
+    -------
+    uncombine()
+        Retuns the original variable.
+
+    Raises
+    ------
+    ValueError
+        If the variable to be combined is given no name.
+    ValueError
+        If the variable is set as both dependent and scaling.
+    ValueError
+        If the variable is set as scaling, but with no dimensions.
+    """
+    
+    def __new__(cls, variable: BasicVariable, name: Optional[str] = None):
+
+        if name is None and variable.name is None:
+            raise ValueError("Variable to be combined has no name")
+        elif name is None:
+            name = variable.name
+
+        return super().__new__(cls, name)
+    
+    def __init__(self, variable: BasicVariable, name: Optional[str] = None):
+
+        BasicCombinedVariable.__init__(self, variable, name=name)
+
+    def _sympystr(self, printer) -> str:
+        """String representation according to Sympy."""
+
+        return printer._print_Symbol(self)
+    
+    def _sympyrepr(self, printer) -> str:
+        """String representation according to Sympy."""
+
+        return BasicCombinedVariable.__repr__(self)
+
+    _latex = _pretty = _sympystr

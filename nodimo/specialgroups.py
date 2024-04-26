@@ -12,12 +12,14 @@ BasicGroup
 """
 
 import sympy as sp
-from sympy import ImmutableDenseMatrix
+from sympy import sstr, ImmutableDenseMatrix
 
 from nodimo.variable import BasicVariable
 from nodimo.group import Group
 from nodimo.matrix import BasicDimensionalMatrix, DimensionalMatrix
-from nodimo._internal import _show_warning, UnrelatedVariableWarning
+from nodimo.power import Power
+from nodimo.product import Product
+from nodimo._internal import _repr, _show_warning, UnrelatedVariableWarning
 
 
 class HomogeneousGroup(Group):
@@ -93,114 +95,148 @@ class HomogeneousGroup(Group):
             self._variables = tuple(clear_variables)
 
 
-# class TransformableGroup(HomogeneousGroup):
-#     """Homogeneous group that can be transformed into another group.
+class TransformationGroup(HomogeneousGroup):
+    """Blueprint for the transformation of a homogeneous group.
 
-#     A TransformableGroup can be transformed into another group by using
-#     its scaling variables as tranformation parameters. Every variable of
-#     the new group is a product between one nonscaling variable and the
-#     set of scaling variables.
+    A TransformationGroup sets the layout fot the transformation of a
+    group of variables into another group by using scaling variables as
+    transformation parameters. Every variable of the new group is a
+    product between one nonscaling variable and the set of scaling
+    variables.
 
-#     Parameters
-#     ----------
-#     *variables : BasicVariable
-#         Variables that constitute the group.
+    Parameters
+    ----------
+    *variables : BasicVariable
+        Variables to be transformed.
 
-#     Attributes
-#     ----------
-#     variables : tuple[BasicVariable]
-#         Tuple with the variables.
-#     dimensions : tuple[str]
-#         Tuple with the dimensions' names.
-#     scaling_variables : tuple[BasicVariable]
-#         Tuple with scaling variables.
-#     nonscaling_variables : tuple[BasicVariable]
-#         Tuple with nonscaling variables.
+    Attributes
+    ----------
+    variables : empty tuple
+        Tuple to be populated with the transformation result.
+    dimensions : empty dictionary
+        Dictionary to be populated with the transformation result.
+    xvariables : tuple[BasicVariable]
+        Tuple with the variables to be transformed.
+    scaling_variables : tuple[BasicVariable]
+        Tuple with scaling variables.
+    nonscaling_variables : tuple[BasicVariable]
+        Tuple with nonscaling variables.
 
-#     Methods
-#     -------
-#     show()
-#         Displays the group in a pretty format.
-
-#     Raises
-#     ------
-#     ValueError
-#         If the number of scaling variables is not adequate.
-#     ValueError
-#         If the scaling variables do not form an independent set.
-#     """
+    Raises
+    ------
+    ValueError
+        If the number of scaling variables is not adequate.
+    ValueError
+        If the scaling variables do not form an independent set.
+    """
     
-#     def __init__(self, *variables: BasicVariable):
+    def __init__(self, *variables: BasicVariable):
 
-#         super().__init__(*variables)
-
-#         self._scaling_variables: BasicVariable
-#         self._nonscaling_variables: BasicVariable
-#         self._dimensional_matrix: DimensionalMatrix
-#         self._nonscaling_matrix: ImmutableDenseMatrix
-#         self._scaling_matrix: ImmutableDenseMatrix
-
-#     @HomogeneousGroup.variables.setter
-#     def variables(self, variables: tuple[BasicVariable]):
-#         self._variables = variables
-#         super()._set_properties()
-#         self._set_properties()
-
-#     @property
-#     def scaling_variables(self) -> tuple[BasicVariable]:
-#         return self._scaling_variables
-
-#     @property
-#     def nonscaling_variables(self) -> tuple[BasicVariable]:
-#         return self._nonscaling_variables
-
-#     def _set_properties(self):
-#         """Sets the group properties."""
+        super().__init__(*variables)
+        self._set_transfgroup_properties()
         
-#         self._separate_variables()
-#         self._build_matrices()
-#         self._validate_group()
+        self._xvariables: tuple[BasicVariable]
+        self._scaling_variables: tuple[BasicVariable]
+        self._nonscaling_variables: tuple[BasicVariable]
+        self._dimensional_matrix: DimensionalMatrix
+        self._nonscaling_matrix: ImmutableDenseMatrix
+        self._scaling_matrix: ImmutableDenseMatrix
 
-#     def _separate_variables(self):
-#         self._scaling_variables = []
-#         self._nonscaling_variables = []
-#         for var in self.variables:
-#             if var.is_scaling:
-#                 self._scaling_variables.append(var)
-#             else:
-#                 self._nonscaling_variables.append(var)
-#         self._variables = tuple(self._nonscaling_variables + self._scaling_variables)
+    # Redefining variables as a read-only property
+    @property
+    def variables(self) -> tuple[BasicVariable]:
+        return self._variables
 
-#     def _build_matrices(self):
-#         self._dimensional_matrix = DimensionalMatrix(*self.variables)
-#         independent_rows = self._dimensional_matrix.independent_rows
-#         nonscaling_matrix = BasicDimensionalMatrix(*self.nonscaling_variables).matrix
-#         scaling_matrix = BasicDimensionalMatrix(*self.scaling_variables).matrix
-#         self._nonscaling_matrix = nonscaling_matrix[independent_rows, :]
-#         self._scaling_matrix = scaling_matrix[independent_rows, :]
+    @property
+    def xvariables(self) -> tuple[BasicVariable]:
+        return self._xvariables
 
-#     def _validate_group(self):
-#         """Validates the given scaling variables."""
+    @xvariables.setter
+    def xvariables(self, variables: tuple[BasicVariable]):
+        self._variables = variables
+        self._set_basicgroup_properties()
+        self._set_homogroup_properties()
+        self._set_transfgroup_properties()
+
+    @property
+    def scaling_variables(self) -> tuple[BasicVariable]:
+        return self._scaling_variables
+
+    @property
+    def nonscaling_variables(self) -> tuple[BasicVariable]:
+        return self._nonscaling_variables
+
+    def _set_transfgroup_properties(self):
+        """Sets the group properties."""
+
+        self._separate_scaling_variables()
+        self._build_matrices()
+        self._validate_group()
+        self._xvariables = tuple(list(self._variables))
+        self._variables = ()
+        self._dimensions = {}
+
+    def _separate_scaling_variables(self):
+        """Separates variables into scaling and nonscaling."""
         
-#         if len(self._scaling_variables) != self._dimensional_matrix.rank:
-#             raise ValueError(
-#                 f"The group must have {self._dimensional_matrix.rank} scaling variables."
-#             )
-#         elif self._scaling_matrix.rank() != self._dimensional_matrix.rank:
-#             raise ValueError("Scaling variables do not form an independent set")
-    
-#     def _sympystr(self, printer) -> str:
-#         """String representation according to Sympy."""
+        scaling_variables = []
+        nonscaling_variables = []
+        for var in self._variables:
+            if var.is_scaling:
+                scaling_variables.append(var)
+            else:
+                nonscaling_variables.append(var)
+
+        self._nonscaling_variables = tuple(nonscaling_variables)
+        self._scaling_variables = tuple(scaling_variables)
+        self._variables = self._nonscaling_variables + self._scaling_variables
+
+    def _build_matrices(self):
+        """Builds scaling and nonscaling matrices."""
         
-#         return f"Scaling variables: {sp.pretty(self.scaling_variables)[1:-1]}"
+        self._dimensional_matrix = BasicDimensionalMatrix(*self._variables)
+        self._dimensional_matrix._set_independent_rows()
+        independent_rows = self._dimensional_matrix._independent_rows
 
-#     def _latex(self, printer) -> str:
-#         """Latex representation according to Sympy."""
+        nonscaling_matrix = self._dimensional_matrix._get_submatrix(*self._nonscaling_variables)
+        scaling_matrix = self._dimensional_matrix._get_submatrix(*self._scaling_variables)
+        self._nonscaling_matrix = nonscaling_matrix[independent_rows, :]
+        self._scaling_matrix = scaling_matrix[independent_rows, :]
 
-#         scvars_latex = R',\ '.join([sp.latex(var) for var in self.scaling_variables])
+    def _validate_group(self):
+        """Validates the scaling variables."""
+        
+        if len(self._scaling_variables) != self._dimensional_matrix.rank:
+            raise ValueError(
+                f"The group must have {self._dimensional_matrix.rank} scaling variables."
+            )
+        elif self._scaling_matrix.rank() != self._dimensional_matrix.rank:
+            raise ValueError("Scaling variables do not form an independent set")
 
-#         return R"\text{Scaling variables: } " + scvars_latex
+    def __eq__(self, other) -> bool:
 
+        if self is other:
+            return True
+        elif not isinstance(other, type(self)):
+            return False
+        elif set(self._xvariables) != set(other.xvariables):
+            return False
+
+        return True
+
+    def __str__(self) -> str:
+
+        class_name = type(self).__name__
+        variables_str = sstr(self._xvariables)
+
+        return f'{class_name}{variables_str}'
+
+    def __repr__(self) -> str:
+
+        class_name = type(self).__name__
+        variables_repr = _repr(self._xvariables)
+
+        return f'{class_name}{variables_repr}'
 
 # An generalization to be implemented later.
 # class DimensionalGroup(Group):
@@ -210,81 +246,131 @@ class HomogeneousGroup(Group):
 #         pass
 
 
-# class NonDimensionalGroup(Group):  # When DimensionalGroup is implemented, this should inherit from it.
-#     """Blablabla.
+class NonDimensionalGroup(TransformationGroup):  # When DimensionalGroup is implemented, this should inherit from it.
+    """Nondimensional group created from a homogeneous group.
 
-#     blablabla.
+    This class creates a group of nondimensinal variables from a
+    homogeneous given group of variables. It does that using the
+    TransformationGroup layout.
 
-#     Parameters
-#     ----------
-#     *scaling_group : ScalingGroup
-#         Variables that constitute the group.
+    Parameters
+    ----------
+    *variables : BasicVariable
+        Variables to be transformed.
 
-#     Attributes
-#     ----------
-#     variables : tuple[BasicVariable]
-#         Tuple with the variables.
-#     dimensions : tuple[str]
-#         Tuple with the dimensions' names.
+    Attributes
+    ----------
+    variables : tuple[BasicVariable]
+        Tuple with nondimensional variables.
+    dimensions : dict[str, int]
+        Empty dictionary that represents the nondimensional group.
+    xvariables : tuple[BasicVariable]
+        Tuple with the variables to be transformed.
+    scaling_variables : tuple[BasicVariable]
+        Tuple with scaling variables.
+    nonscaling_variables : tuple[BasicVariable]
+        Tuple with nonscaling variables.
 
-#     Methods
-#     -------
-#     show()
-#         Displays the group in a pretty format.
-#     """
+    Raises
+    ------
+    ValueError
+        If the number of scaling variables is not adequate.
+    ValueError
+        If the scaling variables do not form an independent set.
+    """
     
-#     def __init__(self, transformable_group: TransformableGroup):
+    def __init__(self, *variables: BasicVariable):
 
-#         self._transformable_group: TransformableGroup = transformable_group
-#         self._variables: BasicVariable
-#         self._separate_variables()
-#         self._calculate_exponents()
+        super().__init__(*variables)
+        self._nondim_products: tuple[BasicVariable]
+        self._set_nondimgroup_properties()
+
+    @TransformationGroup.xvariables.setter
+    def xvariables(self, variables: tuple[BasicVariable]):
+        self._variables = variables
+        self._set_basicgroup_properties()
+        self._set_homogroup_properties()
+        self._set_transfgroup_properties()
+        self._set_nondimgroup_properties()
     
-#     @property
-#     def transformable_group(self) -> TransformableGroup:
-#         return self._transformable_group
-
-#     def _separate_variables(self):
-#         """."""
+    def _set_nondimgroup_properties(self):
+        """Sets the group properties."""
         
-#         dimensional_variables = []
-#         nondimensional_variables = []
-#         for var in self._transformable_group.variables:
-#             if var.is_nondimensional:
-#                 nondimensional_variables.append(var)
-#             else:
-#                 dimensional_variables.append(var)
-
-#         self._transformable_group.variables = tuple(dimensional_variables)
-#         self._variables = tuple(nondimensional_variables)
-
-#     def _calculate_exponents(self):
-#         """Determines the exponents to build the nondimensional products.
-
-#         References
-#         ----------
-#         .. [1] Thomas Szirtes, Applied Dimensional Analysis and Modeling
-#                (Butterworth-Heinemann, 2007), p. 133.
-#         """
-
-#         nvars = len(self._transformable_group.variables)
-#         rank = self._transformable_group._dimensional_matrix.rank
-
-#         A = self.transformable_group._scaling_matrix
-#         B = self.transformable_group._nonscaling_matrix
-
-#         E11 = sp.eye(nvars - rank)
-#         E12 = sp.zeros(nvars - rank, rank)
-#         E21 = -A**-1 * B
-#         E22 = A**-1
-#         E = sp.Matrix([[E11, E12],
-#                        [E21, E22]])
-
-#         Z1 = sp.eye(nvars - rank)
-#         Z2 = sp.zeros(rank, nvars - rank)
-#         Z = sp.Matrix([[Z1],
-#                        [Z2]])
-
-#         exponents = E * Z
+        self._separate_dimensional_variables()
+        self._calculate_exponents()
+        self._build_nondimensional_products()
+    
+    def _separate_dimensional_variables(self):
+        """Retains already nondimensional variables."""
         
-#         self._exponents = exponents.as_immutable()
+        dimensional_variables = []
+        nondimensional_variables = []
+        for var in self._xvariables:
+            if var.is_nondimensional:
+                nondimensional_variables.append(var)
+            else:
+                dimensional_variables.append(var)
+
+        if len(nondimensional_variables) > 0:
+            self.xvariables = tuple(dimensional_variables)
+            self._variables = tuple(nondimensional_variables)
+
+    def _calculate_exponents(self):
+        """Determines the exponents for the scaling variables.
+
+        References
+        ----------
+        .. [1] Thomas Szirtes, Applied Dimensional Analysis and Modeling
+               (Butterworth-Heinemann, 2007), p. 133.
+        """
+
+        nvars = len(self._xvariables)
+        rank = self._dimensional_matrix.rank
+
+        A = self._scaling_matrix
+        B = self._nonscaling_matrix
+
+        E11 = sp.eye(nvars - rank)
+        E12 = sp.zeros(nvars - rank, rank)
+        E21 = -A**-1 * B
+        E22 = A**-1
+        E = sp.Matrix([[E11, E12],
+                       [E21, E22]])
+
+        Z1 = sp.eye(nvars - rank)
+        Z2 = sp.zeros(rank, nvars - rank)
+        Z = sp.Matrix([[Z1],
+                       [Z2]])
+
+        exponents = E * Z
+        
+        self._exponents = exponents.as_immutable()
+
+    def _build_nondimensional_products(self):
+        """Builds the nondimensional variables."""
+
+        self._calculate_exponents()
+        nondim_products = []
+
+        for j in range(len(self._nonscaling_variables)):
+            factors = []
+            for var, exp in zip(self._xvariables, self._exponents.col(j)):
+                factors.append(Power(var, exp))
+            nondim_products.append(Product(*factors))
+
+        self._nondim_products = tuple(nondim_products)
+        self._variables += self._nondim_products
+
+    def _set_asdependent_from_arguments(self):
+        """Sets nondimensional products as dependent from arguments.
+
+        Nondimensional product is set as dependent if it contains at
+        least one dependent variable in its expression.
+        """
+
+        for prod in self._nondim_products:
+            prod.is_dependent = any(var.is_dependent for var in prod._variables)
+
+    def __eq__(self, other) -> bool:
+
+        return super(TransformationGroup, self).__eq__(other)

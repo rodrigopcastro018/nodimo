@@ -18,10 +18,11 @@ from sympy import ImmutableDenseMatrix
 from typing import Optional
 
 from nodimo.variable import BasicVariable
-from nodimo.group import Group
+from nodimo.group import PrintableGroup
+from nodimo._internal import _repr
 
 
-class BasicDimensionalMatrix(Group):
+class BasicDimensionalMatrix(PrintableGroup):
     """Creates a basic dimensional matrix from a group of variables.
 
     A BasicDimensionalMatrix is a matrix with one column for each
@@ -68,13 +69,13 @@ class BasicDimensionalMatrix(Group):
 
         self._set_basicmatrix_properties()
 
-    @Group.variables.setter
+    @PrintableGroup.variables.setter
     def variables(self, variables: tuple[BasicVariable]):
         self._variables = variables
         self._set_basicgroup_properties
         self._set_basicmatrix_properties()
 
-    @Group.dimensions.setter
+    @PrintableGroup.dimensions.setter
     def dimensions(self, dimensions: tuple[str]):
         self._dimensions = dimensions
         self._set_basicmatrix_properties()
@@ -171,9 +172,9 @@ class BasicDimensionalMatrix(Group):
         """String representation according to Sympy."""
 
         class_name = type(self).__name__
-        variables_repr = sp.srepr(self._variables)[1:-1]
+        variables_repr = _repr(self._variables)[1:-1]
 
-        if self._dimensions == Group(*self._variables)._dimensions:
+        if self._dimensions == PrintableGroup(*self._variables)._dimensions:
             dimensions_repr = ''
         else:
             dimensions_repr = f', dimensions={self._dimensions}'
@@ -183,10 +184,7 @@ class BasicDimensionalMatrix(Group):
                 + dimensions_repr
                 + ')')
 
-    def _latex(self, printer) -> str:
-        """Latex representation according to Sympy."""
-
-        return sp.latex(self._matrix, root_notation=False)
+    _latex = _pretty = _sympystr
 
 
 class DimensionalMatrix(BasicDimensionalMatrix):
@@ -311,13 +309,14 @@ class DimensionalMatrix(BasicDimensionalMatrix):
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""
 
-        return sp.pretty(self._labeled_matrix, root_notation=False)
+        return printer._print(self._labeled_matrix)
 
     def _latex(self, printer) -> str:
         """Latex representation according to Sympy."""
 
         return self._latex_repr
 
+    _pretty = _sympystr
 
 # Alias for DimensionalMatrix.
 DimMatrix = DimensionalMatrix

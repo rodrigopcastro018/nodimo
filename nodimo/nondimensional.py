@@ -19,7 +19,7 @@ from itertools import combinations
 
 from nodimo.variable import BasicVariable
 from nodimo.product import Product
-from nodimo.relation import VariableRelation
+from nodimo.relation import Relation
 from nodimo.dimensional import DimensionalModel
 from nodimo._internal import (_is_running_on_jupyter,
                               _show_object,
@@ -103,7 +103,7 @@ class NonDimensionalModel(DimensionalModel):
         self._check_scaling_variables: bool = True
 
         self.nondimensional_groups: list[Product]
-        self.nondimensional_function: VariableRelation
+        self.nondimensional_function: Relation
 
         if build_now:
             self._validate_scaling_variables()
@@ -139,7 +139,7 @@ class NonDimensionalModel(DimensionalModel):
 
         self.nondimensional_groups = self._build_nondimensional_groups()
 
-        self.nondimensional_function = VariableRelation(
+        self.nondimensional_function = Relation(
             *self.nondimensional_variables,
             *self.nondimensional_groups,
             name='Pi'
@@ -304,7 +304,7 @@ class NonDimensionalModels(DimensionalModel):
         self._validate_scaling_variables()
         
         self.scaling_groups: list[list[BasicVariable]]
-        self.nondimensional_functions: list[VariableRelation]
+        self.nondimensional_functions: list[Relation]
 
         self.scaling_groups = self._build_scaling_groups()
         self.nondimensional_functions = self._build_nondimensional_functions()
@@ -364,7 +364,7 @@ class NonDimensionalModels(DimensionalModel):
 
         return scaling_groups
 
-    def _build_nondimensional_functions(self) -> list[VariableRelation]:
+    def _build_nondimensional_functions(self) -> list[Relation]:
         """Builds one nondimensional function for each scaling group.
 
         Returns

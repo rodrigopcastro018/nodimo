@@ -22,7 +22,8 @@ _build_dimensional_matrix(variables, dimensions=[])
 """
 
 import sympy as sp
-from sympy import Rational
+from sympy import srepr, Rational
+from sympy.core._print_helpers import Printable
 from typing import Union
 import warnings
 
@@ -223,6 +224,30 @@ def _build_dimensional_matrix(variables, dimensions=[], return_raw=False):
         return raw_dimensional_matrix
     else:
         return dimensional_matrix
+
+
+def _repr(object) -> str:
+    """Custom repr function.
+
+    This function returns the appropriate (developer) string
+    representation according to the type of the input object. If the
+    input object inherits from sympy.Printable, the sympy.srepr function
+    is used. Otherwise, it uses the built-in repr function.
+    """
+
+    if isinstance(object, Printable):
+        return srepr(object)
+    elif isinstance(object, tuple):
+        is_printable = [isinstance(obj, Printable) for obj in object]
+        if all(is_printable):
+            return srepr(object)
+        elif any(is_printable):
+            tuple_elements_repr = ', '.join(_repr(obj) for obj in object)
+            return f"({tuple_elements_repr})"
+        else:
+            return repr(object)
+    else:
+        return repr(object)
 
 
 class UnrelatedVariableWarning(Warning):

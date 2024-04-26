@@ -12,168 +12,146 @@ ModelFunction
 """
 
 import sympy as sp
-from sympy import Equality
+from sympy import sstr, Equality
 
 from nodimo.variable import BasicVariable
-from nodimo.group import Group
-from nodimo._internal import _show_object, _remove_duplicates
+from nodimo.group import PrintableGroup
+from nodimo.specialgroups import HomogeneousGroup
+from nodimo._internal import _repr
 
 
-# Alias for type used in ModelFunction.
-SeparatedVariablesTuple = tuple[BasicVariable, list[BasicVariable]]
+class BasicRelation(HomogeneousGroup):
+    """Base class for a relation of variables.
 
-
-class VariableRelation(Group):
-    """Creates a function that relates a set of variables or groups.
-
-    This class states a function that represents a model, that is, it
-    expresses a relationship between the variables or variable groups
-    that constitute a model. It inherits from the Sympy Printable class
-    the ability to be displayed on screen in a pretty format.
+    This class builds a mathematical relation between one dependent
+    variable and none or multiple independent variables.
 
     Parameters
     ----------
-    *variables : Variable or VariableGroup
-        Variables or groups that constitute the function.
-    name : str, default='f'
-        Name of the function, traditionally a single letter.
+    *variables : BasicVariable
+        Variables that constitute the relation.
 
     Attributes
     ----------
-    variables : list[Variable or VariableGroup]
-        List of variables or groups used in the function.
-    name : str, default='f'
-        Name of the function, traditionally a single letter.
-    dependent_variable : Variable or VariableGroup
-        Dependent variable or group.
-    independent_variables : list[Variable or VariableGroup]
-        List of independent variables or groups.
-    function : Equality
-        Sympy expression that represents the model function.
-
-    Methods
-    -------
-    show()
-        Displays the function.
+    variables : tuple[BasicVariable]
+        Tuple with the variables.
+    dimensions : tuple[str]
+        Tuple with the dimensions' names.
 
     Raises
     ------
     ValueError
-        If there is less or more than one dependent variable.
+        If there is not exactly one dependent variable.
+    """
+    
+    def __init__(self, *variables: BasicVariable, name: str = 'f'):
 
-    Examples
-    --------
-    Consider the dimensions mass ``M``, length ``L`` and time ``T``.
-    Next, assuming that ``F`` is force, ``m`` is mass and ``a`` is
-    acceleration, the function ``h`` that relates these three variables
-    is built and displayed as:
+        super().__init__(*variables)
+        self.name: str = name
+        self._dependent_variable: BasicVariable
+        self._independent_variables: tuple[BasicVariable]
+        self._set_basicrelation_properties()
 
-    >>> from nodimo import Variable, ModelFunction
-    >>> F = Variable('F', M=1, L=1, T=-2, dependent=True)
-    >>> m = Variable('m', M=1)
-    >>> a = Variable('a', L=1, T=-2)
-    >>> h = ModelFunction(F, m, a)
-    >>> h.show()
+    def _set_basicrelation_properties(self):
+        """Sets basic relation properties"""
+
+        self._validate_variables()
+        self._separate_dependent_variable()
+
+    def _validate_variables(self):
+        """Validates the existence of only one dependent variable.
+
+        If no dependent variable is found, this method tries to define
+        the first given variable as dependent.
+        """
+
+        is_dependent = [var.is_dependent for var in self._variables]
+        if sum(is_dependent) == 0:
+            try:
+                self._variables[0].is_dependent = True
+            except ValueError:
+                raise ValueError("There must be exactly one dependent variable")
+        elif sum(is_dependent) > 1:
+            raise ValueError("There must be exactly one dependent variable")
+
+    def _separate_dependent_variable(self):
+        """Separates variables into dependent and independent."""
+        
+        independent_variables = []
+        for var in self.variables:
+            if var.is_dependent:
+                dependent_variable = var
+            else:
+                independent_variables.append(var)
+
+        self._dependent_variable = dependent_variable
+        self._independent_variables = tuple(independent_variables)
+
+    def __str__(self) -> str:
+
+        dep_var_str = str(self._dependent_variable)
+        indep_var_str = sstr(self._independent_variables)[1:-1]
+
+        return dep_var_str + f' = {self.name}({indep_var_str})'
+
+    def __repr__(self) -> str:
+
+        class_name = type(self).__name__
+        variables_repr = _repr(self._variables)[1:-1]
+        name_repr = f", name='{self.name}'" if self.name != 'f' else ''
+
+        return f'{class_name}({variables_repr}{name_repr})'
+
+
+class Relation(BasicRelation, PrintableGroup):
+    """Creates a relation of variables.
+
+    Similar to a BasicRelation, but with a functional relation as
+    the representation in symbolic format.
+
+    Parameters
+    ----------
+    *variables : BasicVariable
+        Variables that constitute the relation.
+
+    Attributes
+    ----------
+    variables : tuple[BasicVariable]
+        Tuple with the variables.
+    dimensions : tuple[str]
+        Tuple with the dimensions' names.
+
+    Raises
+    ------
+    ValueError
+        If there is not exactly one dependent variable.
     """
 
     def __init__(self, *variables: BasicVariable, name: str = 'f'):
 
-        self.variables: list[BasicVariable]
-        self.variables = _remove_duplicates(list(variables))
-        self.name: str = name
-        self.dependent_variable: BasicVariable
-        self.independent_variables: list[BasicVariable]
+        super().__init__(*variables, name=name)
+        self._set_relation_properties()
 
-        (
-            self.dependent_variable,
-            self.independent_variables
-        ) = self._separate_variables()
+    def _set_relation_properties(self):
+        """Sets basic relation properties"""
 
-        self.function: Equality = self._build_model_function()
+        self._build_functional_relation()
 
-    def _separate_variables(self) -> SeparatedVariablesTuple:
-        """Splits the list of variables in dependent and independent.
+    def _build_functional_relation(self):
+        """Builds functional relation between variables."""
 
-        Returns
-        -------
-        dependent_variable : Variable or VariableGroup
-            Dependent variable or group.
-        independent_variables : list[Variable or VariableGroup]
-            List of independent variables or groups.
-
-        Raises
-        ------
-        ValueError
-            If there is less or more than one dependent variable.
-        """
-
-        dependent_variable = []
-        independent_variables = []
-
-        for var in self.variables:
-            if var.is_dependent:
-                dependent_variable.append(var)
-            else:
-                independent_variables.append(var)
-
-        if len(dependent_variable) != 1:
-            raise ValueError("There must be exactly one dependent variable")
-
-        return dependent_variable[0], independent_variables
-
-    def _build_model_function(self) -> Equality:
-        """Builds the function to be displayed on screen.
-
-        Returns
-        -------
-        function : Equality
-            Sympy expression that represents the model function.
-        """
-
-        (
-            independent_variables_function
-        ) = sp.Function(self.name)(*self.independent_variables)
-
-        function = Equality(self.dependent_variable,
-                            independent_variables_function,
-                            evaluate=False)
-
-        return function
-
-    def show(self) -> None:
-        """Displays the function."""
-
-        _show_object(self)
-
-    def __eq__(self, other) -> bool:
-
-        if self is other:
-            return True
-        elif not isinstance(other, type(self)):
-            return False
-        elif set(self.variables) != set(other.variables):
-            return False
-        
-        return True
+        dep_var = self._dependent_variable
+        indep_vars_func = sp.Function(self.name)(*self._independent_variables)
+        self._function = Equality(dep_var, indep_vars_func, evaluate=False)
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""
 
-        return sp.pretty(self.function, root_notation=False)
+        return printer._print_Relational(self._function)
 
     def _sympyrepr(self, printer) -> str:
         """String representation according to Sympy."""
 
-        class_name = type(self).__name__
-        variables_repr = ', '.join([sp.srepr(var) for var in self.variables])
-        name_repr = f", name='{self.name}'" if self.name != 'f' else ''
+        return BasicRelation.__repr__(self)
 
-        return (f'{class_name}('
-                + variables_repr
-                + name_repr
-                + ')')
-
-    def _latex(self, printer) -> str:
-        """Latex representation according to Sympy."""
-
-        return sp.latex(self.function, root_notation=False)
+    _latex = _pretty = _sympystr
