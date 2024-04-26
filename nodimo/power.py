@@ -16,10 +16,7 @@ Power
 from sympy import Rational, Pow
 from typing import Optional
 
-from nodimo.variable import (BasicVariable,
-                             OneVar,
-                             BasicCombinedVariable,
-                             CombinedVariable)
+from nodimo.variable import Variable, OneVar
 from nodimo._internal import _sympify_number, _repr
 
 
@@ -45,7 +42,7 @@ class Exponentiation:
         Exponent to which the variable will be raised.
     """
 
-    def __init__(self, variable: BasicVariable, exponent: Rational):
+    def __init__(self, variable: Variable, exponent: Rational):
 
         exponent_sp = _sympify_number(exponent)
         
@@ -53,11 +50,11 @@ class Exponentiation:
             exponent_sp *= variable._exponent
             variable = variable._variable
 
-        self._variable: BasicVariable = variable
+        self._variable: Variable = variable
         self._exponent: Rational = exponent_sp
 
     @property
-    def variable(self) -> BasicVariable:
+    def variable(self) -> Variable:
         return self._variable
 
     @property
@@ -65,7 +62,7 @@ class Exponentiation:
         return self._exponent
 
 
-class BasicPower(BasicVariable, Exponentiation):
+class BasicPower(Variable, Exponentiation):
     """Base class for the power of a variable.
 
     Base class that represents the power of a variable. The dimensional
@@ -108,7 +105,7 @@ class BasicPower(BasicVariable, Exponentiation):
 
     def __new__(
         cls,
-        variable: BasicVariable,
+        variable: Variable,
         exponent: Rational,
         name: Optional[str] = None,
         dependent: bool = False,
@@ -128,7 +125,7 @@ class BasicPower(BasicVariable, Exponentiation):
 
     def __init__(
         self,
-        variable: BasicVariable,
+        variable: Variable,
         exponent: Rational,
         name: Optional[str] = None,
         dependent: bool = False,
@@ -146,10 +143,10 @@ class BasicPower(BasicVariable, Exponentiation):
     def dimensions(self) -> dict[str, int]:
         return self._dimensions
 
-    def combine(self, name: Optional[str] = None) -> BasicCombinedVariable:
-        """Converts to a combined variable."""
+    # def combine(self, name: Optional[str] = None) -> BasicCombinedVariable:
+    #     """Converts to a combined variable."""
 
-        return BasicCombinedVariable(self, name)
+    #     return BasicCombinedVariable(self, name)
 
     def _set_dimensions(self):
         """Evaluates the dimensions of the power."""
@@ -232,7 +229,7 @@ class Power(Pow, BasicPower):
 
     def __new__(
         cls,
-        variable: BasicVariable,
+        variable: Variable,
         exponent: Rational,
         name: Optional[str] = None,
         dependent: bool = False,
@@ -248,7 +245,7 @@ class Power(Pow, BasicPower):
 
     def __init__(
         self,
-        variable: BasicVariable,
+        variable: Variable,
         exponent: Rational,
         name: Optional[str] = None,
         dependent: bool = False,
@@ -257,10 +254,10 @@ class Power(Pow, BasicPower):
 
         super().__init__(variable, exponent, name=name, dependent=dependent, scaling=scaling)
 
-    def combine(self, name: Optional[str] = None) -> CombinedVariable:
-        """Converts to a combined variable."""
+    # def combine(self, name: Optional[str] = None) -> CombinedVariable:
+    #     """Converts to a combined variable."""
 
-        return CombinedVariable(self, name)
+    #     return CombinedVariable(self, name)
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""

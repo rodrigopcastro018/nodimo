@@ -14,7 +14,7 @@ BasicGroup
 from sympy import sstr, srepr
 from sympy.core._print_helpers import Printable
 
-from nodimo.variable import BasicVariable
+from nodimo.variable import Variable
 from nodimo._internal import _show_object, _repr
 
 
@@ -37,18 +37,18 @@ class Group:  # TODO: Maybe make this inherit from tuple. Or make it work like a
         Tuple with the dimensions' names.
     """
 
-    def __init__(self, *variables: BasicVariable):
+    def __init__(self, *variables: Variable):
 
-        self._variables: tuple[BasicVariable] = variables
+        self._variables: tuple[Variable] = variables
         self._dimensions: tuple[str]
         self._set_basicgroup_properties()
 
     @property
-    def variables(self) -> tuple[BasicVariable]:
+    def variables(self) -> tuple[Variable]:
         return self._variables
 
     @variables.setter
-    def variables(self, variables: tuple[BasicVariable]):
+    def variables(self, variables: tuple[Variable]):
         self._variables = variables
         self._set_basicgroup_properties()
 
@@ -147,7 +147,7 @@ class PrintableGroup(Printable, Group):
         Displays the group in a pretty format.
     """
 
-    def __init__(self, *variables: BasicVariable):
+    def __init__(self, *variables: Variable):
 
         super().__init__(*variables)
     

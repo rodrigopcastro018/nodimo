@@ -17,7 +17,7 @@ import sympy as sp
 from sympy import ImmutableDenseMatrix
 from typing import Optional
 
-from nodimo.variable import BasicVariable
+from nodimo.variable import Variable
 from nodimo.group import PrintableGroup
 from nodimo._internal import _repr
 
@@ -53,7 +53,7 @@ class BasicDimensionalMatrix(PrintableGroup):
 
     def __init__(
         self,
-        *variables: BasicVariable,
+        *variables: Variable,
         dimensions: Optional[tuple[str]] = None
     ):
 
@@ -62,7 +62,7 @@ class BasicDimensionalMatrix(PrintableGroup):
         self._matrix: ImmutableDenseMatrix
         self._rank: int
         self._independent_rows: tuple[int]
-        self._submatrices: dict[BasicVariable, ImmutableDenseMatrix] = {}
+        self._submatrices: dict[Variable, ImmutableDenseMatrix] = {}
 
         if dimensions is not None:
             self.dimensions = dimensions
@@ -70,7 +70,7 @@ class BasicDimensionalMatrix(PrintableGroup):
         self._set_basicmatrix_properties()
 
     @PrintableGroup.variables.setter
-    def variables(self, variables: tuple[BasicVariable]):
+    def variables(self, variables: tuple[Variable]):
         self._variables = variables
         self._set_basicgroup_properties
         self._set_basicmatrix_properties()
@@ -237,7 +237,7 @@ class DimensionalMatrix(BasicDimensionalMatrix):
 
     def __init__(
         self,
-        *variables: BasicVariable,
+        *variables: Variable,
         dimensions: Optional[tuple[str]] = None
     ):
 
@@ -247,7 +247,7 @@ class DimensionalMatrix(BasicDimensionalMatrix):
         self._set_matrix_properties()
 
     @BasicDimensionalMatrix.variables.setter
-    def variables(self, variables: tuple[BasicVariable]):
+    def variables(self, variables: tuple[Variable]):
         self._variables = variables
         self._set_basicgroup_properties()
         self._set_basicmatrix_properties()

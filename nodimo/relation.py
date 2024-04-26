@@ -14,7 +14,7 @@ ModelFunction
 import sympy as sp
 from sympy import sstr, Equality
 
-from nodimo.variable import BasicVariable
+from nodimo.variable import Variable
 from nodimo.group import PrintableGroup
 from nodimo.specialgroups import HomogeneousGroup
 from nodimo._internal import _repr
@@ -44,12 +44,12 @@ class BasicRelation(HomogeneousGroup):
         If there is not exactly one dependent variable.
     """
     
-    def __init__(self, *variables: BasicVariable, name: str = 'f'):
+    def __init__(self, *variables: Variable, name: str = 'f'):
 
         super().__init__(*variables)
         self.name: str = name
-        self._dependent_variable: BasicVariable
-        self._independent_variables: tuple[BasicVariable]
+        self._dependent_variable: Variable
+        self._independent_variables: tuple[Variable]
         self._set_basicrelation_properties()
 
     def _set_basicrelation_properties(self):
@@ -127,7 +127,7 @@ class Relation(BasicRelation, PrintableGroup):
         If there is not exactly one dependent variable.
     """
 
-    def __init__(self, *variables: BasicVariable, name: str = 'f'):
+    def __init__(self, *variables: Variable, name: str = 'f'):
 
         super().__init__(*variables, name=name)
         self._set_relation_properties()

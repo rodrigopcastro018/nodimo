@@ -16,8 +16,7 @@ Product
 from sympy import Mul, S
 from typing import Optional
 
-from nodimo.variable import (BasicVariable, Variable, OneVar,
-                             BasicCombinedVariable, CombinedVariable)
+from nodimo.variable import Variable, Variable, OneVar
 from nodimo.matrix import BasicDimensionalMatrix
 from nodimo.power import BasicPower, Power
 from nodimo._internal import _repr
@@ -46,13 +45,13 @@ class Multiplication:
         Simplifies the multiplication factors.
     """
 
-    def __init__(self, *variables: BasicVariable):
+    def __init__(self, *variables: Variable):
 
-        self._variables: tuple[BasicVariable] = variables
-        self._base_variables: tuple[BasicVariable]
+        self._variables: tuple[Variable] = variables
+        self._base_variables: tuple[Variable]
 
     @property
-    def variables(self) -> tuple[BasicVariable]:
+    def variables(self) -> tuple[Variable]:
         return self._variables
     
     def simplify(self):
@@ -134,13 +133,13 @@ class Multiplication:
 
             if isinstance(base_var, (Variable, CombinedVariable)):
                 variables.append(Power(base_var, exponent))
-            elif isinstance(base_var, (BasicVariable, BasicCombinedVariable)):
+            elif isinstance(base_var, (Variable, BasicCombinedVariable)):
                 variables.append(BasicPower(base_var, exponent))
 
         self._variables = tuple(variables)
 
 
-class BasicProduct(BasicVariable, Multiplication):
+class BasicProduct(Variable, Multiplication):
     """Base class for the product of variables.
 
     Base class that represents the product of variables. The dimensional
@@ -180,7 +179,7 @@ class BasicProduct(BasicVariable, Multiplication):
     
     def __new__(
         cls,
-        *variables: BasicVariable,
+        *variables: Variable,
         name: Optional[str] = None,
         dependent: bool = False,
         scaling: bool = False,
@@ -198,7 +197,7 @@ class BasicProduct(BasicVariable, Multiplication):
 
     def __init__(
         self,
-        *variables: BasicVariable,
+        *variables: Variable,
         name: Optional[str] = None,
         dependent: bool = False,
         scaling: bool = False,
@@ -219,10 +218,10 @@ class BasicProduct(BasicVariable, Multiplication):
     def dimensions(self) -> dict[str, int]:
         return self._dimensions
 
-    def combine(self, name: Optional[str] = None) -> BasicCombinedVariable:
-        """Converts to a combined variable."""
+    # def combine(self, name: Optional[str] = None) -> BasicCombinedVariable:
+    #     """Converts to a combined variable."""
 
-        return BasicCombinedVariable(self, name)
+    #     return BasicCombinedVariable(self, name)
 
     def _set_dimensions(self, var1, var2):
         """Evaluates the dimensions of the product of two variables."""
@@ -308,7 +307,7 @@ class Product(Mul, BasicProduct):
 
     def __new__(  # FIXME: There is a problem when the *variables are all the same or a 'Power' of each other. The return type is of type sympy.Pow
         cls,
-        *variables: BasicVariable,
+        *variables: Variable,
         name: Optional[str] = None,
         dependent: bool = False,
         scaling: bool = False,
@@ -321,7 +320,7 @@ class Product(Mul, BasicProduct):
 
     def __init__(
         self,
-        *variables: BasicVariable,
+        *variables: Variable,
         name: Optional[str] = None,
         dependent: bool = False,
         scaling: bool = False,
@@ -329,10 +328,10 @@ class Product(Mul, BasicProduct):
 
         super().__init__(*variables, name=name, dependent=dependent, scaling=scaling)
 
-    def combine(self, name: Optional[str] = None) -> CombinedVariable:
-        """Converts to a combined variable."""
+    # def combine(self, name: Optional[str] = None) -> CombinedVariable:
+    #     """Converts to a combined variable."""
 
-        return CombinedVariable(self, name)
+    #     return CombinedVariable(self, name)
 
     def _sympystr(self, printer) -> str:
         """String representation according to Sympy."""

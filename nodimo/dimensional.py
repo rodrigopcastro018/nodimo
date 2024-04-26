@@ -13,7 +13,7 @@ DimensionalModel
 
 import sympy as sp
 
-from nodimo.variable import BasicVariable
+from nodimo.variable import Variable
 from nodimo.group import PrintableGroup
 from nodimo.matrix import DimensionalMatrix
 from nodimo.relation import Relation
@@ -23,8 +23,8 @@ from nodimo._internal import (_build_dimensional_matrix,
 
 
 # Alias for type used in DimensionalModel.
-OrganizedVariablesTuple = tuple[list[BasicVariable], list[BasicVariable],
-                                list[BasicVariable], list[BasicVariable]]
+OrganizedVariablesTuple = tuple[list[Variable], list[Variable],
+                                list[Variable], list[Variable]]
 
 
 class DimensionalModel(PrintableGroup):
@@ -98,18 +98,18 @@ class DimensionalModel(PrintableGroup):
     """
 
     def __init__(self,
-                 *variables: BasicVariable,
+                 *variables: Variable,
                  check_variables: bool = True,
                  display_messages: bool = True):
 
-        self.variables: list[BasicVariable]
+        self.variables: list[Variable]
         self.dimensions: list[str]
         super().__init__(*variables)
 
-        self.dimensional_variables: list[BasicVariable]
-        self.nondimensional_variables: list[BasicVariable]
-        self.scaling_variables: list[BasicVariable]
-        self.nonscaling_variables: list[BasicVariable]
+        self.dimensional_variables: list[Variable]
+        self.nondimensional_variables: list[Variable]
+        self.scaling_variables: list[Variable]
+        self.nonscaling_variables: list[Variable]
 
         self.dimensional_matrix: DimensionalMatrix
         self.dimensional_function: Relation

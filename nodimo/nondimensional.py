@@ -17,7 +17,7 @@ import sympy as sp
 from sympy import Matrix
 from itertools import combinations
 
-from nodimo.variable import BasicVariable
+from nodimo.variable import Variable
 from nodimo.product import Product
 from nodimo.relation import Relation
 from nodimo.dimensional import DimensionalModel
@@ -92,7 +92,7 @@ class NonDimensionalModel(DimensionalModel):
     """
 
     def __init__(self,
-                 *variables: BasicVariable,
+                 *variables: Variable,
                  build_now: bool = True,
                  display_messages: bool = True):
 
@@ -297,13 +297,13 @@ class NonDimensionalModels(DimensionalModel):
     """
 
     def __init__(self,
-                 *variables: BasicVariable,
+                 *variables: Variable,
                  display_messages: bool = True):
 
         super().__init__(*variables, display_messages=display_messages)
         self._validate_scaling_variables()
         
-        self.scaling_groups: list[list[BasicVariable]]
+        self.scaling_groups: list[list[Variable]]
         self.nondimensional_functions: list[Relation]
 
         self.scaling_groups = self._build_scaling_groups()
@@ -337,7 +337,7 @@ class NonDimensionalModels(DimensionalModel):
                              f"{self.dimensional_matrix.rank} "
                              f"scaling variables.")
 
-    def _build_scaling_groups(self) -> list[list[BasicVariable]]:
+    def _build_scaling_groups(self) -> list[list[Variable]]:
         """Builds scaling groups from the initial scaling variables.
 
         Returns

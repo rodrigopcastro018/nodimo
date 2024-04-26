@@ -14,7 +14,7 @@ BasicGroup
 import sympy as sp
 from sympy import sstr, ImmutableDenseMatrix
 
-from nodimo.variable import BasicVariable
+from nodimo.variable import Variable
 from nodimo.group import Group
 from nodimo.matrix import BasicDimensionalMatrix, DimensionalMatrix
 from nodimo.power import Power
@@ -45,13 +45,13 @@ class HomogeneousGroup(Group):
         Discarded variables.
     """
 
-    def __init__(self, *variables: BasicVariable):
+    def __init__(self, *variables: Variable):
         
         super().__init__(*variables)
         self._set_homogroup_properties()
 
     @Group.variables.setter
-    def variables(self, variables: tuple[BasicVariable]):
+    def variables(self, variables: tuple[Variable]):
         self._variables = variables
         self._set_basicgroup_properties()
         self._set_homogroup_properties()
@@ -130,40 +130,40 @@ class TransformationGroup(HomogeneousGroup):
         If the scaling variables do not form an independent set.
     """
     
-    def __init__(self, *variables: BasicVariable):
+    def __init__(self, *variables: Variable):
 
         super().__init__(*variables)
         self._set_transfgroup_properties()
         
-        self._xvariables: tuple[BasicVariable]
-        self._scaling_variables: tuple[BasicVariable]
-        self._nonscaling_variables: tuple[BasicVariable]
+        self._xvariables: tuple[Variable]
+        self._scaling_variables: tuple[Variable]
+        self._nonscaling_variables: tuple[Variable]
         self._dimensional_matrix: DimensionalMatrix
         self._nonscaling_matrix: ImmutableDenseMatrix
         self._scaling_matrix: ImmutableDenseMatrix
 
     # Redefining variables as a read-only property
     @property
-    def variables(self) -> tuple[BasicVariable]:
+    def variables(self) -> tuple[Variable]:
         return self._variables
 
     @property
-    def xvariables(self) -> tuple[BasicVariable]:
+    def xvariables(self) -> tuple[Variable]:
         return self._xvariables
 
     @xvariables.setter
-    def xvariables(self, variables: tuple[BasicVariable]):
+    def xvariables(self, variables: tuple[Variable]):
         self._variables = variables
         self._set_basicgroup_properties()
         self._set_homogroup_properties()
         self._set_transfgroup_properties()
 
     @property
-    def scaling_variables(self) -> tuple[BasicVariable]:
+    def scaling_variables(self) -> tuple[Variable]:
         return self._scaling_variables
 
     @property
-    def nonscaling_variables(self) -> tuple[BasicVariable]:
+    def nonscaling_variables(self) -> tuple[Variable]:
         return self._nonscaling_variables
 
     def _set_transfgroup_properties(self):
@@ -279,14 +279,14 @@ class NonDimensionalGroup(TransformationGroup):  # When DimensionalGroup is impl
         If the scaling variables do not form an independent set.
     """
     
-    def __init__(self, *variables: BasicVariable):
+    def __init__(self, *variables: Variable):
 
         super().__init__(*variables)
-        self._nondim_products: tuple[BasicVariable]
+        self._nondim_products: tuple[Variable]
         self._set_nondimgroup_properties()
 
     @TransformationGroup.xvariables.setter
-    def xvariables(self, variables: tuple[BasicVariable]):
+    def xvariables(self, variables: tuple[Variable]):
         self._variables = variables
         self._set_basicgroup_properties()
         self._set_homogroup_properties()
