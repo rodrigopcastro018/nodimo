@@ -13,9 +13,9 @@ Variable
     Creates a symbolic variable.
 """
 
-from sympy import Symbol, S
+from sympy import Symbol, Mul, Pow, S
 from sympy.core._print_helpers import Printable
-from typing import Optional
+from typing import Optional, Union
 
 from nodimo._internal import _sympify_number, _repr
 
@@ -41,6 +41,8 @@ class Variable(Printable):
     ----------
     name : Optional[str]
         The name that will be displayed in symbolic expressions.
+    symbolic : Symbol
+        Sympy object that represents the variable.
     dimensions : dict[str, int]
         Dictionary containing dimensions' names and exponents.
     is_dependent : bool
@@ -58,26 +60,40 @@ class Variable(Printable):
         If the variable is set as scaling, but with no dimensions.
     """
 
+    _depth: int = 0
+
     def __init__(
         self,
-        name: str = '',  # TODO: Turn name attribute mandatory. Keep it optional on Product and Power.
+        name: str,  # TODO: Turn name attribute mandatory. Keep it optional on Product and Power.
         dependent: bool = False,
         scaling: bool = False,
         **dimensions: int,
     ):
 
-        self.name: Optional[str] = name
-        self._symbolic: Symbol = Symbol(name)
+        self._name = name
         self._dimensions: dict[str, int] = dimensions
         self._is_dependent: bool = bool(dependent)
         self._is_scaling: bool = bool(scaling)
-        self._is_nondimensional: bool = all(
-            dim == 0 for dim in self._dimensions.values()
-        )
+        self._is_nondimensional: bool = all(dim == 0 for dim in dimensions.values())
+        self._symbolic: Union[Symbol, Mul, Pow]
 
         self._validate_properties()
         self._sympify_exponents()
         self._clear_null_dimensions()
+        self._build_symbolic()
+
+    @property
+    def name(self) -> str:
+        return self._name
+    
+    @name.setter
+    def name(self, name: str):
+        self._name = name
+        self._build_symbolic()
+
+    @property
+    def symbolic(self) -> Symbol:
+        return self._symbolic
 
     @property
     def dimensions(self) -> dict[str, int]:
@@ -112,6 +128,11 @@ class Variable(Printable):
     @property
     def is_nondimensional(self) -> bool:
         return self._is_nondimensional
+
+    def _build_symbolic(self):
+        """Builds symbolic representation in Sympy."""
+
+        self._symbolic = Symbol(self.name)
 
     def _clear_null_dimensions(self):
         """Removes dimensions with exponent zero."""
@@ -219,8 +240,16 @@ class OneVar(Variable):
         return super().__new__(cls)
     
     def __init__(self):
-        super().__init__()
+        super().__init__(type(self).__name__)
         self._symbolic = S.One
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def symbolic(self) -> Symbol:
+        return self._symbolic
 
     @property
     def dimensions(self) -> dict[str, int]:
