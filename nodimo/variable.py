@@ -13,11 +13,11 @@ Variable
     Creates a symbolic variable.
 """
 
-from sympy import Symbol, Mul, Pow, S
+from sympy import Symbol, Mul, Pow, S, Rational
 from sympy.core._print_helpers import Printable
 from typing import Optional, Union
 
-from nodimo._internal import _sympify_number, _repr
+from nodimo._internal import _sympify_number, _unsympify_number
 
 
 class Variable(Printable):
@@ -28,7 +28,7 @@ class Variable(Printable):
 
     Parameters
     ----------
-    name : Optional[str], default=None
+    name : str, default=None
         The name that will be displayed in symbolic expressions.
     dependent : bool, default=False
         If ``True``, the variable is dependent.
@@ -39,7 +39,7 @@ class Variable(Printable):
 
     Attributes
     ----------
-    name : Optional[str]
+    name : str
         The name that will be displayed in symbolic expressions.
     symbolic : Symbol
         Sympy object that represents the variable.
@@ -60,8 +60,6 @@ class Variable(Printable):
         If the variable is set as scaling, but with no dimensions.
     """
 
-    _depth: int = 0
-
     def __init__(
         self,
         name: str,  # TODO: Turn name attribute mandatory. Keep it optional on Product and Power.
@@ -70,8 +68,8 @@ class Variable(Printable):
         **dimensions: int,
     ):
 
-        self._name = name
-        self._dimensions: dict[str, int] = dimensions
+        self._name: Optional[str] = name
+        self._dimensions: dict[str, int] = dimensions  # TODO: Check if dict can be substituted by sympy.Dict
         self._is_dependent: bool = bool(dependent)
         self._is_scaling: bool = bool(scaling)
         self._is_nondimensional: bool = all(dim == 0 for dim in dimensions.values())
@@ -82,7 +80,7 @@ class Variable(Printable):
         self._clear_null_dimensions()
         self._build_symbolic()
 
-    @property
+    @property                   # TODO: Make all properties immutable?
     def name(self) -> str:
         return self._name
     
@@ -132,7 +130,7 @@ class Variable(Printable):
     def _build_symbolic(self):
         """Builds symbolic representation in Sympy."""
 
-        self._symbolic = Symbol(self.name)
+        self._symbolic = Symbol(self.name, commutative=False)
 
     def _clear_null_dimensions(self):
         """Removes dimensions with exponent zero."""
@@ -170,28 +168,56 @@ class Variable(Printable):
         elif is_scaling and is_nondimensional:
             raise ValueError("A variable can not be both scaling and nondimensional")
 
+    def __key(self) -> tuple:
+
+        return (
+            self._name,
+            self._is_dependent,
+            self._is_scaling,
+            self._is_nondimensional,
+            frozenset(self._dimensions.items()),
+        )
+
+    def __hash__(self) -> int:
+
+        return hash(self.__key())
+
     def __eq__(self, other) -> bool:  # TODO: Implement this method for all childs of this class
 
         if self is other:
             return True
-        elif not isinstance(other, type(self)):
-            return False
-        elif self.name != other.name:
-            return False
-        elif self._is_dependent and not other.is_dependent:
-            return False
-        elif self._is_scaling and not other.is_scaling:
-            return False
-        elif self._is_nondimensional and not other.is_nondimensional:
-            return False
-        elif self._dimensions != other.dimensions:
-            return False
+        elif isinstance(other, type(self)):
+            return self.__key() == other.__key()
+        return False
 
-        return True
+    def __mul__(self, other):
 
-    def __hash__(self) -> int:  # TODO: Create hash method
+        if not isinstance(other, Variable):
+            raise NotImplemented
+        
+        from .product import Product
+        
+        return Product(self, other)
 
-        pass
+    def __pow__(self, exponent: Rational):
+
+        from .power import Power
+
+        return Power(self, exponent)
+
+    def __truediv__(self, other):
+
+        if not isinstance(other, Variable):
+            raise NotImplemented
+
+        return self * other**-1
+
+    # TODO: define __str__ and __repr__ how they are traditionally done, because Printable defines: __str__ = __repr__ = sstr
+
+    def _sympy_(self):
+        """Sympified variable."""
+
+        return self._symbolic
 
     def _sympyrepr(self, printer) -> str:
         """Developer string representation according to Sympy."""
@@ -204,7 +230,10 @@ class Variable(Printable):
         else:
             dimensions = []
             for dim_name, dim_exp in self.dimensions.items():
-                dimensions.append(f'{dim_name}={dim_exp}')
+                dim_exp_ = _unsympify_number(dim_exp)
+                if isinstance(dim_exp_, str):
+                    dim_exp_ = f"'{dim_exp_}'"
+                dimensions.append(f'{dim_name}={dim_exp_}')
             dimensions_repr = f", {', '.join(dimensions)}"
         
         dependent_repr = f', dependent=True' if self._is_dependent else ''
@@ -240,7 +269,8 @@ class OneVar(Variable):
         return super().__new__(cls)
     
     def __init__(self):
-        super().__init__(type(self).__name__)
+        super().__init__('')
+        self._name = None
         self._symbolic = S.One
 
     @property

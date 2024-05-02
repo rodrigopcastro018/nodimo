@@ -21,9 +21,8 @@ _build_dimensional_matrix(variables, dimensions=[])
     Builds a basic dimensional matrix.
 """
 
-import sympy as sp
-from sympy import srepr, Rational
-from sympy.core._print_helpers import Printable
+import sympy as sp  # TODO: Remove this later
+from sympy import Rational, pretty, sympify
 from typing import Union
 import warnings
 
@@ -75,7 +74,7 @@ def _show_object(obj, use_custom_css=True):
         else:
             display(obj)
     else:
-        print('\n' + sp.pretty(obj, root_notation=False) + '\n')
+        print('\n' + pretty(obj, root_notation=False) + '\n')
 
 
 def _print_horizontal_line():
@@ -120,15 +119,44 @@ def _sympify_number(number: Union[int, str, tuple]) -> Rational:
     True
     """
 
-    number_sp = sp.sympify(number)
+    number_sp = sympify(number)
 
     if number_sp.is_number:
         return number_sp
     elif isinstance(number, tuple) and len(number) in {1,2}:
         if all(obj.is_number for obj in number_sp):
-            return sp.Rational(*number_sp)
+            return Rational(*number_sp)
 
     raise ValueError(f"'{number}' could not be converted to a Sympy number")
+
+
+def _unsympify_number(number_sp: Rational) -> Union[int, str, tuple]:
+    """Does the inverse of _sympify_number.
+
+    Parameters
+    ----------
+    number_sp : Number
+        The input number converted to a Sympy number.
+
+    Returns
+    -------
+    number : Union[int, str, tuple]
+        Any expression that represents a number.
+
+    Raises
+    ------
+    ValueError
+        If the input is not a sympy Number.
+    """
+
+    if not number_sp.is_number:
+        raise ValueError(f"'{number_sp}' is not a Sympy number")
+    elif number_sp.is_Integer:
+        return int(number_sp)
+    elif number_sp.is_Rational:
+        return (int(number_sp.numerator), int(number_sp.denominator))
+    else:
+        return str(number_sp)
 
 
 def _remove_duplicates(original_list):
@@ -224,30 +252,6 @@ def _build_dimensional_matrix(variables, dimensions=[], return_raw=False):
         return raw_dimensional_matrix
     else:
         return dimensional_matrix
-
-
-def _repr(object) -> str:
-    """Custom repr function.
-
-    This function returns the appropriate (developer) string
-    representation according to the type of the input object. If the
-    input object inherits from sympy.Printable, the sympy.srepr function
-    is used. Otherwise, it uses the built-in repr function.
-    """
-
-    if isinstance(object, Printable):
-        return srepr(object)
-    elif isinstance(object, tuple):
-        is_printable = [isinstance(obj, Printable) for obj in object]
-        if all(is_printable):
-            return srepr(object)
-        elif any(is_printable):
-            tuple_elements_repr = ', '.join(_repr(obj) for obj in object)
-            return f"({tuple_elements_repr})"
-        else:
-            return repr(object)
-    else:
-        return repr(object)
 
 
 class UnrelatedVariableWarning(Warning):

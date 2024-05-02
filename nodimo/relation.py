@@ -12,12 +12,11 @@ ModelFunction
 """
 
 import sympy as sp
-from sympy import sstr, Equality
+from sympy import sstr, srepr, Equality
 
 from nodimo.variable import Variable
 from nodimo.group import PrintableGroup
 from nodimo.specialgroups import HomogeneousGroup
-from nodimo._internal import _repr
 
 
 class BasicRelation(HomogeneousGroup):
@@ -97,7 +96,7 @@ class BasicRelation(HomogeneousGroup):
     def __repr__(self) -> str:
 
         class_name = type(self).__name__
-        variables_repr = _repr(self._variables)[1:-1]
+        variables_repr = srepr(self._variables)[1:-1]
         name_repr = f", name='{self.name}'" if self.name != 'f' else ''
 
         return f'{class_name}({variables_repr}{name_repr})'

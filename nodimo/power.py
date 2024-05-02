@@ -13,13 +13,72 @@ Power
     Creates a symbolic power of a variable.
 """
 
-from sympy import Symbol, Pow, Rational
+from sympy import Symbol, Pow, Rational, S, srepr
 
 from nodimo.variable import Variable, OneVar
-from nodimo._internal import _sympify_number, _repr
+from nodimo._internal import _sympify_number, _unsympify_number
 
 
-class Power(Variable):
+class BasicPower:
+    """Exponentiation operator.
+
+    To not be confused with the class Power, which represents the
+    exponentiation result. This class operates some simplifications
+    on the exponentiation operator.
+
+    Parameters
+    ----------
+    variable : BasicVariable
+        Variable to be exponentiated.
+    exponent : Rational
+        Exponent to which the variable will be raised.
+
+    Attributes
+    ----------
+    variable : BasicVariable
+        Variable to be exponentiated.
+    exponent : Rational
+        Exponent to which the variable will be raised.
+    """
+
+    def __init__(self, variable: Variable, exponent: Rational):
+
+        exponent_sp = _sympify_number(exponent)
+        
+        if isinstance(variable, Power):
+            exponent_sp *= variable._exponent
+            variable = variable._variable
+
+        self._variable: Variable = variable
+        self._exponent: Rational = exponent_sp
+        self._dimensions: dict[str, Rational]
+        self._set_dimensions()
+    
+    @property
+    def variable(self) -> Variable:
+        return self._variable
+
+    @property
+    def exponent(self) -> Rational:
+        return self._exponent
+
+    # def combine(self, name: Optional[str] = None) -> BasicCombinedVariable:
+    #     """Converts to a combined variable."""
+
+    #     return BasicCombinedVariable(self, name)
+    
+    def _set_dimensions(self):
+        """Evaluates the dimensions of the power."""
+
+        dimensions = {}
+        if not self._variable.is_nondimensional:
+            for dim, exp in self._variable.dimensions.items():
+                dimensions[dim] = exp * self._exponent
+            
+        self._dimensions = dimensions
+
+
+class Power(Variable, BasicPower):  # TODO: Make the order: BasicPower, Variable. Also define __str__ and __repr__
     """Base class for the power of a variable.
 
     Base class that represents the power of a variable. The dimensional
@@ -32,7 +91,7 @@ class Power(Variable):
         Variable to be exponentiated.
     exponent : Rational
         Exponent to which the variable will be raised.
-    name : Optional[str], default=None
+    name : str, default=''
         Name to be used in string representation.
     dependent : bool, default=False
         If ``True``, the power is dependent.
@@ -41,9 +100,9 @@ class Power(Variable):
 
     Attributes
     ----------
-    name : Optional[str]
+    name : str
         Name to be used in string representation.
-    dimensions : dict[str, int]
+    dimensions : dict[str, Rational]
         Dictionary containing dimensions' names and exponents.
     is_dependent : bool
         If ``True``, the power is dependent.
@@ -68,19 +127,25 @@ class Power(Variable):
         dependent: bool = False,
         scaling: bool = False,
     ):
-        
-        exponent_sp = _sympify_number(exponent)
 
-        if isinstance(variable, Power):
-            exponent_sp *= variable._exponent
-            variable = variable._variable
-        
-        if exponent_sp == 0:
+        if isinstance(variable, OneVar):
             return OneVar()
-        elif exponent_sp == 1:
+
+        bpower = BasicPower(variable, exponent)
+        variable = bpower.variable
+        exponent = bpower.exponent
+        
+        if exponent is S.Zero:
+            return OneVar()
+        elif exponent is S.One:
             return variable
-        else:
-            return super().__new__(cls)
+
+        from .product import Product
+
+        if isinstance(variable, Product):
+            return Product(*(Power(var, exponent) for var in variable.variables))  # TODO: Drop the unpacking once Collection is an iterable object.
+        
+        return super().__new__(cls)
 
     def __init__(
         self,
@@ -91,78 +156,39 @@ class Power(Variable):
         scaling: bool = False,
     ):
 
-        exponent_sp = _sympify_number(exponent)
-        
-        if isinstance(variable, Power):
-            exponent_sp *= variable._exponent
-            variable = variable._variable
-
-        self._variable: Variable = variable
-        self._exponent: Rational = exponent_sp
-        
-        super().__init__(name=name)
-        self._set_dimensions()
+        BasicPower.__init__(self, variable, exponent)
+        super().__init__(name=name, **self._dimensions)
         self.is_dependent = dependent
         self.is_scaling = scaling
-        self._depth += variable._depth
-
-    @property
-    def variable(self) -> Variable:
-        return self._variable
-
-    @property
-    def exponent(self) -> Rational:
-        return self._exponent
     
     @property
-    def dimensions(self) -> dict[str, int]:
+    def dimensions(self) -> dict[str, Rational]:
         return self._dimensions
-
-    # def combine(self, name: Optional[str] = None) -> BasicCombinedVariable:
-    #     """Converts to a combined variable."""
-
-    #     return BasicCombinedVariable(self, name)
 
     def _build_symbolic(self):
         """Builds symbolic representation in Sympy."""
 
         if self.name:
-            self._symbolic = Symbol(self.name)
+            self._symbolic = Symbol(self.name, commutative=False)
         else:
+            var = self._variable
+            # Setting com=True avoids variables with negative exponents
+            # on the numerator. However, the denominator does not follow
+            # input order.
+            com = True if self._exponent < S.Zero else False
+            self._variable._symbolic = Symbol(var.name, commutative=com)
             self._symbolic = Pow(self._variable.symbolic, self._exponent)
-
-    def _set_dimensions(self):
-        """Evaluates the dimensions of the power."""
-
-        if self._variable.is_nondimensional:
-            pass
-        else:
-            dimensions = {}
-            for dim, exp in self._variable.dimensions.items():
-                dimensions[dim] = exp * self._exponent
-            
-            self._dimensions = dimensions
-            self._is_nondimensional = all(dim == 0 for dim in dimensions.values())
-
-    def _to_product(self):
-        """Converts the power of a product to the product of powers."""
-
-        from nodimo.product import Product
-
-        if isinstance(self._variable, Product):
-            powers = []
-            for var in self._variable.variables:
-                powers.append(Power(var, self._exponent))
-            return Product(*powers)
-        else:
-            return self
-
+    
     def _sympyrepr(self, printer) -> str:
         """Developer string representation according to Sympy."""
 
         class_name = type(self).__name__
-        variable_repr = _repr(self._variable)
-        exponent_repr = f', {_repr(self._exponent)}'
+        variable_repr = srepr(self._variable)
+
+        unsymp_exp = _unsympify_number(self._exponent)
+        exp_ = f"'{unsymp_exp}'" if isinstance(unsymp_exp, str) else unsymp_exp
+        exponent_repr = f', {exp_}'
+        
         name_repr = f", name='{self.name}'" if self.name else ''
         dependent_repr = f', dependent=True' if self.is_dependent else ''
         scaling_repr = f', scaling=True' if self.is_scaling else ''

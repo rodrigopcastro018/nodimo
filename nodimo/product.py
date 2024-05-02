@@ -13,16 +13,97 @@ Product
     Creates a symbolic product of variables.
 """
 
-from sympy import Symbol, Mul, S
-from typing import Optional
+from sympy import Symbol, Mul, S, Rational, srepr
 
 from nodimo.variable import Variable, Variable, OneVar
-from nodimo.matrix import BasicDimensionalMatrix
-from nodimo.power import Power, Power
-from nodimo._internal import _repr
+from nodimo.group import Collection
+from nodimo.power import Power
 
 
-class Product(Variable):
+class BasicProduct(Collection):
+    """Multiplication operator.
+
+    To not be confused with the class Product, which represents the
+    multiplication result. This class provides the possibility of
+    simplifying the multiplication operator.
+
+    Parameters
+    ----------
+    *variables : BasicVariable
+        Variables to be multiplied.
+
+    Attributes
+    ----------
+    variables : tuple[BasicVariable]
+        Variables to be multiplied.
+    """
+    
+    def __init__(self, *variables: Variable):
+
+        super().__init__(*variables)
+        self._set_dimensions()
+        
+        self._original_variables: tuple[Variable] = tuple(list(self._variables))
+        self._variables: tuple[Variable] = tuple(list(self._disassembled_variables))
+
+        self._is_simplifiable: bool = any((
+            self._has_one, self._has_product, not self._is_independent,
+        ))
+
+        if self._is_simplifiable:
+            self._simplify()
+
+    @property
+    def variables(self) -> tuple[Variable]:
+        return self._variables
+
+    # def combine(self, name: Optional[str] = None) -> BasicCombinedVariable:
+    #     """Converts to a combined variable."""
+
+    #     return BasicCombinedVariable(self, name)
+
+    def _set_dimensions(self):
+        """Evaluates the dimensions of the product."""
+
+        # Start with the dimensions' names.
+        super()._set_dimensions()
+
+        # Then, define the dimensions' exponents.
+        dimensions = {}
+        for dim in self._dimensions:
+            exp = S.Zero
+            for var in self._variables:
+                if dim in var.dimensions.keys():
+                    exp += var.dimensions[dim]
+            dimensions[dim] = exp
+
+        self._dimensions = dimensions
+
+    def _simplify(self):
+        """Simplifies the multiplication factors."""
+
+        self._factors_to_powers()
+        self._variables = self._clear_ones(*self._variables)
+    
+    def _factors_to_powers(self):
+        """Converts factors with same base variable to power."""
+
+        variables = []
+        for base_var in self._base_variables:
+            exponent = S.Zero
+            for var in self._variables:
+                if var == base_var:
+                    exponent += S.One
+                elif isinstance(var, Power):
+                    if var._variable == base_var:
+                        exponent += var._exponent
+
+            variables.append(Power(base_var, exponent))
+
+        self._variables = tuple(variables)
+
+
+class Product(Variable, BasicProduct):  # TODO: Make the order: BasicProduct, Variable. Also define __str__ and __repr__
     """Base class for the product of variables.
 
     Base class that represents the product of variables. The dimensional
@@ -38,6 +119,8 @@ class Product(Variable):
         If ``True``, the product is dependent.
     scaling : bool, default=False
         If ``True``, the product can be used as scaling parameter.
+    simplify : bool, default=False
+        If ``True``, the multiplication factors get simplified.
 
     Attributes
     ----------
@@ -59,8 +142,6 @@ class Product(Variable):
     ValueError
         If the product is set as scaling when it has no dimensions.
     """
-    
-    _depth: int = 1
 
     def __new__(
         cls,
@@ -70,13 +151,14 @@ class Product(Variable):
         scaling: bool = False,
     ):
 
+        bprod = BasicProduct(*variables)
+        if bprod._is_simplifiable:
+            variables = bprod._variables
+
         if len(variables) == 0:
             return OneVar()
         if len(variables) == 1:
-            var = variables[0]
-            if isinstance(var, Product):
-                return super().__new__(cls)
-            return var
+            return variables[0]
         else:
             return super().__new__(cls)
 
@@ -86,149 +168,34 @@ class Product(Variable):
         name: str = '',
         dependent: bool = False,
         scaling: bool = False,
+        simplify: bool = False,
     ):
 
-        self._variables: tuple[Variable] = variables
-        self._base_variables: tuple[Variable]
-        super().__init__(name=name)
-        self._simplify()
-
-        var1 = self._variables[0]
-        var2 = Product(*self._variables[1:])
-        self._set_dimensions(var1, var2)  # TODO: Check if i really need this class to work as a binary operator. Couldn't i evaluate the dimensions all at once?
-
+        BasicProduct.__init__(self, *variables)
+        super().__init__(name=name, **self._dimensions)
         self.is_dependent = dependent
         self.is_scaling = scaling
-        self._depth += max(var._depth for var in variables)
 
     @property
-    def variables(self) -> tuple[Variable]:
-        return self._variables
-
-    @property
-    def dimensions(self) -> dict[str, int]:
+    def dimensions(self) -> dict[str, Rational]:
         return self._dimensions
-
-    # def combine(self, name: Optional[str] = None) -> BasicCombinedVariable:
-    #     """Converts to a combined variable."""
-
-    #     return BasicCombinedVariable(self, name)
 
     def _build_symbolic(self):
         """Builds symbolic representation in Sympy."""
 
         if self.name:
-            self._symbolic = Symbol(self.name)
+            self._symbolic = Symbol(self.name, commutative=False)
         else:
             var_symb = []
             for var in self._variables:
                 var_symb.append(var.symbolic)
             self._symbolic = Mul(*var_symb)
 
-    def _set_dimensions(self, var1, var2):
-        """Evaluates the dimensions of the product of two variables."""
-
-        if var1.is_nondimensional and var2.is_nondimensional:
-            pass
-        elif var1.is_nondimensional:
-            self._dimensions = var2.dimensions
-        elif var2.is_nondimensional:
-            self._dimensions = var1.dimensions
-        else:
-            dimensional_matrix = BasicDimensionalMatrix(var1, var2)
-            exponents = []
-            for row in dimensional_matrix._raw_matrix:
-                exponents.append(sum(row))
-            
-            self._dimensions = dict(zip(dimensional_matrix.dimensions, exponents))
-            self._clear_null_dimensions()
-
-        self._is_nondimensional = all(dim == 0 for dim in self._dimensions.values())
-
-    def _simplify(self):
-        """Simplifies the multiplication factors."""
-
-        self._clear_ones()  # To not use OneVar() as base variable.
-        self._products_to_factors()
-        self._set_base_variables()
-        if len(self._variables) > len(self._base_variables):
-            self._factors_to_powers()
-        self._clear_ones()  # Removes canceled base variables.
-
-    def _clear_ones(self):
-        """Removes instances of OneVar."""
-
-        variables = []
-        for var in self._variables:
-            if not isinstance(var, OneVar):
-                variables.append(var)
-
-        self._variables = tuple(variables)
-    
-    def _products_to_factors(self):
-        """Susbtitutes products by its factors."""
-
-        variables = list(self._variables)
-        depth = max(var._depth for var in variables)
-
-        for _ in range(depth):
-            new_variables = []
-            for var in variables:
-                if isinstance(var, Product):
-                    new_variables.extend(var._variables)
-                elif isinstance(var, Power):
-                    new_var = var._to_product()
-                    if new_var is var:
-                        new_variables.append(var)
-                    else:
-                        new_variables.extend(new_var._variables)
-                else:
-                    new_variables.append(var)
-            variables = new_variables.copy()
-
-        self._variables = tuple(variables)
-
-    def _set_base_variables(self):
-        """Determines the base variables.
-
-        Base variables are instances of Variable and
-        CombinedVariable.
-        """
-
-        base_variables = []
-        for var in self._variables:
-            if isinstance(var, Power):
-                base_var = var._variable
-            else:
-                base_var = var
-
-            if base_var not in base_variables:
-                base_variables.append(base_var)
-        
-        self._base_variables = tuple(base_variables)
-    
-    def _factors_to_powers(self):
-        """Converts factors with same base variable to power."""
-
-        variables = []
-        for base_var in self._base_variables:
-            exponent = S.Zero
-            for var in self._variables:
-                if var == base_var:
-                    exponent += S.One
-                elif isinstance(var, Power):
-                    if var._variable == base_var:
-                        exponent += var._exponent
-
-            variables.append(Power(base_var, exponent))
-
-        self._variables = tuple(variables)
-
     def _sympyrepr(self, printer) -> str:
         """Developer string representation according to Sympy."""
 
         class_name = type(self).__name__
-        variables_repr = _repr(self._variables)[1:-1]
+        variables_repr = srepr(self._variables)[1:-1]
         name_repr = f", name='{self.name}'" if self.name else ''
         dependent_repr = f', dependent=True' if self.is_dependent else ''
         scaling_repr = f', scaling=True' if self.is_scaling else ''

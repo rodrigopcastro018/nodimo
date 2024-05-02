@@ -12,14 +12,14 @@ BasicGroup
 """
 
 import sympy as sp
-from sympy import sstr, ImmutableDenseMatrix
+from sympy import sstr, srepr, ImmutableDenseMatrix
 
 from nodimo.variable import Variable
 from nodimo.group import Group
 from nodimo.matrix import BasicDimensionalMatrix, DimensionalMatrix
 from nodimo.power import Power
 from nodimo.product import Product
-from nodimo._internal import _repr, _show_warning, UnrelatedVariableWarning
+from nodimo._internal import _show_warning, UnrelatedVariableWarning
 
 
 class HomogeneousGroup(Group):
@@ -48,12 +48,6 @@ class HomogeneousGroup(Group):
     def __init__(self, *variables: Variable):
         
         super().__init__(*variables)
-        self._set_homogroup_properties()
-
-    @Group.variables.setter
-    def variables(self, variables: tuple[Variable]):
-        self._variables = variables
-        self._set_basicgroup_properties()
         self._set_homogroup_properties()
 
     def _set_homogroup_properties(self):
@@ -151,13 +145,6 @@ class TransformationGroup(HomogeneousGroup):
     def xvariables(self) -> tuple[Variable]:
         return self._xvariables
 
-    @xvariables.setter
-    def xvariables(self, variables: tuple[Variable]):
-        self._variables = variables
-        self._set_basicgroup_properties()
-        self._set_homogroup_properties()
-        self._set_transfgroup_properties()
-
     @property
     def scaling_variables(self) -> tuple[Variable]:
         return self._scaling_variables
@@ -211,7 +198,7 @@ class TransformationGroup(HomogeneousGroup):
                 f"The group must have {self._dimensional_matrix.rank} scaling variables."
             )
         elif self._scaling_matrix.rank() != self._dimensional_matrix.rank:
-            raise ValueError("Scaling variables do not form an independent set")
+            raise ValueError("Scaling variables do not form a dimensionally independent set")
 
     def __eq__(self, other) -> bool:
 
@@ -234,7 +221,7 @@ class TransformationGroup(HomogeneousGroup):
     def __repr__(self) -> str:
 
         class_name = type(self).__name__
-        variables_repr = _repr(self._xvariables)
+        variables_repr = srepr(self._xvariables)
 
         return f'{class_name}{variables_repr}'
 
@@ -283,14 +270,6 @@ class NonDimensionalGroup(TransformationGroup):  # When DimensionalGroup is impl
 
         super().__init__(*variables)
         self._nondim_products: tuple[Variable]
-        self._set_nondimgroup_properties()
-
-    @TransformationGroup.xvariables.setter
-    def xvariables(self, variables: tuple[Variable]):
-        self._variables = variables
-        self._set_basicgroup_properties()
-        self._set_homogroup_properties()
-        self._set_transfgroup_properties()
         self._set_nondimgroup_properties()
     
     def _set_nondimgroup_properties(self):
