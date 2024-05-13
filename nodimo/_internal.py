@@ -22,7 +22,7 @@ _build_dimensional_matrix(variables, dimensions=[])
 """
 
 import sympy as sp  # TODO: Remove this later
-from sympy import Rational, pretty, sympify
+from sympy import Rational, pretty, sympify, nsimplify
 from typing import Union
 import warnings
 
@@ -86,7 +86,7 @@ def _print_horizontal_line():
         print(78 * '-')
 
 
-def _sympify_number(number: Union[int, str, tuple]) -> Rational:
+def _sympify_number(number: Union[int, float, str, tuple]) -> Rational:
     """Converts a number representation into a Sympy number.
 
     This method is roughly a wrapper for Sympy.sympify, but it only
@@ -112,20 +112,28 @@ def _sympify_number(number: Union[int, str, tuple]) -> Rational:
     --------
 
     >>> from nodimo._internal import _sympify_number as spnum
-    >>> import sympy as sp
-    >>> spnum(5) == spnum('5') == sp.Integer(5)
+    >>> from sympy import Integer, Rational
+    >>> spnum(5) == spnum(5.0) == spnum('5') == Integer(5)
     True
-    >>> spnum((2,3)) == spnum('2/3') == sp.Rational(2,3)
+    >>> spnum((2,3)) == spnum(2/3) == spnum('2/3') == Rational(2,3)
     True
     """
 
     number_sp = sympify(number)
 
-    if number_sp.is_number:
+    if number_sp.is_Rational:
         return number_sp
+    elif number_sp.is_Float:
+        number_sp_rational = nsimplify(number_sp, rational=True)
+        if number_sp_rational.denominator <= 100:
+            return number_sp_rational
+        else:
+            return number_sp
     elif isinstance(number, tuple) and len(number) in {1,2}:
         if all(obj.is_number for obj in number_sp):
             return Rational(*number_sp)
+    elif number_sp.is_number:
+        return number_sp
 
     raise ValueError(f"'{number}' could not be converted to a Sympy number")
 

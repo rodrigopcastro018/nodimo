@@ -78,9 +78,7 @@ from nodimo.variable import Variable, Var
 from nodimo.product import Product, Prod
 from nodimo.power import Power
 from nodimo.matrix import DimensionalMatrix, DimMatrix
-from nodimo.dimensional import DimensionalModel, DimModel
-from nodimo.nondimensional import (NonDimensionalModel, NonDimModel,
-                                    NonDimensionalModels, NonDimModels)
+from nodimo.model import Model
 
 # init_printing(root_notation=False)
 
@@ -88,10 +86,8 @@ __all__ = ['Variable', 'Var',
            'Product', 'Prod',
            'Power', 'Pow',
            'DimensionalMatrix', 'DimMatrix',
-           'VariableRelation',
-           'DimensionalModel', 'DimModel',
-           'NonDimensionalModel', 'NonDimModel',
-           'NonDimensionalModels', 'NonDimModels']
+           'Relation',
+           'Model']
 
 """To include in global settings:
     - limit_denominator

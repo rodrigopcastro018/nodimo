@@ -13,10 +13,10 @@ Product
     Creates a symbolic product of variables.
 """
 
-from sympy import Symbol, Mul, S, Rational, srepr
+from sympy import Symbol, Mul, S, Rational, sstr, srepr
 
 from nodimo.variable import Variable, Variable, OneVar
-from nodimo.group import Collection
+from nodimo.groups import Collection
 from nodimo.power import Power
 
 
@@ -41,14 +41,15 @@ class BasicProduct(Collection):
     def __init__(self, *variables: Variable):
 
         super().__init__(*variables)
-        self._set_dimensions()
+        self._set_base_variables()
+        self._set_product_dimensions()
         
         self._original_variables: tuple[Variable] = tuple(list(self._variables))
         self._variables: tuple[Variable] = tuple(list(self._disassembled_variables))
 
-        self._is_simplifiable: bool = any((
-            self._has_one, self._has_product, not self._is_independent,
-        ))
+        self._is_simplifiable: bool = (
+            len(self._disassembled_variables) != len(self._base_variables)
+        )
 
         if self._is_simplifiable:
             self._simplify()
@@ -57,18 +58,9 @@ class BasicProduct(Collection):
     def variables(self) -> tuple[Variable]:
         return self._variables
 
-    # def combine(self, name: Optional[str] = None) -> BasicCombinedVariable:
-    #     """Converts to a combined variable."""
-
-    #     return BasicCombinedVariable(self, name)
-
-    def _set_dimensions(self):
+    def _set_product_dimensions(self):
         """Evaluates the dimensions of the product."""
 
-        # Start with the dimensions' names.
-        super()._set_dimensions()
-
-        # Then, define the dimensions' exponents.
         dimensions = {}
         for dim in self._dimensions:
             exp = S.Zero
@@ -102,8 +94,12 @@ class BasicProduct(Collection):
 
         self._variables = tuple(variables)
 
+    def __str__(self) -> str:
+        
+        return ' * '.join(sstr(var) for var in self._variables)
 
-class Product(Variable, BasicProduct):  # TODO: Make the order: BasicProduct, Variable. Also define __str__ and __repr__
+
+class Product(Variable, BasicProduct):
     """Base class for the product of variables.
 
     Base class that represents the product of variables. The dimensional
@@ -143,6 +139,8 @@ class Product(Variable, BasicProduct):  # TODO: Make the order: BasicProduct, Va
         If the product is set as scaling when it has no dimensions.
     """
 
+    _is_product = True
+
     def __new__(
         cls,
         *variables: Variable,
@@ -168,7 +166,6 @@ class Product(Variable, BasicProduct):  # TODO: Make the order: BasicProduct, Va
         name: str = '',
         dependent: bool = False,
         scaling: bool = False,
-        simplify: bool = False,
     ):
 
         BasicProduct.__init__(self, *variables)
@@ -191,11 +188,15 @@ class Product(Variable, BasicProduct):  # TODO: Make the order: BasicProduct, Va
                 var_symb.append(var.symbolic)
             self._symbolic = Mul(*var_symb)
 
+    def _key(self) -> tuple:
+
+        return (frozenset(self._variables),)
+
     def _sympyrepr(self, printer) -> str:
         """Developer string representation according to Sympy."""
 
         class_name = type(self).__name__
-        variables_repr = srepr(self._variables)[1:-1]
+        variables_repr = ', '.join(srepr(var) for var in self._variables)
         name_repr = f", name='{self.name}'" if self.name else ''
         dependent_repr = f', dependent=True' if self.is_dependent else ''
         scaling_repr = f', scaling=True' if self.is_scaling else ''
