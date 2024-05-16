@@ -51,13 +51,22 @@ class Model(Relation):
     --------
     * Free fall
 
-    Consider the dimensions mass ``M``, length ``L`` and time ``T``.
-    Next, assume that ``z`` is height, ``m`` is mass, ``v`` is velocity,
-    ``g`` is gravitational acceleration, ``t`` is time, ``z0`` is the
-    initial height and ``v0`` is the initial velocity. In addition, take
-    the scaling groups formed by ``g``, ``z0`` and ``v0``.
-    Finally, the nondimensional model ``model`` for the height ``z``
-    is built and displayed as:
+        Dimensions
+        ``M``: mass
+        ``L``: length
+        ``T``: time
+
+        Variables
+        ``z``: height
+        ``m``: mass
+        ``v``: velocity
+        ``g``: gravitational acceleration
+        ``t``: time
+        ``z0``: initial height
+        ``v0``: initial velocity
+    
+    Considering the scaling groups that can be formed with ``g``, ``z0``
+    and ``v0``, the ``model`` for ``z`` is built and displayed as:
 
     >>> from nodimo import Variable, Model
     >>> z = Variable('z', L=1, dependent=True)
@@ -65,29 +74,36 @@ class Model(Relation):
     >>> v = Variable('v', L=1, T=-1)
     >>> g = Variable('g', L=1, T=-2, scaling=True)
     >>> t = Variable('t', T=1)
-    >>> z0 = Variable('z_0', L=1, scaling=True)
-    >>> v0 = Variable('v_0', L=1, T=-1, scaling=True)
+    >>> z0 = Variable('z0', L=1, scaling=True)
+    >>> v0 = Variable('v0', L=1, T=-1, scaling=True)
     >>> model = Model(z, m, v, g, t, z0, v0)
     >>> model.show()
     """
 
     def __init__(self, *variables: Variable):
-
         super().__init__(*variables)
+        self._scaling_groups: tuple[ScalingGroup]
+        self._relations: dict[ScalingGroup, Relation]
+        self._set_model()
+
+    @property
+    def relations(self) -> dict[ScalingGroup, Relation]:
+        return self._relations
+
+    def _set_model(self):
         self._set_matrix_rank()
         self._set_scaling_variables()
-        self._validate_scaling_variables()
-        self._scaling_groups: tuple[ScalingGroup]
-        self._build_scaling_groups()
-        self._build_models()
+        self._validate_model()
+        self._set_scaling_groups()
+        self._set_relations()
 
-    def _validate_scaling_variables(self):
+    def _validate_model(self):
         if len(self._scaling_variables) < self._rank:
-            raise ValueError(f"The model must have at least {self._rank} scaling variables")
-    
-    def _build_scaling_groups(self):
-        """Builds scaling groups from given variables."""
+            raise ValueError(
+                f"The model must have at least {self._rank} scaling variables"
+            )
 
+    def _set_scaling_groups(self):
         scaling_groups = []
         for scgroup in combinations(self._scaling_variables, self._rank):
             try:
@@ -103,8 +119,7 @@ class Model(Relation):
 
         self._scaling_groups = tuple(scaling_groups)
     
-    def _build_models(self):
-
+    def _set_relations(self):
         relations = {}
         for scgroup in self._scaling_groups:
             variables = list(self._nonscaling_variables)
@@ -116,7 +131,9 @@ class Model(Relation):
             variables.extend(scgroup._variables)
 
             ndgroup = NonDimensionalGroup(*variables)
-            ndgroup._set_asdependent_from_arguments()
+            for prod in ndgroup._products:
+                prod.is_dependent = any(var.is_dependent for var in prod._variables)
+
             if scgroup._id_number is None:
                 relation_name = 'Phi'
             else:
@@ -127,7 +144,6 @@ class Model(Relation):
         self._relations = relations
 
     def show(self):
-
         nb_scgroups = len(self._scaling_groups)
         for i, (scgroup, relation) in enumerate(self._relations.items()):
             scgroup.show(use_custom_css=False)

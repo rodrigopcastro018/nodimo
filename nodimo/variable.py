@@ -13,14 +13,13 @@ Variable
     Creates a symbolic variable.
 """
 
-from sympy import Symbol, Mul, Pow, S, Rational, srepr
-from sympy.core._print_helpers import Printable
+from sympy import sstr, srepr, latex, Symbol, Mul, Pow, S, Rational
 from typing import Optional, Union
 
 from nodimo._internal import _sympify_number, _unsympify_number
 
 
-class Variable(Printable):
+class Variable:
     """Base class for variables.
 
     Most basic type of variable, with a few attributes that are useful
@@ -72,24 +71,23 @@ class Variable(Printable):
         scaling: bool = False,
         **dimensions: int,
     ):
-
-        self._name: Optional[str] = name
+        self._name: str = name
         self._dimensions: dict[str, Rational] = dimensions
         self._is_dependent: bool = bool(dependent)
         self._is_scaling: bool = bool(scaling)
         self._is_nondimensional: bool = all(dim == 0 for dim in dimensions.values())
         self._symbolic: Union[Symbol, Mul, Pow]
 
-        self._validate_properties()
+        self._validate_variable()
         self._set_variable_dimensions()
-        self._build_symbolic()
+        self._set_symbolic()
 
     @property
     def name(self) -> str:
         return self._name
 
     @property
-    def symbolic(self) -> Symbol:
+    def symbolic(self) -> Union[Symbol, Mul, Pow]:
         return self._symbolic
 
     @property
@@ -102,7 +100,7 @@ class Variable(Printable):
 
     @is_dependent.setter
     def is_dependent(self, dependent: bool):
-        self._validate_properties(is_dependent=dependent)
+        self._validate_variable(is_dependent=dependent)
         self._is_dependent = bool(dependent)
 
     @property
@@ -111,19 +109,14 @@ class Variable(Printable):
 
     @is_scaling.setter
     def is_scaling(self, scaling: bool):
-        self._validate_properties(is_scaling=scaling)
+        self._validate_variable(is_scaling=scaling)
         self._is_scaling = bool(scaling)
 
     @property
     def is_nondimensional(self) -> bool:
         return self._is_nondimensional
 
-    def _copy(self):
-        return eval(srepr(self))
-
-    def _build_symbolic(self):
-        """Builds symbolic representation in Sympy."""
-
+    def _set_symbolic(self):
         self._symbolic = Symbol(self.name, commutative=False)
 
     def _set_variable_dimensions(self):
@@ -139,13 +132,11 @@ class Variable(Printable):
             else:
                 self._dimensions[dim] = _sympify_number(exp)
     
-    def _validate_properties(
+    def _validate_variable(
         self,
         is_dependent: Optional[bool] = None,
         is_scaling: Optional[bool] = None,
     ):
-        """Validates variable's properties."""
-
         if is_dependent is None:
             is_dependent = self._is_dependent
         if is_scaling is None:
@@ -156,16 +147,16 @@ class Variable(Printable):
         elif is_scaling and self._is_nondimensional:
             raise ValueError("A variable can not be both scaling and nondimensional")
 
-    def _key(self) -> tuple:
+    def _copy(self):
+        return eval(srepr(self))
 
+    def _key(self) -> tuple:
         return (self._name, frozenset(self._dimensions.items()))
 
     def __hash__(self) -> int:
-
         return hash(self._key())
 
     def __eq__(self, other) -> bool:
-
         if self is other:
             return True
         elif isinstance(other, type(self)):
@@ -173,7 +164,6 @@ class Variable(Printable):
         return False
 
     def __mul__(self, other):
-
         if not isinstance(other, Variable):
             raise NotImplemented
         
@@ -182,21 +172,25 @@ class Variable(Printable):
         return Product(self, other)
 
     def __pow__(self, exponent: Rational):
-
         from .power import Power
 
         return Power(self, exponent)
 
     def __truediv__(self, other):
-
         if not isinstance(other, Variable):
             raise NotImplemented
 
         return self * other**-1
 
-    def _sympy_(self):
-        """Sympified variable."""
+    def __str__(self) -> str:
+        return sstr(self)
 
+    def _repr_latex_(self):
+        """Latex representation according to IPython/Jupyter."""
+
+        return f'$\\displaystyle {latex(self)}$'
+
+    def _sympy_(self):
         return self._symbolic
 
     def _sympyrepr(self, printer) -> str:
@@ -234,6 +228,7 @@ class Variable(Printable):
         return printer._print(self._symbolic)
 
     _latex = _pretty = _sympystr
+    __repr__ = __str__
 
 
 # Alias for the class Variable.
@@ -241,11 +236,7 @@ Var = Variable
 
 
 class OneVar(Variable):
-    """Nondimensional number one.
-
-    This is the identity element for the Product operator and the result
-    of the Power operator when the zero exponent is given.
-    """
+    """Nondimensional one."""
 
     _is_one = True
 
@@ -256,18 +247,6 @@ class OneVar(Variable):
         super().__init__('')
         self._name = None
         self._symbolic = S.One
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def symbolic(self) -> Symbol:
-        return self._symbolic
-
-    @property
-    def dimensions(self) -> dict[str, int]:
-        return self._dimensions
 
     @property
     def is_dependent(self) -> bool:
