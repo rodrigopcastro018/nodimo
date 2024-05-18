@@ -76,6 +76,8 @@ class Product(Variable):
         super().__init__(
             name=name, **self._dimensions, dependent=dependent, scaling=scaling,
         )
+        if not self.name:
+            self._set_symbolic_product()
 
     @property
     def variables(self) -> tuple[Variable]:
@@ -108,21 +110,18 @@ class Product(Variable):
         dimensions = {}
         for var in self._variables:
             for dim, exp in var.dimensions.items():
-                if dim in dimensions.keys():
+                if dim in dimensions:
                     dimensions[dim] += exp
                 else:
                     dimensions[dim] = exp
 
         self._dimensions = dimensions
 
-    def _set_symbolic(self):
-        if self.name:
-            self._symbolic = Symbol(self.name, commutative=False)
-        else:
-            var_symb = []
-            for var in self._variables:
-                var_symb.append(var.symbolic)
-            self._symbolic = Mul(*var_symb)
+    def _set_symbolic_product(self):
+        var_symb = []
+        for var in self._variables:
+            var_symb.append(var.symbolic)
+        self._symbolic = Mul(*var_symb)
 
     def _copy(self):
         return eval(srepr(self))
@@ -131,8 +130,6 @@ class Product(Variable):
         return (frozenset(self._variables),)
 
     def _sympyrepr(self, printer) -> str:
-        """Developer string representation according to Sympy."""
-
         class_name = type(self).__name__
         variables_repr = ', '.join(printer._print(var) for var in self._variables)
         name_repr = f", name='{self.name}'" if self.name else ''

@@ -1,4 +1,5 @@
-from sympy import sstr, latex, S, Rational, ImmutableDenseMatrix
+from sympy import sstr, latex, S, Rational, ImmutableDenseMatrix, sympify
+from sympy.printing.pretty.stringpict import prettyForm
 from typing import Union
 
 from nodimo.variable import Variable, OneVar
@@ -24,12 +25,12 @@ class Collection:
     variables : tuple[Variable]
         Tuple with the variables that constitute the collection.
     dimensions : tuple[str] or dict[str, Rational]
-        Tuple with the dimensions' names.
+        Tuple with the dimensions.
 
     Methods
     -------
     show()
-        Displays the group in a pretty format.
+        Displays the collection in a pretty format.
     """
 
     def __init__(self, *variables: Variable):
@@ -69,10 +70,6 @@ class Collection:
     def dimensions(self) -> DimensionType:
         return self._dimensions
 
-    @property
-    def symbolic(self):
-        return self._symbolic
-
     def show(self, use_custom_css: bool = True):
         _show_object(self, use_custom_css=use_custom_css)  # TODO: Include use_custom_css in the future global settings.
     
@@ -82,15 +79,12 @@ class Collection:
     def _set_collection_dimensions(self):
         dimensions = []
         for var in self._variables:
-            for dim in var.dimensions.keys():
+            for dim in var.dimensions:
                 if dim not in dimensions:
                     dimensions.append(dim)
 
         self._dimensions = tuple(dimensions)
-
-    def _set_symbolic(self):
-        self._symbolic = self._variables
-
+    
     def _clear_ones(self):
         """Removes instances of OneVar."""
 
@@ -177,13 +171,13 @@ class Collection:
         self._nondimensional_variables = tuple(nondimensional_variables)
     
     def _set_matrix(self):
-        """Builds a dimensional matrix from the variables."""
+        """Builds basic dimensional matrix."""
 
         raw_matrix = []
         for dim in self._dimensions:
             dim_exponents = []
             for var in self._variables:
-                if dim in var.dimensions.keys():
+                if dim in var.dimensions:
                     dim_exponents.append(var.dimensions[dim])
                 else:
                     dim_exponents.append(S.Zero)
@@ -235,6 +229,7 @@ class Collection:
             The submatrix built from the given variables.
 
         Raises
+        ------
         ValueError
             If the given variables are not all part of the collection.
         """
@@ -277,53 +272,52 @@ class Collection:
     def __str__(self) -> str:
         return sstr(self)
 
+    __repr__ = __str__
+
     def _repr_latex_(self):
         """Latex representation according to IPython/Jupyter."""
 
         return f'$\\displaystyle {latex(self)}$'
     
     def _sympy_(self):
-        """Sympified representation."""
-
-        return self._symbolic
+        return sympify(self._variables)
 
     def _sympyrepr(self, printer) -> str:
         """Developer string representation according to Sympy."""
 
         class_name = type(self).__name__
-        variables = printer._print(self._variables)
+        variables = ', '.join(printer._print(var) for var in self._variables)
 
-        return class_name + variables
-
-    # def _sympystr(self, printer) -> str:
-    #     """User string representation according to Sympy."""
-
-    #     printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
-    #     class_name = printer._print(type(self).__name__)
-    #     variables = printer._print(self._variables)
-
-    #     return class_name + variables
-
-    # def _pretty(self, printer) -> prettyForm:
-    #     """Pretty representation according to Sympy."""
-
-    #     printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
-    #     class_name = printer._print(type(self).__name__)
-    #     variables = printer._print(self._variables)
-
-    #     return prettyForm(*class_name.right(variables))
-
-    # _latex = _sympystr
+        return f'{class_name}({variables})'
 
     def _sympystr(self, printer) -> str:
         """User string representation according to Sympy."""
 
-        if not hasattr(self, '_symbolic'):
-            self._set_symbolic()
+        printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
+        class_name = printer._print(type(self).__name__)
+        variables = ', '.join(printer._print(var) for var in self._variables)
+
+        return f'{class_name}({variables})'
+
+    def _latex(self, printer) -> str:
+        """Latex representation according to Sympy."""
 
         printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
+        class_name = printer._print(type(self).__name__)
+        variables = R',\ '.join(printer._print(var) for var in self._variables)
 
-        return printer._print(self._symbolic)
+        return f'{class_name}\\left({variables}\\right)'
 
-    _latex = _pretty = _sympystr
-    __repr__ = __str__
+    def _pretty(self, printer) -> prettyForm:
+        """Pretty representation according to Sympy."""
+
+        printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
+        class_name = printer._print(type(self).__name__)
+
+        variables = prettyForm('')
+        for i, var in enumerate(self._variables):
+            sep = ', ' if i > 0 else ''
+            variables = prettyForm(*variables.right(sep, printer._print(var)))
+        variables = prettyForm(*variables.parens())
+
+        return prettyForm(*class_name.right(variables))

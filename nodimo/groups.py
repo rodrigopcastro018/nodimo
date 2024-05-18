@@ -11,18 +11,15 @@ BasicGroup
     Base class for classes created with variables.
 """
 
-from sympy import Rational, Matrix, zeros, eye
+from sympy import Matrix, zeros, eye
 from sympy.printing.pretty.stringpict import prettyForm
-from typing import Union, Optional
+from typing import Optional
 
 from nodimo.variable import Variable
 from nodimo.collection import Collection
 from nodimo.power import Power
 from nodimo.product import Product
 from nodimo._internal import _show_warning, UnrelatedVariableWarning
-
-
-DimensionType = Union[tuple[str], dict[str, Rational]]
 
 
 class Group(Collection):
@@ -40,8 +37,6 @@ class Group(Collection):
         self._clear_duplicate_variables()
 
     def _clear_duplicate_variables(self):
-        """Removes duplicate variables, keeping the order."""
-
         clear_variables = []
         for var in self._variables:
             if var not in clear_variables:
@@ -53,19 +48,7 @@ class Group(Collection):
 class HomogeneousGroup(Group):
     """Dimensionally homogeneous group of variables.
 
-    Equivalent to Group, but it is dimmensionally homogenous.
-
-    Parameters
-    ----------
-    *variables : BasicVariable
-        Variables that constitute the group.
-
-    Attributes
-    ----------
-    variables : tuple[BasicVariable]
-        Tuple with the variables.
-    dimensions : tuple[str]
-        Tuple with the dimensions' names.
+    Equivalent to a dimmensionally homogenous Group.
 
     Warns
     -----
@@ -78,40 +61,35 @@ class HomogeneousGroup(Group):
         self._set_homogeneous_group()
 
     def _set_homogeneous_group(self):
-        self._clear_unrelated_variables()
+        self._clear_heterogeneous_variables()
 
-    def _clear_unrelated_variables(self):
-        """Removes unrelated variables.
-
-        Unrelated variables are the only ones in the set of variables to have
-        a particular dimension.
-        """
-
+    def _clear_heterogeneous_variables(self):
         clear_variables = list(self._variables)
-        unrelated_variables = []
+        heterogenous_variables = []
         for _ in self._variables:
             self._set_matrix()
-            unr_var = None
+            var = None
             for row in self._raw_matrix:
                 row_bool = [bool(exp) for exp in row]
                 if sum(row_bool) == 1:
-                    unr_var = clear_variables[row_bool.index(True)]
-                    if unr_var not in unrelated_variables:
-                        unrelated_variables.append(unr_var)
-                        clear_variables.remove(unr_var)
+                    var = clear_variables[row_bool.index(True)]
+                    if var not in heterogenous_variables:
+                        heterogenous_variables.append(var)
+                        clear_variables.remove(var)
                         self._variables = tuple(clear_variables)
                         self._set_collection_dimensions()
                         break
-            if unr_var is None:
+            if var is None:
                 break
 
-        if len(unrelated_variables) > 0:
-            _show_warning(f"Discarded variables "
-                          f"({str(unrelated_variables)[1:-1]})",
+        if len(heterogenous_variables) > 0:
+            _show_warning(f"Discarded variables ({str(heterogenous_variables)[1:-1]})",
                           UnrelatedVariableWarning)
 
 
 class ScalingGroup(Group):
+    """TODO
+    """
 
     def __init__(self, *variables: Variable, id_number: Optional[int] = None):
 
@@ -120,12 +98,12 @@ class ScalingGroup(Group):
         self._set_scaling_group()
 
     def _set_scaling_group(self):
-        self._clear_ones()  # TODO: Find a better place to put this.
-        self._set_scgroup_variables()
+        self._clear_ones()
+        self._set_scaling_group_variables()
         self._set_matrix_rank()
         self._validate_scaling_group()
 
-    def _set_scgroup_variables(self):
+    def _set_scaling_group_variables(self):
         """Sets all variables in the group as scaling."""
 
         new_variables = []
@@ -144,37 +122,41 @@ class ScalingGroup(Group):
             raise ValueError("Scaling variables are not dimensionally independent")
 
     def _sympyrepr(self, printer) -> str:
-        """Developer string representation according to Sympy."""
-
         class_name = type(self).__name__
         variables_repr = ', '.join(printer._print(var) for var in self._variables)
         id_number_repr = f', id_number={self._id_number}' if self._id_number else ''
 
         return f'{class_name}({variables_repr}{id_number_repr})'
 
-    def _sympystr(self, printer):
-        """User string representation according to Sympy."""
-
+    def _sympystr(self, printer) -> str:
         id_number = f' {self._id_number}' if self._id_number else ''
         scgroup = printer._print(f"Scaling group{id_number} ")
-        variables = printer._print(self._variables)
+        variables = ', '.join(printer._print(var) for var in self._variables)
 
-        return scgroup + variables
+        return f'{scgroup}({variables})'
 
-    def _pretty(self, printer):
-        """Pretty representation according to Sympy."""
-
+    def _latex(self, printer) -> str:
         id_number = f' {self._id_number}' if self._id_number else ''
         scgroup = printer._print(f"Scaling group{id_number} ")
-        variables = printer._print(self._variables)
+        variables = R',\ '.join(printer._print(var) for var in self._variables)
+
+        return f'{scgroup}\\left({variables}\\right)'
+
+    def _pretty(self, printer) -> prettyForm:
+        id_number = f' {self._id_number}' if self._id_number else ''
+        scgroup = printer._print(f"Scaling group{id_number} ")
+
+        variables = prettyForm('')
+        for i, var in enumerate(self._variables):
+            sep = ', ' if i > 0 else ''
+            variables = prettyForm(*variables.right(sep, printer._print(var)))
+        variables = prettyForm(*variables.parens())
 
         return prettyForm(*scgroup.right(variables))
 
-    _latex = _sympystr
-
 
 class TransformationGroup(HomogeneousGroup):  # TODO: What if the group has no scaling variables?
-    """Blueprint for the transformation of a homogeneous group.
+    """Blueprint for the transformation of a homogeneous group.  # TODO: Think about merging this class with DimensionalGroup
 
     A TransformationGroup sets the layout fot the transformation of a
     group of variables into another group by using scaling variables as
@@ -182,30 +164,11 @@ class TransformationGroup(HomogeneousGroup):  # TODO: What if the group has no s
     product between one nonscaling variable and the set of scaling
     variables.
 
-    Parameters
-    ----------
-    *variables : BasicVariable
-        Variables to be transformed.
-
-    Attributes
-    ----------
-    variables : empty tuple
-        Tuple to be populated with the transformation result.
-    dimensions : empty dictionary
-        Dictionary to be populated with the transformation result.
-    xvariables : tuple[BasicVariable]
-        Tuple with the variables to be transformed.
-    scaling_variables : tuple[BasicVariable]
-        Tuple with scaling variables.
-    nonscaling_variables : tuple[BasicVariable]
-        Tuple with nonscaling variables.
-
     Raises
     ------
     ValueError
-        If the number of scaling variables is not adequate.
-    ValueError
-        If the scaling variables do not form an independent set.
+        If the number of scaling variables is not adequate or if the
+        scaling variables do not form an independent set.
     """
     
     def __init__(self, *variables: Variable):
@@ -216,6 +179,8 @@ class TransformationGroup(HomogeneousGroup):  # TODO: What if the group has no s
     def _set_transformation_group(self):
         self._set_scaling_variables()
         self._set_matrix_independent_rows()
+        self._set_matrix()  # TODO: Decide. It's either this or redo HomogeneousGroup._clear_unrelated_variables
+        self._set_submatrices()
         self._set_scaling_matrix()
         self._validate_transformation_group()
         self._xvariables = tuple(list(self._variables))
@@ -223,8 +188,6 @@ class TransformationGroup(HomogeneousGroup):  # TODO: What if the group has no s
     def _set_scaling_matrix(self):
         """Builds scaling and nonscaling matrices."""
 
-        self._set_matrix()  # TODO: Decide. It's either this or redo HomogeneousGroup._clear_unrelated_variables
-        self._set_submatrices()
         scaling_matrix = self._get_submatrix(*self._scaling_variables)
         nonscaling_matrix = self._get_submatrix(*self._nonscaling_variables)
 
@@ -241,12 +204,117 @@ class TransformationGroup(HomogeneousGroup):  # TODO: What if the group has no s
             )
 
 
-# An generalization to be implemented later.
-# class DimensionalGroup(Group):
-# 
-#     def __init__(self, scaling_group: ScalingGroup, dimensions: Optional[dict[str, int]] = {}):  # dimensions == {} must be equivalent to NonDimensionalGroup implementation
-# 
-#         pass
+class DimensionalGroup(HomogeneousGroup):
+    """Dimensional group created from a homogeneous group.
+
+    This class creates a group of dimensional variables from a
+    homogeneous given group of variables. It does that using the
+    TransformationGroup layout. The resulting group has all variables
+    with the same dimension.
+    """
+
+    def __init__(self, *variables: Variable, **dimensions: int):
+        super().__init__(*variables)
+        self._is_nondimensional: bool
+        self._xvariables: tuple[Variable] = self._variables
+        self._set_dimensional_group_dimensions(**dimensions)
+        self._set_dimensional_group()
+
+    def _set_dimensional_group(self):
+        self._set_scaling_variables()
+        self._set_matrix()  # TODO: Decide. It's either this or redo HomogeneousGroup._clear_unrelated_variables
+        self._set_matrix_independent_rows()
+        self._set_submatrices()
+        self._set_scaling_matrix()
+        self._validate_dimensional_group()
+        self._set_exponent_matrix()
+        self._set_dimensional_group_variables()
+
+    def _set_dimensional_group_dimensions(self, **dimensions: int):
+        var = Variable('', **dimensions)
+
+        if not set(var.dimensions).issubset(set(self._dimensions)):
+            invalid_dimensions = []
+            for dim in var.dimensions:
+                if dim not in self._dimensions:
+                    invalid_dimensions.append(dim)
+            raise ValueError(f"Invalid dimensions ({str(invalid_dimensions)[1:-1]})")
+
+        group_dimensions = {}
+        for dim in self._dimensions:
+            if dim in var.dimensions:
+                group_dimensions[dim] = var.dimensions[dim]
+            else:
+                group_dimensions[dim] = S.Zero
+
+        self._dimensions = group_dimensions
+        self._is_nondimensional = var.is_nondimensional
+
+    def _set_scaling_matrix(self):
+        scaling_matrix = self._get_submatrix(*self._scaling_variables)
+        nonscaling_matrix = self._get_submatrix(*self._nonscaling_variables)
+
+        self._scaling_matrix = scaling_matrix[self._independent_rows, :]
+        self._nonscaling_matrix = nonscaling_matrix[self._independent_rows, :]
+
+    def _validate_dimensional_group(self):
+        check1 = len(self._scaling_variables) == self._rank
+        check2 = self._scaling_matrix.rank() == self._rank
+        if not check1 or not check2:
+            raise ValueError(
+                f"The group must have {self._rank} "
+                f"dimensionally independent scaling variables"
+            )
+
+    def _set_exponent_matrix(self):
+        """Determines the exponent of each variable, for every product.
+
+        References
+        ----------
+        .. [1] Thomas Szirtes, Applied Dimensional Analysis and Modeling
+               (Butterworth-Heinemann, 2007), p. 133.
+        """
+
+        nvars = len(self._variables)
+        rank = self._rank
+        nprods = nvars - rank
+
+        A = self._scaling_matrix
+        B = self._nonscaling_matrix
+
+        E11 = eye(nprods)
+        E12 = zeros(nprods, rank)
+        E21 = -A**-1 * B
+        E22 = A**-1
+        E = Matrix([[E11, E12],
+                    [E21, E22]])
+
+        Z1 = eye(nprods)
+        Z2C = Matrix(list(self._dimensions.values()))
+        Z2 = Matrix.hstack(*nprods*[Z2C])
+        Z = Matrix([[Z1],
+                    [Z2]])
+
+        exponents = E * Z
+
+        self._exponents = exponents.as_immutable()
+
+    def _set_dimensional_group_variables(self):
+        variables = self._nonscaling_variables + self._scaling_variables
+        products = []
+        for j in range(self._exponents.cols):
+            factors = []
+            for var, exp in zip(variables, self._exponents.col(j)):
+                factors.append(Power(var, exp))
+            products.append(Product(*factors))
+
+        self._variables = tuple(products)
+
+    def _sympyrepr(self, printer) -> str:
+        class_name = type(self).__name__
+        variables = ', '.join(printer._print(var) for var in self._xvariables)
+
+        return f'{class_name}({variables})'
 
 
 class NonDimensionalGroup(TransformationGroup):
@@ -255,31 +323,6 @@ class NonDimensionalGroup(TransformationGroup):
     This class creates a group of nondimensinal variables from a
     homogeneous given group of variables. It does that using the
     TransformationGroup layout.
-
-    Parameters
-    ----------
-    *variables : BasicVariable
-        Variables to be transformed.
-
-    Attributes
-    ----------
-    variables : tuple[BasicVariable]
-        Tuple with nondimensional variables.
-    dimensions : dict[str, int]
-        Empty dictionary that represents the nondimensional group.
-    xvariables : tuple[BasicVariable]
-        Tuple with the variables to be transformed.
-    scaling_variables : tuple[BasicVariable]
-        Tuple with scaling variables.
-    nonscaling_variables : tuple[BasicVariable]
-        Tuple with nonscaling variables.
-
-    Raises
-    ------
-    ValueError
-        If the number of scaling variables is not adequate.
-    ValueError
-        If the scaling variables do not form an independent set.
     """
     
     def __init__(self, *variables: Variable):
@@ -292,12 +335,12 @@ class NonDimensionalGroup(TransformationGroup):
         self._variables = self._dimensional_variables
         self._set_transformation_group()
         self._variables = self._nondimensional_variables
-        self._calculate_exponents()
-        self._build_nondimensional_products()
+        self._set_exponents()
+        self._set_products()
         self._set_collection_dimensions()
 
-    def _calculate_exponents(self):
-        """Determines the exponents for the scaling variables.
+    def _set_exponents(self):
+        """Determines the exponent of each variable, for every product.
 
         References
         ----------
@@ -327,11 +370,9 @@ class NonDimensionalGroup(TransformationGroup):
 
         self._exponents = exponents.as_immutable()
 
-    def _build_nondimensional_products(self):
+    def _set_products(self):
         variables = self._nonscaling_variables + self._scaling_variables
-        self._calculate_exponents()
         products = []
-
         for j in range(len(self._nonscaling_variables)):
             factors = []
             for var, exp in zip(variables, self._exponents.col(j)):

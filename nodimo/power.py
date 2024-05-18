@@ -93,6 +93,8 @@ class Power(Variable):
         super().__init__(
             name=name, **self._dimensions, dependent=dependent, scaling=scaling,
         )
+        if not self.name:
+            self._set_symbolic_power()
 
     @property
     def variable(self) -> Variable:
@@ -110,17 +112,14 @@ class Power(Variable):
 
         self._dimensions = dimensions
     
-    def _set_symbolic(self):
-        if self.name:
-            self._symbolic = Symbol(self.name, commutative=False)
-        else:
-            var = self._variable
-            # Setting com=True avoids variables with negative exponents
-            # on the numerator. However, the denominator does not follow
-            # input order.
-            com = True if self._exponent < S.Zero else False
-            self._variable._symbolic = Symbol(var.name, commutative=com)
-            self._symbolic = Pow(self._variable.symbolic, self._exponent)
+    def _set_symbolic_power(self):
+        var = self._variable
+        # Setting com=True avoids variables with negative exponents
+        # on the numerator. However, the denominator does not follow
+        # input order.
+        com = True if self._exponent < S.Zero else False
+        self._variable._symbolic = Symbol(var.name, commutative=com)
+        self._symbolic = Pow(self._variable.symbolic, self._exponent)
 
     def _copy(self):
         return eval(srepr(self))

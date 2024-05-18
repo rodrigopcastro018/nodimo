@@ -206,7 +206,7 @@ def _obtain_dimensions(*variables):
     dimensions = []
 
     for var in variables:
-        dimensions += list(var.dimensions.keys())
+        dimensions += list(var.dimensions)
 
     dimensions = _remove_duplicates(dimensions)
 
@@ -245,7 +245,7 @@ def _build_dimensional_matrix(variables, dimensions=[], return_raw=False):
         dimension_exponents = []
 
         for var in variables:
-            if dim in var.dimensions.keys():
+            if dim in var.dimensions:
                 dimension_exponents.append(var.dimensions[dim])
             else:
                 dimension_exponents.append(0)

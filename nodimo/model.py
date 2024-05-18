@@ -144,9 +144,8 @@ class Model(Relation):
         self._relations = relations
 
     def show(self):
-        nb_scgroups = len(self._scaling_groups)
+        super().show()
         for i, (scgroup, relation) in enumerate(self._relations.items()):
+            _print_horizontal_line()
             scgroup.show(use_custom_css=False)
             relation.show()
-            if i+1 < nb_scgroups:
-                _print_horizontal_line()

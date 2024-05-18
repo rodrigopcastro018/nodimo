@@ -80,7 +80,7 @@ class Variable:
 
         self._validate_variable()
         self._set_variable_dimensions()
-        self._set_symbolic()
+        self._set_symbolic_variable()
 
     @property
     def name(self) -> str:
@@ -116,7 +116,7 @@ class Variable:
     def is_nondimensional(self) -> bool:
         return self._is_nondimensional
 
-    def _set_symbolic(self):
+    def _set_symbolic_variable(self):
         self._symbolic = Symbol(self.name, commutative=False)
 
     def _set_variable_dimensions(self):

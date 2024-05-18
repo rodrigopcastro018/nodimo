@@ -84,9 +84,9 @@ class DimensionalMatrix(Group):
         self._set_matrix()
         self._set_matrix_rank()
         self._set_matrix_independent_rows()
-        self._set_symbolic()
+        self._set_symbolic_dimensional_matrix()
 
-    def _set_symbolic(self):
+    def _set_symbolic_dimensional_matrix(self):
         labeled_matrix = self._matrix.as_mutable()
         dimensions_matrix = Matrix(self._dimensions)
         variables_matrix = Matrix([[Variable('')] + list(self._variables)])
@@ -95,9 +95,10 @@ class DimensionalMatrix(Group):
 
         self._symbolic = labeled_matrix.as_immutable()
 
-    def _sympyrepr(self, printer) -> str:
-        """Developer string representation according to Sympy."""
+    def _sympy_(self):
+        return self._matrix
 
+    def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
         variables_repr = ', '.join(printer._print(var) for var in self._variables)
 
@@ -108,9 +109,10 @@ class DimensionalMatrix(Group):
 
         return f'{class_name}({variables_repr}{dimensions_repr})'
 
-    def _latex(self, printer) -> str:
-        """Latex representation according to Sympy."""
+    def _sympystr(self, printer) -> str:
+        return self._symbolic.table(printer, rowstart='', rowend='', colsep='  ')
 
+    def _latex(self, printer) -> str:
         dmatrix = R'\begin{array}'
         dmatrix += '{r|' + 'r' * len(self._variables) + '} & '
         dmatrix += ' & '.join([printer._print(var) for var in self._variables])
@@ -129,6 +131,9 @@ class DimensionalMatrix(Group):
         dmatrix += R'\end{array}'
         
         return dmatrix
+
+    def _pretty(self, printer):
+        return printer._print_matrix_contents(self._symbolic)
 
 
 # Alias for DimensionalMatrix.
