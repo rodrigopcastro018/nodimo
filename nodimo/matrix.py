@@ -14,7 +14,6 @@ DimensionalMatrix
 """
 
 from sympy import ImmutableDenseMatrix, Matrix
-from typing import Optional
 
 from nodimo.variable import Variable
 from nodimo.groups import Group
@@ -30,8 +29,6 @@ class DimensionalMatrix(Group):
     ----------
     *variables : Variable
         Variables that constitute the dimensional matrix.
-    dimensions : tuple[str], default=None
-        List with the dimensions to be used in the dimensional matrix.
 
     Attributes
     ----------
@@ -46,6 +43,8 @@ class DimensionalMatrix(Group):
 
     Methods
     -------
+    set_dimensions_order(*dimensions_names)
+        Sets the dimensions column order.
     show()
         Displays the labeled dimensional matrix.
 
@@ -59,13 +58,9 @@ class DimensionalMatrix(Group):
     >>> dmatrix.show()
     """
 
-    def __init__(self, *variables: Variable, dimensions: Optional[tuple[str]] = None):
+    def __init__(self, *variables: Variable):
 
         super().__init__(*variables)
-
-        if dimensions is not None:
-            self._dimensions = dimensions
-        
         self._set_dimensional_matrix()
 
     @property
@@ -88,7 +83,7 @@ class DimensionalMatrix(Group):
 
     def _set_symbolic_dimensional_matrix(self):
         labeled_matrix = self._matrix.as_mutable()
-        dimensions_matrix = Matrix(self._dimensions)
+        dimensions_matrix = Matrix(list(self._dimensions))
         variables_matrix = Matrix([[Variable('')] + list(self._variables)])
         labeled_matrix = labeled_matrix.col_insert(0, dimensions_matrix)
         labeled_matrix = labeled_matrix.row_insert(0, variables_matrix)
@@ -100,14 +95,9 @@ class DimensionalMatrix(Group):
 
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
-        variables_repr = ', '.join(printer._print(var) for var in self._variables)
+        variables = ', '.join(printer._print(var) for var in self._variables)
 
-        if self._dimensions == Group(*self._variables)._dimensions:
-            dimensions_repr = ''
-        else:
-            dimensions_repr = f', dimensions={self._dimensions}'
-
-        return f'{class_name}({variables_repr}{dimensions_repr})'
+        return f'{class_name}({variables})'
 
     def _sympystr(self, printer) -> str:
         return self._symbolic.table(printer, rowstart='', rowend='', colsep='  ')
@@ -117,23 +107,37 @@ class DimensionalMatrix(Group):
         dmatrix += '{r|' + 'r' * len(self._variables) + '} & '
         dmatrix += ' & '.join([printer._print(var) for var in self._variables])
         dmatrix += R'\\ \hline '
-        for i, dim in enumerate(self._dimensions):
-            dim_latex = [printer._print(dim)]
-            exp_latex = []
-            for exp in self._matrix[i, :]:
+        for dim, exponents in zip(self._dimensions, self._raw_matrix):
+            row = [printer._print(dim)]
+            for exp in exponents:
                 if exp < 0:
-                    exp_latex.append(printer._print(exp))
+                    row.append(printer._print(exp))
                 else:
                     # Mimic the minus sign to preserve column width.
-                    exp_latex.append(R'\phantom{-}' + printer._print(exp))
-            dim_and_exp_latex = ' & '.join(dim_latex + exp_latex)
-            dmatrix += dim_and_exp_latex + R'\\'
+                    row.append(R'\phantom{-}' + printer._print(exp))
+            dmatrix += ' & '.join(row) + R'\\'
         dmatrix += R'\end{array}'
-        
+
         return dmatrix
 
     def _pretty(self, printer):
         return printer._print_matrix_contents(self._symbolic)
+
+    def set_dimensions_order(self, *dimensions_names: str):
+        """Sets the dimensions column order.
+
+        Parameters
+        ----------
+        *dimensions_names : str
+            Dimensions' names in the requested order.
+        """
+
+        dimensions = dict((dim, 0) for dim in dimensions_names)
+        for dim in self._dimensions:
+                dimensions[dim] = self._dimensions[dim]
+
+        self._set_dimensions(**dimensions)
+        self._set_dimensional_matrix()
 
 
 # Alias for DimensionalMatrix.

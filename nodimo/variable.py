@@ -13,7 +13,7 @@ Variable
     Creates a symbolic variable.
 """
 
-from sympy import sstr, srepr, latex, Symbol, Mul, Pow, S, Rational
+from sympy import sstr, srepr, latex, Symbol, Mul, Pow, S, Number
 from typing import Optional, Union
 
 from nodimo._internal import _sympify_number, _unsympify_number
@@ -42,7 +42,7 @@ class Variable:
         The name that will be displayed in symbolic expressions.
     symbolic : Symbol
         Sympy object that represents the variable.
-    dimensions : dict[str, int]
+    dimensions : dict[str, Number]
         Dictionary containing dimensions' names and exponents.
     is_dependent : bool
         If ``True``, the variable is dependent.
@@ -72,7 +72,7 @@ class Variable:
         **dimensions: int,
     ):
         self._name: str = name
-        self._dimensions: dict[str, Rational] = dimensions
+        self._dimensions: dict[str, Number] = dimensions
         self._is_dependent: bool = bool(dependent)
         self._is_scaling: bool = bool(scaling)
         self._is_nondimensional: bool = all(dim == 0 for dim in dimensions.values())
@@ -91,7 +91,7 @@ class Variable:
         return self._symbolic
 
     @property
-    def dimensions(self) -> dict[str, Rational]:
+    def dimensions(self) -> dict[str, Number]:
         return self._dimensions
 
     @property
@@ -171,7 +171,7 @@ class Variable:
         
         return Product(self, other)
 
-    def __pow__(self, exponent: Rational):
+    def __pow__(self, exponent: Number):
         from .power import Power
 
         return Power(self, exponent)
@@ -203,7 +203,7 @@ class Variable:
             dimensions_repr = ''
         else:
             dimensions = []
-            for dim_name, dim_exp in self.dimensions.items():
+            for dim_name, dim_exp in self._dimensions.items():
                 dim_exp_ = _unsympify_number(dim_exp)
                 if isinstance(dim_exp_, str):
                     dim_exp_ = f"'{dim_exp_}'"

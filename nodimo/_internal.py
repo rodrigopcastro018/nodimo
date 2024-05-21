@@ -21,8 +21,7 @@ _build_dimensional_matrix(variables, dimensions=[])
     Builds a basic dimensional matrix.
 """
 
-import sympy as sp  # TODO: Remove this later
-from sympy import Rational, pretty, sympify, nsimplify
+from sympy import Number, pretty, sympify, nsimplify
 from typing import Union
 import warnings
 
@@ -86,7 +85,7 @@ def _print_horizontal_line():
         print(78 * '-')
 
 
-def _sympify_number(number: Union[int, float, str, tuple]) -> Rational:
+def _sympify_number(number: Union[int, float, str, tuple]) -> Number:
     """Converts a number representation into a Sympy number.
 
     This method is roughly a wrapper for Sympy.sympify, but it only
@@ -119,6 +118,9 @@ def _sympify_number(number: Union[int, float, str, tuple]) -> Rational:
     True
     """
 
+    if hasattr(number, 'is_number') and number.is_number:
+        return number
+    
     number_sp = sympify(number)
 
     if number_sp.is_Rational:
@@ -130,21 +132,22 @@ def _sympify_number(number: Union[int, float, str, tuple]) -> Rational:
         else:
             return number_sp
     elif isinstance(number, tuple) and len(number) in {1,2}:
-        if all(obj.is_number for obj in number_sp):
-            return Rational(*number_sp)
+        if all(obj.is_Number for obj in number_sp):
+            return Number(*number_sp)
     elif number_sp.is_number:
         return number_sp
+    
+    num = f"'{number}'" if isinstance(number, str) else number
+    raise ValueError(f"{num} could not be converted to a Sympy number")
 
-    raise ValueError(f"'{number}' could not be converted to a Sympy number")
 
-
-def _unsympify_number(number_sp: Rational) -> Union[int, str, tuple]:
+def _unsympify_number(number_sp: Number) -> Union[int, str, tuple]:
     """Does the inverse of _sympify_number.
 
     Parameters
     ----------
     number_sp : Number
-        The input number converted to a Sympy number.
+        The Sympy number.
 
     Returns
     -------
@@ -154,11 +157,12 @@ def _unsympify_number(number_sp: Rational) -> Union[int, str, tuple]:
     Raises
     ------
     ValueError
-        If the input is not a sympy Number.
+        If the input is not a Sympy Number.
     """
 
-    if not number_sp.is_number:
-        raise ValueError(f"'{number_sp}' is not a Sympy number")
+    if not hasattr(number_sp, 'is_number') or not number_sp.is_number:
+        num = f"'{number_sp}'" if isinstance(number_sp, str) else number_sp
+        raise ValueError(f"{num} is not a Sympy number")
     elif number_sp.is_Integer:
         return int(number_sp)
     elif number_sp.is_Rational:
@@ -167,111 +171,17 @@ def _unsympify_number(number_sp: Rational) -> Union[int, str, tuple]:
         return str(number_sp)
 
 
-def _remove_duplicates(original_list):
-    """Removes duplicates from a list, keeping the order.
+class NodimoWarning(Warning):
+    """Custom warning.
 
-    Parameters
-    ----------
-    original_list : list
-        List to be checked for duplicates.
-
-    Returns
-    -------
-    new_list : list
-        List with duplicates removed.
-    """
-
-    new_list = []
-    for e in original_list:
-        if e not in new_list:
-            new_list.append(e)
-
-    return new_list
-
-
-def _obtain_dimensions(*variables):
-    """Obtains the dimensions' names from the given variables.
-
-    Parameters
-    ----------
-    *variables : Variable
-        Variables to get the dimensions extracted.
-
-    Returns
-    -------
-    dimensions : list[str]
-        List containing the dimensions' names.
-    """
-
-    dimensions = []
-
-    for var in variables:
-        dimensions += list(var.dimensions)
-
-    dimensions = _remove_duplicates(dimensions)
-
-    return dimensions
-
-
-def _build_dimensional_matrix(variables, dimensions=[], return_raw=False):
-    """Builds a basic dimensional matrix.
-
-    A basic dimensional matrix contains only numbers, no labels.
-
-    Parameters
-    ----------
-    variables : list[Variable]
-        List with the variables used to build the dimensional matrix.
-    dimensions : list[str], default=[]
-        List with the dimensions' names of the given variables. If not
-        provided, this list is obtained from the variables.
-    return_raw : bool, defaul=True
-        If ``True``, return matrix will be a list of lists.
-
-    Returns
-    -------
-    dimensional_matrix : Matrix or list[list[int]]
-        Matrix with one column for each variable, one row for each
-        dimension, and every entry represents the dimension's exponent
-        of a particular variable.
-    """
-
-    if len(variables) > 0 and dimensions == []:
-        dimensions = _obtain_dimensions(*variables)
-
-    raw_dimensional_matrix = []
-
-    for dim in dimensions:
-        dimension_exponents = []
-
-        for var in variables:
-            if dim in var.dimensions:
-                dimension_exponents.append(var.dimensions[dim])
-            else:
-                dimension_exponents.append(0)
-
-        raw_dimensional_matrix.append(dimension_exponents)
-
-    dimensional_matrix = sp.Matrix(raw_dimensional_matrix)
-    dimensional_matrix = sp.nsimplify(dimensional_matrix,
-                                      rational=True).as_mutable()
-
-    if return_raw:
-        return raw_dimensional_matrix
-    else:
-        return dimensional_matrix
-
-
-class UnrelatedVariableWarning(Warning):
-    """Unrelated variable warning.
-    
-    Issued when a variable can not be used and, therefore, is discarded.
+    Issued anytime Nodimo finds an inconsistency in the user's input,
+    but one that can be handled without halting the execution.
     """
 
     pass
 
 
-warnings.simplefilter('always', UnrelatedVariableWarning)
+warnings.simplefilter('always', NodimoWarning)
 
 
 def custom_formatwarning(message, category, filename, lineno, line=None):
@@ -280,10 +190,8 @@ def custom_formatwarning(message, category, filename, lineno, line=None):
     return f'\033[93m{category.__name__}\033[0m: {message}\n'
 
 
-warnings.formatwarning = custom_formatwarning
+warnings.formatwarning = custom_formatwarning  # TODO: Check if this does not impact other warning messages.
 
 
-def _show_warning(message: str, category: Warning):
-    """Displays a message with warning colors."""
-
-    warnings.warn(message, category)
+def _show_nodimo_warning(message: str):
+    warnings.warn(message, NodimoWarning)

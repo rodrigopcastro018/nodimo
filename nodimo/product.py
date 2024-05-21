@@ -13,7 +13,7 @@ Product
     Creates a symbolic product of variables.
 """
 
-from sympy import Symbol, Mul, S, srepr
+from sympy import Mul, S, srepr
 
 from nodimo.variable import Variable, OneVar
 from nodimo.collection import Collection

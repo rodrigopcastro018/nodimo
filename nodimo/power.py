@@ -13,7 +13,7 @@ Power
     Creates a symbolic power of a variable.
 """
 
-from sympy import srepr, Symbol, Pow, Rational, S
+from sympy import srepr, Symbol, Pow, Number, S
 
 from nodimo.variable import Variable, OneVar
 from nodimo._internal import _sympify_number, _unsympify_number
@@ -30,14 +30,14 @@ class Power(Variable):
     ----------
     variable : BasicVariable
         Variable to be exponentiated.
-    exponent : Rational
+    exponent : Number
         Exponent to which the variable will be raised.
 
     Attributes
     ----------
     variable : BasicVariable
         Variable to be exponentiated.
-    exponent : Rational
+    exponent : Number
         Exponent to which the variable will be raised.
     """
 
@@ -46,7 +46,7 @@ class Power(Variable):
     def __new__(
         cls,
         variable: Variable,
-        exponent: Rational,
+        exponent: Number,
         name: str = '',
         dependent: bool = False,
         scaling: bool = False,
@@ -77,7 +77,7 @@ class Power(Variable):
     def __init__(
         self,
         variable: Variable,
-        exponent: Rational,
+        exponent: Number,
         name: str = '',
         dependent: bool = False,
         scaling: bool = False,
@@ -88,7 +88,7 @@ class Power(Variable):
             variable = variable._variable
 
         self._variable: Variable = variable
-        self._exponent: Rational = exponent_sp
+        self._exponent: Number = exponent_sp
         self._set_power_dimensions()
         super().__init__(
             name=name, **self._dimensions, dependent=dependent, scaling=scaling,
@@ -101,7 +101,7 @@ class Power(Variable):
         return self._variable
 
     @property
-    def exponent(self) -> Rational:
+    def exponent(self) -> Number:
         return self._exponent
 
     def _set_power_dimensions(self):

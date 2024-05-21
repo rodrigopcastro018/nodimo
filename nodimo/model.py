@@ -16,9 +16,9 @@ NonDimensionalModel
 from itertools import combinations
 
 from nodimo.variable import Variable
-from nodimo.groups import NonDimensionalGroup, ScalingGroup
+from nodimo.groups import DimensionalGroup, ScalingGroup
 from nodimo.relation import Relation
-from nodimo._internal import _print_horizontal_line
+from nodimo._internal import _print_horizontal_line, _unsympify_number
 
 
 class Model(Relation):
@@ -80,8 +80,9 @@ class Model(Relation):
     >>> model.show()
     """
 
-    def __init__(self, *variables: Variable):
+    def __init__(self, *variables: Variable, **dimensions: int):
         super().__init__(*variables)
+        self._set_dimensions(**dimensions)
         self._scaling_groups: tuple[ScalingGroup]
         self._relations: dict[ScalingGroup, Relation]
         self._set_model()
@@ -96,6 +97,7 @@ class Model(Relation):
         self._validate_model()
         self._set_scaling_groups()
         self._set_relations()
+        self._clear_null_dimensions()
 
     def _validate_model(self):
         if len(self._scaling_variables) < self._rank:
@@ -128,18 +130,19 @@ class Model(Relation):
                     reset_var = var._copy()
                     reset_var.is_scaling = False
                     variables.append(reset_var)
-            variables.extend(scgroup._variables)
+            variables.extend(scgroup.variables)
 
-            ndgroup = NonDimensionalGroup(*variables)
-            for prod in ndgroup._products:
-                prod.is_dependent = any(var.is_dependent for var in prod._variables)
+            dgroup = DimensionalGroup(*variables, **self._dimensions)
+            for prod in dgroup.variables:
+                if prod._is_product:
+                    prod.is_dependent = any(var.is_dependent for var in prod.variables)
 
             if scgroup._id_number is None:
                 relation_name = 'Phi'
             else:
                 relation_name = f'Phi_{scgroup._id_number}'
 
-            relations[scgroup] = Relation(*ndgroup.variables, name=relation_name)
+            relations[scgroup] = Relation(*dgroup.variables, name=relation_name)
 
         self._relations = relations
 
@@ -149,3 +152,20 @@ class Model(Relation):
             _print_horizontal_line()
             scgroup.show(use_custom_css=False)
             relation.show()
+
+    def _sympyrepr(self, printer) -> str:
+        class_name = type(self).__name__
+        variables = ', '.join(printer._print(var) for var in self._variables)
+
+        if self._is_nondimensional:
+            dimensions = ''
+        else:
+            dims = []
+            for dim_name, dim_exp in self._dimensions.items():
+                dim_exp_ = _unsympify_number(dim_exp)
+                if isinstance(dim_exp_, str):
+                    dim_exp_ = f"'{dim_exp_}'"
+                dims.append(f'{dim_name}={dim_exp_}')
+            dimensions = f", {', '.join(dims)}"
+    
+        return f'{class_name}({variables}{dimensions})'
