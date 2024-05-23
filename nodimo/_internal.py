@@ -21,7 +21,7 @@ _build_dimensional_matrix(variables, dimensions=[])
     Builds a basic dimensional matrix.
 """
 
-from sympy import Number, pretty, sympify, nsimplify
+from sympy import pretty, Number, sympify, nsimplify
 from typing import Union
 import warnings
 
@@ -185,8 +185,6 @@ warnings.simplefilter('always', NodimoWarning)
 
 
 def custom_formatwarning(message, category, filename, lineno, line=None):
-    """Custom format for warning messages."""
-    
     return f'\033[93m{category.__name__}\033[0m: {message}\n'
 
 

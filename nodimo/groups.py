@@ -173,20 +173,23 @@ class ScalingGroup(Group):
         return prettyForm(*scgroup.right(variables))
 
 
-class IndependentGroup(Group):
-    """Group of independent variables.
+class PrimeGroup(Group):
+    """Group of prime variables.
 
-    A group is independent if any variable in it can not be obtained as
-    a product of the others. Duplicates and instances of OneVar are
-    removed in the group setting.
+    A variable is prime if it can not be obtained as the product of the
+    other variables of the group.
+
+    Warns
+    -----
+    NodimoWarning
+        Nonprime variables.
 
     Notes
     -----
-    The process used to validate this group is similar to what is done
-    in ScalingGroup and DimensionalGroup. The trick consists of creating
-    a new group of variables (bariables), which use base variables as
-    dimensions, and this new group is validated by means of its
-    dimensional matrix.
+    The process used to create this group is similar to what is done in
+    ScalingGroup and DimensionalGroup. The trick consists of creating a
+    new group of variables (bariables), which use base variables as
+    dimensions.
     """
 
     def __init__(self, *variables: Variable):
@@ -198,7 +201,7 @@ class IndependentGroup(Group):
         self._clear_ones()
         self._set_base_variables()
         self._set_bariables()
-        self._validate_independent_group()
+        self._clear_nonprime_variables()
 
     def _get_bariable_dimensions(self, variable):
         dimensions = {}
@@ -223,21 +226,41 @@ class IndependentGroup(Group):
 
         self._bariables = tuple(bariables)
 
-    def _validate_independent_group(self):
+    def _clear_nonprime_variables(self):
         bargroup = Group(*self._bariables)
         bargroup._set_matrix_rank()
         if len(self._bariables) > bargroup._rank:
-            raise ValueError(
-                f"The provided group of variables could not be set as independent"
+            _, prime_bariables = bargroup._matrix.rref()
+        else:
+            prime_bariables = tuple(range(len(self._bariables)))
+
+        prime_variables = []
+        nonprime_variables = []
+        for i, var in enumerate(self._variables):
+            if i in prime_bariables:
+                prime_variables.append(var)
+            else:
+                nonprime_variables.append(var)
+
+        self._variables = tuple(prime_variables)
+
+        if len(nonprime_variables) > 0:
+            _show_nodimo_warning(
+                f"Nonprime variables ({str(nonprime_variables)[1:-1]})"
             )
 
 
-class DimensionalGroup(HomogeneousGroup):
-    """(Non)dimensional group created from a homogeneous group.
+class DimensionalGroup(HomogeneousGroup, PrimeGroup):
+    """(Non)dimensional group.
 
     This class creates a new group of variables from a homogeneous given
     group of variables. The resulting group has all variables with the
     same dimension.
+
+    Parameters
+    ----------
+    *variables : Variable
+    **dimensions : int
 
     Raises
     ------
@@ -247,7 +270,8 @@ class DimensionalGroup(HomogeneousGroup):
     """
 
     def __init__(self, *variables: Variable, **dimensions: int):
-        super().__init__(*variables)
+        super(DimensionalGroup, self).__init__(*variables)
+        super(HomogeneousGroup, self).__init__(*self._variables)
         self._is_nondimensional: bool
         self._xvariables: tuple[Variable] = self._variables
         self._set_dimensions(**dimensions)
@@ -255,9 +279,7 @@ class DimensionalGroup(HomogeneousGroup):
 
     def _set_dimensional_group(self):
         self._set_scaling_variables()
-        self._set_matrix()  # TODO: Decide. It's either this or redo HomogeneousGroup._clear_unrelated_variables
         self._set_matrix_independent_rows()
-        self._set_submatrices()
         self._set_scaling_matrix()
         self._validate_dimensional_group()
         self._set_exponent_matrix()

@@ -71,12 +71,15 @@ class Product(Variable):
         scaling: bool = False,
     ):
 
-        self._variables = self._simplify_factors(*variables)
+        self._variables = self._simplify_factors(*variables)  # TODO: Remove Products and Powers names before simplifying.
         self._set_product_dimensions()
         super().__init__(
             name=name, **self._dimensions, dependent=dependent, scaling=scaling,
         )
+        self._numerator_variables: tuple[Variable]
+        self._denominator_variables: tuple[Variable]
         if not self.name:
+            self._set_numerator_variables()
             self._set_symbolic_product()
 
     @property
@@ -118,6 +121,7 @@ class Product(Variable):
         self._dimensions = dimensions
 
     def _set_symbolic_product(self):
+        # Denominator variables do not follow input order.
         var_symb = []
         for var in self._variables:
             var_symb.append(var.symbolic)
@@ -143,5 +147,43 @@ class Product(Variable):
                 + scaling_repr
                 + ')')
 
+    def _set_numerator_variables(self):
+        numerator_variables = []
+        denominator_variables = []
+        for var in self._variables:
+            if var._is_power and var.exponent < 0:
+                varinv = var._copy()
+                varinv._exponent *= -1
+                varinv._set_symbolic_power()
+                denominator_variables.append(varinv)
+            else:
+                numerator_variables.append(var)
 
+        self._numerator_variables = tuple(numerator_variables)
+        self._denominator_variables = tuple(denominator_variables)
+
+    def _printmethod(self, printer):
+        """Keeps the input order on output representations."""
+
+        printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
+
+        if self._name:
+            return printer._print(self._symbolic)
+
+        numerator = printer._print(Mul(*self._numerator_variables))
+
+        if len(self._denominator_variables) > 0:
+            denominator = printer._print(Mul(*self._denominator_variables))
+            if printer.printmethod == '_sympystr':
+                return f'{numerator}/({denominator})'
+            elif printer.printmethod == '_pretty':
+                return numerator / denominator
+            elif printer.printmethod == '_latex':
+                return f'\\frac{{{numerator}}}{{{denominator}}}'
+        else:
+            return numerator
+
+    _latex = _pretty = _sympystr = _printmethod
+
+        
 Prod = Product

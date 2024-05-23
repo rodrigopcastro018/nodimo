@@ -114,9 +114,8 @@ class Power(Variable):
     
     def _set_symbolic_power(self):
         var = self._variable
-        # Setting com=True avoids variables with negative exponents
-        # on the numerator. However, the denominator does not follow
-        # input order.
+        # Setting com=True avoids variables with negative exponents on
+        # the numerator in Product.symbolic.
         com = True if self._exponent < S.Zero else False
         self._variable._symbolic = Symbol(var.name, commutative=com)
         self._symbolic = Pow(self._variable.symbolic, self._exponent)

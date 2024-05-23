@@ -1,5 +1,6 @@
 from sympy import sstr, latex, S, Number, ImmutableDenseMatrix, sympify
 from sympy.printing.pretty.stringpict import prettyForm
+from itertools import combinations
 
 from nodimo.variable import Variable, OneVar
 from nodimo._internal import _show_object
@@ -51,8 +52,6 @@ class Collection:
         self._dimensional_variables: tuple[Variable]
         self._nondimensional_variables: tuple[Variable]
 
-        self._is_independent: bool  #TODO: Implement this in a different method
-
         self._raw_matrix: list[list[Number]]
         self._matrix: ImmutableDenseMatrix
         self._rank: int
@@ -73,8 +72,37 @@ class Collection:
         _show_object(self, use_custom_css=use_custom_css)  # TODO: Include use_custom_css in the future global settings.
     
     def _set_collection(self):
+        self._validate_collection()
         self._set_collection_dimensions()
 
+    def _validate_collection(self):
+        not_variables = []
+        for var in self._variables:
+            if not isinstance(var, Variable):
+                not_variables.append(var)
+
+        if len(not_variables) > 0:
+            raise TypeError(f"Not variables ({str(not_variables)[1:-1]})")
+
+        # Check for different variables with equal name.
+        variables_namesakes = []
+        variables_combinations = combinations(self._variables, 2)
+        for var1, var2 in variables_combinations:
+            namesake = None
+            if var1.name != '':
+                if var1.name == var2.name and var1.dimensions != var2.dimensions:
+                    namesake = var1.name
+                elif var1.name == var2.name and var1.dimensions == var2.dimensions:
+                    if type(var1) != type(var2):
+                        namesake = var1.name
+                if namesake is not None and namesake not in variables_namesakes:
+                    variables_namesakes.append(namesake)
+
+        if len(variables_namesakes) > 0:
+            raise ValueError(
+                f"Repeated variables' names ({str(variables_namesakes)[1:-1]})"
+            )
+    
     def _set_collection_dimensions(self):
         dimensions = {}
         for var in self._variables:
@@ -317,7 +345,7 @@ class Collection:
         """Latex representation according to IPython/Jupyter."""
 
         return f'$\\displaystyle {latex(self)}$'
-    
+
     def _sympy_(self):
         return sympify(self._variables)
 

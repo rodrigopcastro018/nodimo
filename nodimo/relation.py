@@ -14,10 +14,10 @@ ModelFunction
 from sympy import Equality, Function
 
 from nodimo.variable import Variable
-from nodimo.groups import HomogeneousGroup
+from nodimo.groups import HomogeneousGroup, PrimeGroup
 
 
-class Relation(HomogeneousGroup):
+class Relation(HomogeneousGroup, PrimeGroup):
     """Creates a relation of variables.
 
     This class builds a mathematical relation between one dependent
@@ -42,8 +42,8 @@ class Relation(HomogeneousGroup):
     """
 
     def __init__(self, *variables: Variable, name: str = 'f'):
-
-        super().__init__(*variables)
+        super(Relation, self).__init__(*variables)
+        super(HomogeneousGroup, self).__init__(*self._variables)
         self._name: str = name
         self._set_relation()
 
