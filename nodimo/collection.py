@@ -1,6 +1,23 @@
+"""
+     ┓•     
+┏┓┏┓┏┫┓┏┳┓┏┓
+┛┗┗┛┗┻┗┛┗┗┗┛
+
+=====================================
+Collection (:mod:`nodimo.collection`)
+=====================================
+
+This module contains the base class for everything that is created with
+multiple variables.
+
+Classes
+-------
+Collection
+    Creates a collection of variables.
+"""
+
 from sympy import sstr, latex, S, Number, ImmutableDenseMatrix, sympify
 from sympy.printing.pretty.stringpict import prettyForm
-from itertools import combinations
 
 from nodimo.variable import Variable, OneVar
 from nodimo._internal import _show_object
@@ -9,8 +26,8 @@ from nodimo._internal import _show_object
 class Collection:
     """Collection of variables.
 
-    This class contains common attributes and methods that are used by
-    classes created with a collection of variables.
+    This is the base class for all classes created with a collection of
+    variables.
 
     Parameters
     ----------
@@ -22,30 +39,31 @@ class Collection:
     variables : tuple[Variable]
         Tuple with the variables that constitute the collection.
     dimensions : dict[str, Number]
-        Dictionary with all dimensions' names as keys. If all variables
-        have the same dimensions, the exponents are the dictionary's
-        values. Otherwise, the dictionary's values are NaN.
-
-    Methods
-    -------
-    show()
-        Displays the collection in a pretty format.
+        Dictionary with all dimensions' names as keys. Equal exponents
+        among all variables are the dictionary's values. Otherwise, the
+        dictionary's values are NaN.
+    
+    Raises
+    ------
+    TypeError
+        If inputs to class are not objects of type Variable.
+    ValueError
+        If inputs contains different variables with equal names.
     """
 
     def __init__(self, *variables: Variable):
-
         # Main attributes.
-        self._variables: tuple[Variable] = variables
+        self._variables: tuple[Variable]
         self._dimensions: dict[str, Number]
         self._is_nondimensional: bool
 
         # Attributes to be used in child classes.
         self._disassembled_variables: tuple[Variable]
         self._base_variables: tuple[Variable]
-        
+
         self._scaling_variables: tuple[Variable]
         self._nonscaling_variables: tuple[Variable]
-        
+
         self._dependent_variables: tuple[Variable]
         self._independent_variables: tuple[Variable]
 
@@ -58,6 +76,7 @@ class Collection:
         self._independent_rows: tuple[int]
         self._submatrices: dict[Variable, ImmutableDenseMatrix]
 
+        self._set_collection_variables(*variables)
         self._set_collection()
 
     @property
@@ -72,37 +91,34 @@ class Collection:
         _show_object(self, use_custom_css=use_custom_css)  # TODO: Include use_custom_css in the future global settings.
     
     def _set_collection(self):
+        self._set_base_variables()
         self._validate_collection()
         self._set_collection_dimensions()
 
-    def _validate_collection(self):
+    def _set_collection_variables(self, *variables):
         not_variables = []
-        for var in self._variables:
+        for var in variables:
             if not isinstance(var, Variable):
                 not_variables.append(var)
-
         if len(not_variables) > 0:
             raise TypeError(f"Not variables ({str(not_variables)[1:-1]})")
 
-        # Check for different variables with equal name.
-        variables_namesakes = []
-        variables_combinations = combinations(self._variables, 2)
-        for var1, var2 in variables_combinations:
-            namesake = None
-            if var1.name != '':
-                if var1.name == var2.name and var1.dimensions != var2.dimensions:
-                    namesake = var1.name
-                elif var1.name == var2.name and var1.dimensions == var2.dimensions:
-                    if type(var1) != type(var2):
-                        namesake = var1.name
-                if namesake is not None and namesake not in variables_namesakes:
-                    variables_namesakes.append(namesake)
+        self._variables = variables
 
-        if len(variables_namesakes) > 0:
+    def _validate_collection(self):
+        repeated_names = []
+        for i, var1 in enumerate(self._base_variables):
+            for var2 in list(self._base_variables)[i+1:]:
+                repname = var1.name if var1.name == var2.name else None
+                if repname is not None and repname not in repeated_names:
+                    repeated_names.append(repname)
+
+        if len(repeated_names) > 0:
             raise ValueError(
-                f"Repeated variables' names ({str(variables_namesakes)[1:-1]})"
+                f"A collection can not contain different variables "
+                f"with equal names ({str(repeated_names)[1:-1]})"
             )
-    
+
     def _set_collection_dimensions(self):
         dimensions = {}
         for var in self._variables:
@@ -129,7 +145,7 @@ class Collection:
         """Reserved for subclasses that need dimensions setting."""
 
         # Validate input dimensions in face of the collection's.
-        var = Variable('', **dimensions)
+        var = Variable('dummy_var', **dimensions)
         if not set(var.dimensions).issubset(set(self._dimensions)):
             invalid_dimensions = []
             for dim in var.dimensions:
@@ -256,7 +272,7 @@ class Collection:
     def _set_matrix_rank(self):
         if not hasattr(self, '_matrix'):
             self._set_matrix()
-        
+
         self._rank = self._matrix.rank()
 
     def _set_matrix_independent_rows(self):

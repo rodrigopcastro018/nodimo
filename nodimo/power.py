@@ -14,6 +14,7 @@ Power
 """
 
 from sympy import srepr, Symbol, Pow, Number, S
+from typing import Optional
 
 from nodimo.variable import Variable, OneVar
 from nodimo._internal import _sympify_number, _unsympify_number
@@ -62,6 +63,8 @@ class Power(Variable):
         if exponent_sp == 0:
             return OneVar()
         elif exponent_sp == 1:
+            if variable.symbolic.is_commutative:
+                variable._set_symbolic_variable()
             return variable
         
         if variable._is_product:
@@ -90,10 +93,14 @@ class Power(Variable):
         self._variable: Variable = variable
         self._exponent: Number = exponent_sp
         self._set_power_dimensions()
+
+        dummy_name = 'Power' if name == '' else name
         super().__init__(
-            name=name, **self._dimensions, dependent=dependent, scaling=scaling,
+            name=dummy_name, **self._dimensions, dependent=dependent, scaling=scaling,
         )
-        if not self.name:
+
+        if name == '':
+            self._name = name
             self._set_symbolic_power()
 
     @property

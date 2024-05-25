@@ -13,7 +13,8 @@ Product
     Creates a symbolic product of variables.
 """
 
-from sympy import Mul, S, srepr
+from sympy import Symbol, Pow, Mul, S, srepr
+from typing import Union
 
 from nodimo.variable import Variable, OneVar
 from nodimo.collection import Collection
@@ -71,15 +72,19 @@ class Product(Variable):
         scaling: bool = False,
     ):
 
-        self._variables = self._simplify_factors(*variables)  # TODO: Remove Products and Powers names before simplifying.
+        self._variables = self._simplify_factors(*variables)
         self._set_product_dimensions()
+
+        dummy_name = 'Product' if name == '' else name
         super().__init__(
-            name=name, **self._dimensions, dependent=dependent, scaling=scaling,
+            name=dummy_name, **self._dimensions, dependent=dependent, scaling=scaling,
         )
-        self._numerator_variables: tuple[Variable]
-        self._denominator_variables: tuple[Variable]
-        if not self.name:
-            self._set_numerator_variables()
+
+        self._numerator_symbols: tuple[Union[Symbol, Mul, Pow]]
+        self._denominator_symbols: tuple[Union[Symbol, Mul, Pow]]
+        if name == '':
+            self._name = name
+            self._set_numerator_symbols()
             self._set_symbolic_product()
 
     @property
@@ -121,10 +126,19 @@ class Product(Variable):
         self._dimensions = dimensions
 
     def _set_symbolic_product(self):
-        # Denominator variables do not follow input order.
+        """Not currently used by the printing methods.
+
+        The symbolic attribute created here is not used for printing
+        because the denominator variables don't follow input order.
+        """
+
         var_symb = []
         for var in self._variables:
-            var_symb.append(var.symbolic)
+            if var._is_power and var._name:
+                var_pow = Power(var.variable, var.exponent)
+                var_symb.append(var_pow.symbolic)
+            else:
+                var_symb.append(var.symbolic)
         self._symbolic = Mul(*var_symb)
 
     def _copy(self):
@@ -147,20 +161,23 @@ class Product(Variable):
                 + scaling_repr
                 + ')')
 
-    def _set_numerator_variables(self):
-        numerator_variables = []
-        denominator_variables = []
+    def _set_numerator_symbols(self):
+        numerator_symbols = []
+        denominator_symbols = []
         for var in self._variables:
             if var._is_power and var.exponent < 0:
-                varinv = var._copy()
-                varinv._exponent *= -1
-                varinv._set_symbolic_power()
-                denominator_variables.append(varinv)
+                varinv = Power(var.variable, -var.exponent)
+                denominator_symbols.append(varinv.symbolic)
             else:
-                numerator_variables.append(var)
+                if var._is_power and var.name:
+                    var_pow = Power(var.variable, var.exponent)
+                    symbol = var_pow.symbolic
+                else:
+                    symbol = var.symbolic
+                numerator_symbols.append(symbol)
 
-        self._numerator_variables = tuple(numerator_variables)
-        self._denominator_variables = tuple(denominator_variables)
+        self._numerator_symbols = tuple(numerator_symbols)
+        self._denominator_symbols = tuple(denominator_symbols)
 
     def _printmethod(self, printer):
         """Keeps the input order on output representations."""
@@ -170,10 +187,10 @@ class Product(Variable):
         if self._name:
             return printer._print(self._symbolic)
 
-        numerator = printer._print(Mul(*self._numerator_variables))
+        numerator = printer._print(Mul(*self._numerator_symbols))
 
-        if len(self._denominator_variables) > 0:
-            denominator = printer._print(Mul(*self._denominator_variables))
+        if len(self._denominator_symbols) > 0:
+            denominator = printer._print(Mul(*self._denominator_symbols))
             if printer.printmethod == '_sympystr':
                 return f'{numerator}/({denominator})'
             elif printer.printmethod == '_pretty':

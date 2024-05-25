@@ -188,8 +188,8 @@ class PrimeGroup(Group):
     -----
     The process used to create this group is similar to what is done in
     ScalingGroup and DimensionalGroup. The trick consists of creating a
-    new group of variables (bariables), which use base variables as
-    dimensions.
+    new group of variables (bariables), which use base variables' names
+    as dimensions.
     """
 
     def __init__(self, *variables: Variable):
@@ -199,7 +199,6 @@ class PrimeGroup(Group):
 
     def _set_independent_group(self):
         self._clear_ones()
-        self._set_base_variables()
         self._set_bariables()
         self._clear_nonprime_variables()
 

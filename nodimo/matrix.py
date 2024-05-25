@@ -13,7 +13,7 @@ DimensionalMatrix
     Creates a dimensional matrix from a group of variables.
 """
 
-from sympy import ImmutableDenseMatrix, Matrix
+from sympy import Symbol, ImmutableDenseMatrix, Matrix
 
 from nodimo.variable import Variable
 from nodimo.groups import Group
@@ -84,7 +84,7 @@ class DimensionalMatrix(Group):
     def _set_symbolic_dimensional_matrix(self):
         labeled_matrix = self._matrix.as_mutable()
         dimensions_matrix = Matrix(list(self._dimensions))
-        variables_matrix = Matrix([[Variable('')] + list(self._variables)])
+        variables_matrix = Matrix([[Symbol('')] + list(self._variables)])
         labeled_matrix = labeled_matrix.col_insert(0, dimensions_matrix)
         labeled_matrix = labeled_matrix.row_insert(0, variables_matrix)
 

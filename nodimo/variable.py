@@ -27,7 +27,7 @@ class Variable:
 
     Parameters
     ----------
-    name : str, default=None
+    name : str
         The name that will be displayed in symbolic expressions.
     dependent : bool, default=False
         If ``True``, the variable is dependent.
@@ -71,15 +71,16 @@ class Variable:
         scaling: bool = False,
         **dimensions: int,
     ):
-        self._name: str = name
-        self._dimensions: dict[str, Number] = dimensions
+        self._name: str
+        self._dimensions: dict[str, Number]
         self._is_dependent: bool = bool(dependent)
         self._is_scaling: bool = bool(scaling)
         self._is_nondimensional: bool = all(dim == 0 for dim in dimensions.values())
         self._symbolic: Union[Symbol, Mul, Pow]
 
         self._validate_variable()
-        self._set_variable_dimensions()
+        self._set_variable_name(name)
+        self._set_variable_dimensions(dimensions)
         self._set_symbolic_variable()
 
     @property
@@ -116,22 +117,6 @@ class Variable:
     def is_nondimensional(self) -> bool:
         return self._is_nondimensional
 
-    def _set_symbolic_variable(self):
-        self._symbolic = Symbol(self.name, commutative=False)
-
-    def _set_variable_dimensions(self):
-        """Sanitizes and sympifies the dimensions' exponents.
-
-        This method removes dimensions with exponent zero and converts
-        the non-zero exponents to Sympy numbers.
-        """
-
-        for dim, exp in self._dimensions.copy().items():
-            if exp == 0:
-                del self._dimensions[dim]
-            else:
-                self._dimensions[dim] = _sympify_number(exp)
-    
     def _validate_variable(
         self,
         is_dependent: Optional[bool] = None,
@@ -146,7 +131,34 @@ class Variable:
             raise ValueError("A variable can not be both dependent and scaling")
         elif is_scaling and self._is_nondimensional:
             raise ValueError("A variable can not be both scaling and nondimensional")
+    
+    def _set_variable_name(self, name: str):
+        if not isinstance(name, str):
+            raise TypeError("Variable name must be a non-empty string")
+        elif name.strip() == '':
+            raise ValueError("Invalid variable name")
 
+        self._name = name
+
+    def _set_variable_dimensions(self, dimensions: dict[str, int]):
+        """Sanitizes and sympifies the dimensions' exponents.
+
+        This method removes dimensions with exponent zero and converts
+        the non-zero exponents to Sympy numbers.
+        """
+
+        dimensions_sp = dimensions.copy()
+        for dim, exp in dimensions.items():
+            if exp == 0:
+                del dimensions_sp[dim]
+            else:
+                dimensions_sp[dim] = _sympify_number(exp)
+
+        self._dimensions = dimensions_sp
+
+    def _set_symbolic_variable(self):
+        self._symbolic = Symbol(self._name, commutative=False)
+    
     def _copy(self):
         return eval(srepr(self))
 
@@ -195,7 +207,7 @@ class Variable:
 
     def _sympyrepr(self, printer) -> str:
         """Developer string representation according to Sympy."""
-        
+
         class_name = type(self).__name__
         name_repr = f"'{self.name}'" if self.name is not None else ''
 
@@ -209,7 +221,7 @@ class Variable:
                     dim_exp_ = f"'{dim_exp_}'"
                 dimensions.append(f'{dim_name}={dim_exp_}')
             dimensions_repr = f", {', '.join(dimensions)}"
-        
+
         dependent_repr = f', dependent=True' if self._is_dependent else ''
         scaling_repr = f', scaling=True' if self._is_scaling else ''
 
@@ -244,8 +256,8 @@ class OneVar(Variable):
         return super().__new__(cls)
     
     def __init__(self):
-        super().__init__('')
-        self._name = None
+        super().__init__('OneVar')
+        self._name = ''
         self._symbolic = S.One
 
     @property
