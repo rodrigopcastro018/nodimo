@@ -1,11 +1,16 @@
-"""
-     ┓•     
-┏┓┏┓┏┫┓┏┳┓┏┓
-┛┗┗┛┗┻┗┛┗┗┗┛
+#         ┓•         Licensed under the MIT License
+#    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+#    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
 
-=====================================
-Collection (:mod:`nodimo.collection`)
-=====================================
+
+"""
+         ┓•         Licensed under the MIT License
+    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
+
+
+Collection
+==========
 
 This module contains the base class for everything that is created with
 multiple variables.

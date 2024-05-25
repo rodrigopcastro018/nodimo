@@ -1,7 +1,14 @@
 """
-=======================================
-Model Function (:mod:`nodimo.function`)
-=======================================
+     _   _   _| o  _ _   _     Licensed under the MIT License
+    | | (_) (_| | | | | (_)    Copyright (c) 2024 Rodrigo Castro
+
+
+     _  _  _|. _ _  _     Licensed under the MIT License
+    | |(_)(_||| | |(_)    Copyright (c) 2024 Rodrigo Castro
+
+
+Relation
+========
 
 This module contains the class to creates model functions.
 

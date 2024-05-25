@@ -1,7 +1,12 @@
 """
-=================================
-Power (:mod:`nodimo.power`)
-=================================
+              .                Nodimo
+    ,-. ,-. ,-| . ,-.-. ,-.    Licensed under the MIT License
+    | | | | | | | | | | | |    Copyright (c) 2024 Rodrigo Castro
+    ' ' `-' `-' ' ' ' ' `-'    https://nodimo.readthedocs.io
+
+
+Power
+=====
 
 This module contains the classes to create a variable power.
 

@@ -1,14 +1,29 @@
 """
-===========================
-Basic (:mod:`nodimo.basic`)
-===========================
+                  _ _                 
+  _ __   ___   __| (_)_ __ ___   ___   Nodimo
+ | '_ \ / _ \ / _` | | '_ ` _ \ / _ \  Licensed under the MIT License
+ | | | | (_) | (_| | | | | | | | (_) | Copyright (c) 2024 Rodrigo Castro
+ |_| |_|\___/ \__,_|_|_| |_| |_|\___/  https://nodimo.readthedocs.io
 
-This module contains base classes for Nodimo.
+
+                   _  _                   
+ _ __    ___    __| |(_) _ __ ___    ___   Nodimo
+| '_ \  / _ \  / _` || || '_ ` _ \  / _ \  Licensed under MIT License
+| | | || (_) || (_| || || | | | | || (_) | Copyright (c) Rodrigo Castro
+|_| |_| \___/  \__,_||_||_| |_| |_| \___/  https://nodimo.readthedocs.io
+
+
+Groups
+======
+
+This module contains classes to create groups of variables.
 
 Classes
 -------
-BasicGroup
-    Base class for classes created with variables.
+Group
+    Creates a group of variables.
+HomogeneorusGroup
+    Creates a homogeneous group of variables.
 """
 
 from sympy import Matrix, zeros, eye

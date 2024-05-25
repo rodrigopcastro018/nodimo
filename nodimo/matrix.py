@@ -1,7 +1,12 @@
 """
-=============================
-Matrix (:mod:`nodimo.matrix`)
-=============================
+                 _  _             
+     ___  ___  _| ||_| _____  ___     Licensed under the MIT License
+    |   || . || . || ||     || . |    Copyright (c) 2024 Rodrigo Castro
+    |_|_||___||___||_||_|_|_||___|    https://nodimo.readthedocs.io
+
+
+Matrix
+======
 
 This module contains the classes to create a dimensional matrix.
 

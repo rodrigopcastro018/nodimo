@@ -1,7 +1,9 @@
 """
-=================================
-Variable (:mod:`nodimo.variable`)
-=================================
+
+
+
+Product
+=======
 
 This module contains the classes to create a product of variables.
 

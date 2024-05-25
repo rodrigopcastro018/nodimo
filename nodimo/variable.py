@@ -1,16 +1,21 @@
 """
-=================================
-Variable (:mod:`nodimo.variable`)
-=================================
+                 _  _             
+    ._ _  ___  _| |<_>._ _ _  ___     Licensed under the MIT License
+    | ' |/ . \/ . || || ' ' |/ . \    Copyright (c) 2024 Rodrigo Castro
+    |_|_|\___/\___||_||_|_|_|\___/    https://nodimo.readthedocs.io
+
+
+Variable
+========
 
 This module contains the class to create a symbolic variable.
 
 Classes
 -------
-BasicVariable
-    Base class for variables.
 Variable
-    Creates a symbolic variable.
+    Creates a variable.
+OneVar
+    Creates the nondimensional number one.
 """
 
 from sympy import sstr, srepr, latex, Symbol, Mul, Pow, S, Number
