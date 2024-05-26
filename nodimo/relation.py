@@ -1,12 +1,11 @@
+#     _   _   _| o  _ _   _     Licensed under the MIT License
+#    | | (_) (_| | | | | (_)    Copyright (c) 2024 Rodrigo Castro
+
+
+#     _  _  _|. _ _  _     Licensed under the MIT License
+#    | |(_)(_||| | |(_)    Copyright (c) 2024 Rodrigo Castro
+
 """
-     _   _   _| o  _ _   _     Licensed under the MIT License
-    | | (_) (_| | | | | (_)    Copyright (c) 2024 Rodrigo Castro
-
-
-     _  _  _|. _ _  _     Licensed under the MIT License
-    | |(_)(_||| | |(_)    Copyright (c) 2024 Rodrigo Castro
-
-
 Relation
 ========
 

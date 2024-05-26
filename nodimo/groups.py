@@ -1,18 +1,17 @@
+#                  _ _                 
+#  _ __   ___   __| (_)_ __ ___   ___   Nodimo
+# | '_ \ / _ \ / _` | | '_ ` _ \ / _ \  Licensed under the MIT License
+# | | | | (_) | (_| | | | | | | | (_) | Copyright (c) Rodrigo Castro
+# |_| |_|\___/ \__,_|_|_| |_| |_|\___/  https://nodimo.readthedocs.io
+
+
+#                    _  _                   
+#  _ __    ___    __| |(_) _ __ ___    ___   Nodimo
+# | '_ \  / _ \  / _` || || '_ ` _ \  / _ \  Licensed under MIT License
+# | | | || (_) || (_| || || | | | | || (_) | Copyright Rodrigo Castro
+# |_| |_| \___/  \__,_||_||_| |_| |_| \___/  nodimo.readthedocs.io
+
 """
-                  _ _                 
-  _ __   ___   __| (_)_ __ ___   ___   Nodimo
- | '_ \ / _ \ / _` | | '_ ` _ \ / _ \  Licensed under the MIT License
- | | | | (_) | (_| | | | | | | | (_) | Copyright (c) 2024 Rodrigo Castro
- |_| |_|\___/ \__,_|_|_| |_| |_|\___/  https://nodimo.readthedocs.io
-
-
-                   _  _                   
- _ __    ___    __| |(_) _ __ ___    ___   Nodimo
-| '_ \  / _ \  / _` || || '_ ` _ \  / _ \  Licensed under MIT License
-| | | || (_) || (_| || || | | | | || (_) | Copyright (c) Rodrigo Castro
-|_| |_| \___/  \__,_||_||_| |_| |_| \___/  https://nodimo.readthedocs.io
-
-
 Groups
 ======
 

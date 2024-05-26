@@ -1,10 +1,9 @@
+#              .                Nodimo
+#    ,-. ,-. ,-| . ,-.-. ,-.    Licensed under the MIT License
+#    | | | | | | | | | | | |    Copyright (c) 2024 Rodrigo Castro
+#    ' ' `-' `-' ' ' ' ' `-'    https://nodimo.readthedocs.io
+
 """
-              .                Nodimo
-    ,-. ,-. ,-| . ,-.-. ,-.    Licensed under the MIT License
-    | | | | | | | | | | | |    Copyright (c) 2024 Rodrigo Castro
-    ' ' `-' `-' ' ' ' ' `-'    https://nodimo.readthedocs.io
-
-
 Power
 =====
 

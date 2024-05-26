@@ -1,10 +1,9 @@
+#                 _  _             
+#    ._ _  ___  _| |<_>._ _ _  ___     Licensed under the MIT License
+#    | ' |/ . \/ . || || ' ' |/ . \    Copyright (c) 2024 Rodrigo Castro
+#    |_|_|\___/\___||_||_|_|_|\___/    https://nodimo.readthedocs.io
+
 """
-                 _  _             
-    ._ _  ___  _| |<_>._ _ _  ___     Licensed under the MIT License
-    | ' |/ . \/ . || || ' ' |/ . \    Copyright (c) 2024 Rodrigo Castro
-    |_|_|\___/\___||_||_|_|_|\___/    https://nodimo.readthedocs.io
-
-
 Variable
 ========
 
