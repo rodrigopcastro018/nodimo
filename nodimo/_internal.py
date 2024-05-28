@@ -1,30 +1,41 @@
-"""This module contains variables and functions for internal use.
+#         ┓•         Licensed under the MIT License
+#    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+#    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
+
+"""
+Internal
+========
+
+This module contains variables and functions for internal use.
 
 Variables
 ---------
 _is_running_on_jupyter : bool
-    If ``True``, the package in running on jupyter notebooks.
+    If ``True``, the package in running on IPython/Jupyter.
 
 Functions
 ---------
-_show_object(obj)
+_custom_display(obj)
+    Displays object using a custom CSS style.
+_show_object(obj, use_custom_css=True)
     Prints object in shell.
 _print_horizontal_line()
     Prints a horizontal line.
-_print_warning(message)
-    Prints a message with warning colors.
-_remove_duplicates(original_list)
-    Removes duplicates from a list, keeping the order.
-_obtain_dimensions(*variables)
-    Obtains the dimensions' names from the given variables.
-_build_dimensional_matrix(variables, dimensions=[])
-    Builds a basic dimensional matrix.
+_show_nodimo_warning(message)
+    Displays a NodimoWarning message with custom format.
+
+Classes
+-------
+NodimoWarning
+    (Custom) Nodimo warning
 """
 
 from sympy import pretty, Number, sympify, nsimplify
 from typing import Union
 import warnings
 
+
+# Determine if Nodimo is running on IPython/Jupyter.
 try:
     from IPython import get_ipython
 
@@ -73,12 +84,10 @@ def _show_object(obj, use_custom_css=True):
         else:
             display(obj)
     else:
-        print('\n' + pretty(obj, root_notation=False) + '\n')
+        print('\n' + pretty(obj) + '\n')  # TODO: root_notation=False was removed. Check if it will affect the diplay.
 
 
 def _print_horizontal_line():
-    """Prints a horizontal line."""
-
     if _is_running_on_jupyter:
         display(Markdown('<hr>'))
     else:
@@ -89,13 +98,14 @@ def _sympify_number(number: Union[int, float, str, tuple]) -> Number:
     """Converts a number representation into a Sympy number.
 
     This method is roughly a wrapper for Sympy.sympify, but it only
-    accepts and returns number objects. A workaround was implemented to
-    allow the creation of rational numbers from tuples.
+    accepts objects that can be transformed into a Sympy number. A
+    workaround was implemented to allow the creation of rational numbers
+    from tuples.
 
     Parameters
     ----------
-    number : Union[int, str, tuple]
-        Any expression that represents a number.
+    number : Union[int, float, str, tuple]
+        Anything that represents a number.
 
     Returns
     -------
@@ -113,35 +123,35 @@ def _sympify_number(number: Union[int, float, str, tuple]) -> Number:
     >>> from nodimo._internal import _sympify_number as spnum
     >>> from sympy import Integer, Rational
     >>> spnum(5) == spnum(5.0) == spnum('5') == Integer(5)
-    True
     >>> spnum((2,3)) == spnum(2/3) == spnum('2/3') == Rational(2,3)
-    True
     """
 
     if hasattr(number, 'is_number') and number.is_number:
         return number
-    
-    number_sp = sympify(number)
 
-    if number_sp.is_Rational:
-        return number_sp
-    elif number_sp.is_Float:
-        number_sp_rational = nsimplify(number_sp, rational=True)
-        if number_sp_rational.denominator <= 100:
-            return number_sp_rational
-        else:
+    try:
+        number_sp = sympify(number)
+
+        if number_sp.is_Rational:
             return number_sp
-    elif isinstance(number, tuple) and len(number) in {1,2}:
-        if all(obj.is_Number for obj in number_sp):
-            return Number(*number_sp)
-    elif number_sp.is_number:
-        return number_sp
-    
-    num = f"'{number}'" if isinstance(number, str) else number
-    raise ValueError(f"{num} could not be converted to a Sympy number")
+        elif number_sp.is_Float:
+            number_sp_rational = nsimplify(number_sp, rational=True)
+            if number_sp_rational.denominator <= 100:
+                return number_sp_rational
+            else:
+                return number_sp
+        elif isinstance(number, tuple) and len(number) in {1,2}:
+            if all(obj.is_Number for obj in number_sp):
+                return Number(*number_sp)
+        elif number_sp.is_number:
+            return number_sp
+
+        raise
+    except:
+        raise ValueError(f"{repr(number)} could not be converted to a Sympy number")
 
 
-def _unsympify_number(number_sp: Number) -> Union[int, str, tuple]:
+def _unsympify_number(number_sp: Number) -> Union[int, float, str, tuple]:
     """Does the inverse of _sympify_number.
 
     Parameters
@@ -151,7 +161,7 @@ def _unsympify_number(number_sp: Number) -> Union[int, str, tuple]:
 
     Returns
     -------
-    number : Union[int, str, tuple]
+    number : Union[int, float, str, tuple]
         Any expression that represents a number.
 
     Raises
@@ -161,18 +171,19 @@ def _unsympify_number(number_sp: Number) -> Union[int, str, tuple]:
     """
 
     if not hasattr(number_sp, 'is_number') or not number_sp.is_number:
-        num = f"'{number_sp}'" if isinstance(number_sp, str) else number_sp
-        raise ValueError(f"{num} is not a Sympy number")
+        raise ValueError(f"{repr(number_sp)} is not a Sympy number")
     elif number_sp.is_Integer:
         return int(number_sp)
     elif number_sp.is_Rational:
         return (int(number_sp.numerator), int(number_sp.denominator))
+    elif number_sp.is_Float:
+        return float(number_sp)
     else:
         return str(number_sp)
 
 
 class NodimoWarning(Warning):
-    """Custom warning.
+    """(Custom) Nodimo warning.
 
     Issued anytime Nodimo finds an inconsistency in the user's input,
     but one that can be handled without halting the execution.
@@ -184,11 +195,11 @@ class NodimoWarning(Warning):
 warnings.simplefilter('always', NodimoWarning)
 
 
-def custom_formatwarning(message, category, filename, lineno, line=None):
+def _nodimo_formatwarning(message, category, filename, lineno, line=None):
     return f'\033[93m{category.__name__}\033[0m: {message}\n'
 
 
-warnings.formatwarning = custom_formatwarning  # TODO: Check if this does not impact other warning messages.
+warnings.formatwarning = _nodimo_formatwarning  # TODO: Check if this does not impact other warning messages.
 
 
 def _show_nodimo_warning(message: str):

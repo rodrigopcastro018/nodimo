@@ -1,18 +1,15 @@
-#                 _  _             
-#     ___  ___  _| ||_| _____  ___     Licensed under the MIT License
-#    |   || . || . || ||     || . |    Copyright (c) 2024 Rodrigo Castro
-#    |_|_||___||___||_||_|_|_||___|    https://nodimo.readthedocs.io
+#         ┓•         Licensed under the MIT License
+#    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+#    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
 
 """
 Matrix
 ======
 
-This module contains the classes to create a dimensional matrix.
+This module contains the class to create a dimensional matrix.
 
 Classes
 -------
-BasicDimensionalMatrix
-    Creates a basic dimensional matrix from a group of variables.
 DimensionalMatrix
     Creates a dimensional matrix from a group of variables.
 """
@@ -24,10 +21,13 @@ from nodimo.groups import Group
 
 
 class DimensionalMatrix(Group):
-    """Creates a dimensional matrix from a group of variables.
+    """Dimensional matrix of a group of variables.
 
-    Similar to a BasicDimensionalMatrix, but with labels at the side and
-    at the top of the matrix to display the dimensions and variables.
+    A DimensionalMatrix is a matrix with one column for each variable,
+    one row for each dimension's name, and every element represents the
+    dimension's exponent of a particular variable. Labels at the top
+    and at the right side are added to identify the variables and the
+    dimensions' names, respectively.
 
     Parameters
     ----------
@@ -48,22 +48,23 @@ class DimensionalMatrix(Group):
     Methods
     -------
     set_dimensions_order(*dimensions_names)
-        Sets the dimensions column order.
+        Sets the dimensions' names order.
     show()
-        Displays the labeled dimensional matrix.
+        Displays the dimensional matrix.
 
     Examples
     --------
-    >>> from nodimo import Variable, DimensionalMatrix
+
+    >>> from nodimo import Variable, Product, DimensionalMatrix
     >>> F = Variable('F', M=1, L=1, T=-2)
     >>> k = Variable('m', M=1, T=-2)
     >>> x = Variable('a', L=1)
-    >>> dmatrix = DimensionalMatrix(F, k, x)
+    >>> kx = Product(k, x)
+    >>> dmatrix = DimensionalMatrix(F, k, x, kx)
     >>> dmatrix.show()
     """
 
     def __init__(self, *variables: Variable):
-
         super().__init__(*variables)
         self._set_dimensional_matrix()
 

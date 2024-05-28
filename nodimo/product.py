@@ -1,18 +1,17 @@
+#         ┓•         Licensed under the MIT License
+#    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+#    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
+
 """
-
-
-
 Product
 =======
 
-This module contains the classes to create a product of variables.
+This module contains the class to create a product of variables.
 
 Classes
 -------
-BasicProduct
-    Base class for the product of variables.
 Product
-    Creates a symbolic product of variables.
+    Creates a product of variables.
 """
 
 from sympy import Symbol, Pow, Mul, S, srepr
@@ -24,17 +23,16 @@ from nodimo.power import Power
 
 
 class Product(Variable):
-    """Base class for the product of variables.
+    """Product of variables.
 
-    Base class that represents the product of variables. The dimensional
-    properties of the product are calculated from the input variables.
+    This class represents the product of variables.
 
     Parameters
     ----------
     *variables : Variable
         Variables to be multiplied.
     name : str, default=''
-        Name to be used in string representation.
+        Name to be used as the product representation.
     dependent : bool, default=False
         If ``True``, the product is dependent.
     scaling : bool, default=False
@@ -42,10 +40,8 @@ class Product(Variable):
 
     Attributes
     ----------
-    *variables : Variable
+    variables : tuple[Variable]
         Product factors.
-    name : str
-        Name to be used in string representation.
     """
 
     _is_product = True
@@ -94,7 +90,7 @@ class Product(Variable):
         return self._variables
 
     @classmethod
-    def _simplify_factors(self, *variables: Variable) -> Variable:
+    def _simplify_factors(self, *variables: Variable) -> tuple[Variable]:
         col = Collection(*variables)
         col._set_base_variables()
         col._variables = col._disassembled_variables
@@ -138,9 +134,9 @@ class Product(Variable):
         for var in self._variables:
             if var._is_power and var._name:
                 var_pow = Power(var.variable, var.exponent)
-                var_symb.append(var_pow.symbolic)
+                var_symb.append(var_pow._symbolic)
             else:
-                var_symb.append(var.symbolic)
+                var_symb.append(var._symbolic)
         self._symbolic = Mul(*var_symb)
 
     def _copy(self):
@@ -151,17 +147,12 @@ class Product(Variable):
 
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
-        variables_repr = ', '.join(printer._print(var) for var in self._variables)
-        name_repr = f", name='{self.name}'" if self.name else ''
-        dependent_repr = f', dependent=True' if self.is_dependent else ''
-        scaling_repr = f', scaling=True' if self.is_scaling else ''
+        variables = ', '.join(printer._print(var) for var in self._variables)
+        name = f", name='{self.name}'" if self.name else ''
+        dependent = f', dependent=True' if self.is_dependent else ''
+        scaling = f', scaling=True' if self.is_scaling else ''
 
-        return (f'{class_name}('
-                + variables_repr
-                + name_repr
-                + dependent_repr
-                + scaling_repr
-                + ')')
+        return f'{class_name}({variables}{name}{dependent}{scaling})'
 
     def _set_numerator_symbols(self):
         numerator_symbols = []
@@ -169,13 +160,13 @@ class Product(Variable):
         for var in self._variables:
             if var._is_power and var.exponent < 0:
                 varinv = Power(var.variable, -var.exponent)
-                denominator_symbols.append(varinv.symbolic)
+                denominator_symbols.append(varinv._symbolic)
             else:
                 if var._is_power and var.name:
                     var_pow = Power(var.variable, var.exponent)
-                    symbol = var_pow.symbolic
+                    symbol = var_pow._symbolic
                 else:
-                    symbol = var.symbolic
+                    symbol = var._symbolic
                 numerator_symbols.append(symbol)
 
         self._numerator_symbols = tuple(numerator_symbols)

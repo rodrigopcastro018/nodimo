@@ -1,13 +1,12 @@
-#                 _  _             
-#    ._ _  ___  _| |<_>._ _ _  ___     Licensed under the MIT License
-#    | ' |/ . \/ . || || ' ' |/ . \    Copyright (c) 2024 Rodrigo Castro
-#    |_|_|\___/\___||_||_|_|_|\___/    https://nodimo.readthedocs.io
+#         ┓•         Licensed under the MIT License
+#    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+#    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
 
 """
 Variable
 ========
 
-This module contains the class to create a symbolic variable.
+This module contains the class to create a variable.
 
 Classes
 -------
@@ -26,13 +25,13 @@ from nodimo._internal import _sympify_number, _unsympify_number
 class Variable:
     """Base class for variables.
 
-    Most basic type of variable, with a few attributes that are useful
-    in describing its dimensional properties.
+    Most basic type of variable, with a attributes that are useful in
+    describing its dimensional properties.
 
     Parameters
     ----------
     name : str
-        The name that will be displayed in symbolic expressions.
+        Name to be used as the variable representation.
     dependent : bool, default=False
         If ``True``, the variable is dependent.
     scaling : bool, default=False
@@ -43,9 +42,7 @@ class Variable:
     Attributes
     ----------
     name : str
-        The name that will be displayed in symbolic expressions.
-    symbolic : Symbol
-        Sympy object that represents the variable.
+        Name used as the variable representation.
     dimensions : dict[str, Number]
         Dictionary containing dimensions' names and exponents.
     is_dependent : bool
@@ -57,6 +54,10 @@ class Variable:
 
     Raises
     ------
+    TypeError
+        If the variable name is not an non-empty string.
+    ValueError
+        If the variable name is invalid.
     ValueError
         If the variable is set as both dependent and scaling.
     ValueError
@@ -76,7 +77,7 @@ class Variable:
         **dimensions: int,
     ):
         self._name: str
-        self._dimensions: dict[str, Number]
+        self._dimensions: dict[str, Number]  # TODO: ISO80k calls it dimension, not dimensions.
         self._is_dependent: bool = bool(dependent)
         self._is_scaling: bool = bool(scaling)
         self._is_nondimensional: bool = all(dim == 0 for dim in dimensions.values())
@@ -90,10 +91,6 @@ class Variable:
     @property
     def name(self) -> str:
         return self._name
-
-    @property
-    def symbolic(self) -> Union[Symbol, Mul, Pow]:
-        return self._symbolic
 
     @property
     def dimensions(self) -> dict[str, Number]:
@@ -151,18 +148,18 @@ class Variable:
         the non-zero exponents to Sympy numbers.
         """
 
-        dimensions_sp = dimensions.copy()
+        dimensions_sp = {}
         for dim, exp in dimensions.items():
-            if exp == 0:
-                del dimensions_sp[dim]
-            else:
-                dimensions_sp[dim] = _sympify_number(exp)
+            exp_sp = _sympify_number(exp)
+            if exp_sp != 0:
+                dimensions_sp[dim] = exp_sp
 
         self._dimensions = dimensions_sp
 
     def _set_symbolic_variable(self):
+        # To preserve Product factors order, commutative=False.
         self._symbolic = Symbol(self._name, commutative=False)
-    
+
     def _copy(self):
         return eval(srepr(self))
 
@@ -213,28 +210,18 @@ class Variable:
         """Developer string representation according to Sympy."""
 
         class_name = type(self).__name__
-        name_repr = f"'{self.name}'" if self.name is not None else ''
+        name = f"'{self.name}'" if self.name is not None else ''
+        dimensions = ''
+        if not self._is_nondimensional:
+            dim_exp = []
+            for dim, exp in self._dimensions.items():
+                exp_ = _unsympify_number(exp)
+                dim_exp.append(f'{dim}={repr(exp_)}')
+            dimensions = f", {', '.join(dim_exp)}"
+        dependent = f', dependent=True' if self._is_dependent else ''
+        scaling = f', scaling=True' if self._is_scaling else ''
 
-        if self._is_nondimensional:
-            dimensions_repr = ''
-        else:
-            dimensions = []
-            for dim_name, dim_exp in self._dimensions.items():
-                dim_exp_ = _unsympify_number(dim_exp)
-                if isinstance(dim_exp_, str):
-                    dim_exp_ = f"'{dim_exp_}'"
-                dimensions.append(f'{dim_name}={dim_exp_}')
-            dimensions_repr = f", {', '.join(dimensions)}"
-
-        dependent_repr = f', dependent=True' if self._is_dependent else ''
-        scaling_repr = f', scaling=True' if self._is_scaling else ''
-
-        return (f'{class_name}('
-                + name_repr
-                + dimensions_repr
-                + dependent_repr
-                + scaling_repr
-                + ')')
+        return f'{class_name}({name}{dimensions}{dependent}{scaling})'
 
     def _sympystr(self, printer) -> str:
         """User string representation according to Sympy."""

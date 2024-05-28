@@ -1,26 +1,17 @@
-#                  _ _           
-#     _ _  ___  __| (_)_ __  ___     Licensed under the MIT License
-#    | ' \/ _ \/ _` | | '  \/ _ \    Copyright (c) 2024 Rodrigo Castro
-#    |_||_\___/\__,_|_|_|_|_\___/    https://nodimo.readthedocs.io
-
-
-#                  _  _             
-#    _ _   ___  __| |(_) _ __   ___    Licensed under the MIT License
-#   | ' \ / _ \/ _` || || '  \ / _ \   Copyright (c) 2024 Rodrigo Castro
-#   |_||_|\___/\__,_||_||_|_|_|\___/   https://nodimo.readthedocs.io
+#         ┓•         Licensed under the MIT License
+#    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+#    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
 
 """
-Models
-======
+Model
+=====
 
 This module contains the classes to create (non)dimensional models.
 
 Classes
 -------
-DimensionalModel
-    Creates a dimensional model from a given set of variables.
-NonDimensionalModel
-    Creates nondimensional models from a given set of variables.
+Model
+    Creates a (non)dimensional model from a given set of variables.
 """
 
 from itertools import combinations
@@ -32,25 +23,32 @@ from nodimo._internal import _print_horizontal_line, _unsympify_number
 
 
 class Model(Relation):
-    """Creates (non)dimensional relations from a given set of variables.
+    """(Non)dimensional model built from the given set of variables.
 
-    This model builds relations using the resulting variables of a group
-    transformation.
+    This class builds relations using the resulting variables of a group
+    transformation (DimensionalGroup). Every relation is associated with
+    a scaling group, which are built using the given scaling variables.
 
     Parameters
     ----------
     *variables : Variable
         Variables that constitute the model.
+    **dimensions : int
+        Aimed dimensions for the model given as keyword arguments.
 
     Attributes
     ----------
+    variables : tuple[Variable]
+        Tuple with the variables that constitute the model.
+    dimensions : dict[str, Number]
+        Dictionary with the model dimensions.
     relations : dict[ScalingGroup, Relation]
         Dictionary containing pairs of scaling groups and relations.
 
     Methods
     -------
     show()
-        Displays scaling groups and respective (non)dimensional relations.
+        Prints scaling groups and respective (non)dimensional relations.
 
     Raises
     ------

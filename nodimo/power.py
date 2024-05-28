@@ -1,49 +1,54 @@
-#              .                Nodimo
-#    ,-. ,-. ,-| . ,-.-. ,-.    Licensed under the MIT License
-#    | | | | | | | | | | | |    Copyright (c) 2024 Rodrigo Castro
-#    ' ' `-' `-' ' ' ' ' `-'    https://nodimo.readthedocs.io
+#         ┓•         Licensed under the MIT License
+#    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+#    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
 
 """
 Power
 =====
 
-This module contains the classes to create a variable power.
+This module contains the class to create a power of a variable.
 
 Classes
 -------
-BasicPower
-    Base class for the power of a variable.
 Power
-    Creates a symbolic power of a variable.
+    Creates a power of a variable.
 """
 
 from sympy import srepr, Symbol, Pow, Number, S
-from typing import Optional
 
 from nodimo.variable import Variable, OneVar
 from nodimo._internal import _sympify_number, _unsympify_number
 
 
 class Power(Variable):
-    """Base class for the power of a variable.
+    """Power of a variable.
 
-    Base class that represents the power of a variable. The dimensional
-    properties of the power are calculated from the input variable and
-    the exponent.
+    This class represents the power of a variable.
 
     Parameters
     ----------
-    variable : BasicVariable
+    variable : Variable
         Variable to be exponentiated.
     exponent : Number
         Exponent to which the variable will be raised.
+    name : str, default=''
+        Name to be used as the power representation.
+    dependent : bool, default=False
+        If ``True``, the power is dependent.
+    scaling : bool, default=False
+        If ``True``, the power can be used as scaling parameter.
 
     Attributes
     ----------
-    variable : BasicVariable
-        Variable to be exponentiated.
+    variable : Variable
+        Variable that is the base of the exponentiation.
     exponent : Number
-        Exponent to which the variable will be raised.
+        Exponent to which the variable is raised.
+    
+    Raises
+    ------
+    TypeError
+        If the exponentiation base is not a variable.
     """
 
     _is_power = True
@@ -67,11 +72,11 @@ class Power(Variable):
         if exponent_sp == 0:
             return OneVar()
         elif exponent_sp == 1:
-            if variable.symbolic.is_commutative:
+            if variable._symbolic.is_commutative:
                 variable._set_symbolic_variable()
             return variable
         
-        if variable._is_product:
+        if hasattr(variable, '_is_product') and variable._is_product:
             from nodimo.product import Product
             factors = []
             for var in variable.variables:
@@ -89,13 +94,9 @@ class Power(Variable):
         dependent: bool = False,
         scaling: bool = False,
     ):
-        exponent_sp = _sympify_number(exponent)
-        if isinstance(variable, Power):
-            exponent_sp *= variable._exponent
-            variable = variable._variable
-
-        self._variable: Variable = variable
-        self._exponent: Number = exponent_sp
+        self._variable: Variable
+        self._exponent: Number
+        self._set_power(variable, exponent)
         self._set_power_dimensions()
 
         dummy_name = 'Power' if name == '' else name
@@ -115,6 +116,19 @@ class Power(Variable):
     def exponent(self) -> Number:
         return self._exponent
 
+    def _set_power(self, variable: Variable, exponent: Number):
+        if not isinstance(variable, Variable):
+            raise TypeError(f"{repr(variable)} is not a variable")
+
+        exponent_sp = _sympify_number(exponent)
+
+        if isinstance(variable, Power):
+            exponent_sp *= variable.exponent
+            variable = variable.variable
+
+        self._variable = variable
+        self._exponent = exponent_sp
+
     def _set_power_dimensions(self):
         dimensions = {}
         if not self._variable.is_nondimensional:
@@ -122,14 +136,14 @@ class Power(Variable):
                 dimensions[dim] = exp * self._exponent
 
         self._dimensions = dimensions
-    
+
     def _set_symbolic_power(self):
         var = self._variable
         # Setting com=True avoids variables with negative exponents on
-        # the numerator in Product.symbolic.
+        # the numerator of Product._symbolic.
         com = True if self._exponent < S.Zero else False
         self._variable._symbolic = Symbol(var.name, commutative=com)
-        self._symbolic = Pow(self._variable.symbolic, self._exponent)
+        self._symbolic = Pow(self._variable._symbolic, self._exponent)
 
     def _copy(self):
         return eval(srepr(self))
@@ -139,20 +153,11 @@ class Power(Variable):
 
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
-        variable_repr = printer._print(self._variable)
-
+        variable = printer._print(self._variable)
         unsymp_exp = _unsympify_number(self._exponent)
-        exp_ = f"'{unsymp_exp}'" if isinstance(unsymp_exp, str) else unsymp_exp
-        exponent_repr = f', {exp_}'
+        exponent = f', {repr(unsymp_exp)}'
+        name = f", name='{self.name}'" if self.name else ''
+        dependent = f', dependent=True' if self.is_dependent else ''
+        scaling = f', scaling=True' if self.is_scaling else ''
 
-        name_repr = f", name='{self.name}'" if self.name else ''
-        dependent_repr = f', dependent=True' if self.is_dependent else ''
-        scaling_repr = f', scaling=True' if self.is_scaling else ''
-
-        return (f'{class_name}('
-                + variable_repr
-                + exponent_repr
-                + name_repr
-                + dependent_repr
-                + scaling_repr
-                + ')')
+        return f'{class_name}({variable}{exponent}{name}{dependent}{scaling})'

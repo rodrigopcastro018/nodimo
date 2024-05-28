@@ -1,21 +1,13 @@
-#                  _ _                 
-#  _ __   ___   __| (_)_ __ ___   ___   Nodimo
-# | '_ \ / _ \ / _` | | '_ ` _ \ / _ \  Licensed under the MIT License
-# | | | | (_) | (_| | | | | | | | (_) | Copyright (c) Rodrigo Castro
-# |_| |_|\___/ \__,_|_|_| |_| |_|\___/  https://nodimo.readthedocs.io
-
-
-#                    _  _                   
-#  _ __    ___    __| |(_) _ __ ___    ___   Nodimo
-# | '_ \  / _ \  / _` || || '_ ` _ \  / _ \  Licensed under MIT License
-# | | | || (_) || (_| || || | | | | || (_) | Copyright Rodrigo Castro
-# |_| |_| \___/  \__,_||_||_| |_| |_| \___/  nodimo.readthedocs.io
+#         ┓•         Licensed under the MIT License
+#    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+#    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
 
 """
 Groups
 ======
 
-This module contains classes to create groups of variables.
+This module contains classes to create groups of variables, which are
+specific types of collections.
 
 Classes
 -------
@@ -23,6 +15,12 @@ Group
     Creates a group of variables.
 HomogeneorusGroup
     Creates a homogeneous group of variables.
+ScalingGroup
+    Creates a Group of scaling variables.
+PrimeGroup
+    Creates a group of prime variables.
+DimensionalGroup
+    Creates a (non)dimensional group of variables.
 """
 
 from sympy import Matrix, zeros, eye
@@ -36,14 +34,17 @@ from nodimo.product import Product
 from nodimo._internal import _unsympify_number, _show_nodimo_warning
 
 
-class Group(Collection):
+class Group(Collection):  # What if my input contains two equal variables, but one of them is dependent.
     """Group of variables.
 
-    Equivalent to a Collection without duplicate variables.
+    Equivalent to a Collection, but duplicate variables are removed.
+
+    Warns
+    -----
+        Removed duplicate variables.
     """
 
     def __init__(self, *variables: Variable):
-
         super().__init__(*variables)
         self._set_group()
 
@@ -63,7 +64,7 @@ class Group(Collection):
 
         if len(duplicate_variables) > 0:
             _show_nodimo_warning(
-                f"Duplicate variables ({str(duplicate_variables)[1:-1]})"
+                f"Removed duplicate variables ({str(duplicate_variables)[1:-1]})"
             )
 
 
@@ -75,7 +76,7 @@ class HomogeneousGroup(Group):
     Warns
     -----
     NodimoWarning
-        Dimensionally heterogeneous variables.
+        Removed dimensionally heterogeneous variables.
     """
 
     def __init__(self, *variables: Variable):
@@ -110,7 +111,7 @@ class HomogeneousGroup(Group):
                 break
 
         if len(heterogeneous_variables) > 0:
-            _show_nodimo_warning(f"Dimensionally heterogeneous variables "
+            _show_nodimo_warning(f"Removed dimensionally heterogeneous variables "
                                  f"({str(heterogeneous_variables)[1:-1]})")
 
 
@@ -124,7 +125,6 @@ class ScalingGroup(Group):
     """
 
     def __init__(self, *variables: Variable, id_number: Optional[int] = None):
-
         super().__init__(*variables)
         self._id_number: int = id_number
         self._set_scaling_group()
@@ -190,13 +190,13 @@ class ScalingGroup(Group):
 class PrimeGroup(Group):
     """Group of prime variables.
 
-    A variable is prime if it can not be obtained as the product of the
-    other variables of the group.
+    A variable is prime if it can not be obtained as the product of
+    powers of the other variables of the group.
 
     Warns
     -----
     NodimoWarning
-        Nonprime variables.
+        Removed nonprime variables.
 
     Notes
     -----
@@ -259,12 +259,12 @@ class PrimeGroup(Group):
 
         if len(nonprime_variables) > 0:
             _show_nodimo_warning(
-                f"Nonprime variables ({str(nonprime_variables)[1:-1]})"
+                f"Removed nonprime variables ({str(nonprime_variables)[1:-1]})"  # TODO: derived quantities
             )
 
 
 class DimensionalGroup(HomogeneousGroup, PrimeGroup):
-    """(Non)dimensional group.
+    """Transformed (non)dimensional group of variables.
 
     This class creates a new group of variables from a homogeneous given
     group of variables. The resulting group has all variables with the
@@ -273,7 +273,9 @@ class DimensionalGroup(HomogeneousGroup, PrimeGroup):
     Parameters
     ----------
     *variables : Variable
+        Variables to be transformed.
     **dimensions : int
+        Aimed dimensions for the group given as keyword arguments.
 
     Raises
     ------

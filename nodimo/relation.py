@@ -1,20 +1,17 @@
-#     _   _   _| o  _ _   _     Licensed under the MIT License
-#    | | (_) (_| | | | | (_)    Copyright (c) 2024 Rodrigo Castro
-
-
-#     _  _  _|. _ _  _     Licensed under the MIT License
-#    | |(_)(_||| | |(_)    Copyright (c) 2024 Rodrigo Castro
+#         ┓•         Licensed under the MIT License
+#    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+#    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
 
 """
 Relation
 ========
 
-This module contains the class to creates model functions.
+This module contains the class to create a relation between variables.
 
 Classes
 -------
-ModelFunction
-    Creates a function that relates a set of variables or groups.
+Relation
+    Creates a relation between variables.
 """
 
 from sympy import Equality, Function
@@ -36,10 +33,8 @@ class Relation(HomogeneousGroup, PrimeGroup):
 
     Attributes
     ----------
-    variables : tuple[BasicVariable]
-        Tuple with the variables.
-    dimensions : tuple[str]
-        Tuple with the dimensions' names.
+    variables : tuple[Variable]
+        Variables that constitute the relation.
 
     Raises
     ------

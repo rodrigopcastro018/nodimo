@@ -38,10 +38,10 @@ class Collection:
     variables : tuple[Variable]
         Tuple with the variables that constitute the collection.
     dimensions : dict[str, Number]
-        Dictionary with all dimensions' names as keys. Equal exponents
-        among all variables are the dictionary's values. Otherwise, the
-        dictionary's values are NaN.
-    
+        Dictionary with all dimensions' names as keys, and values are
+        are a definite exponent if all variables share the same
+        dimension exponent. Otherwise, value is set as NaN.
+
     Raises
     ------
     TypeError
@@ -193,7 +193,7 @@ class Collection:
         self._disassembled_variables = tuple(disassembled_variables)
 
     def _set_base_variables(self):
-        """Determines all instances of Variable."""
+        """Determines all nonrepetitive instances of Variable."""
         
         if not hasattr(self, '_disassembled_variables'):
             self._set_disassembled_variables()
