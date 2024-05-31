@@ -97,13 +97,11 @@ class Power(Variable):
         self._variable: Variable
         self._exponent: Number
         self._set_power(variable, exponent)
-        self._set_power_dimensions()
-
+        self._dimension = self._variable.dimension**self._exponent
         dummy_name = 'Power' if name == '' else name
         super().__init__(
-            name=dummy_name, **self._dimensions, dependent=dependent, scaling=scaling,
+            name=dummy_name, **self._dimension, dependent=dependent, scaling=scaling,
         )
-
         if name == '':
             self._name = name
             self._set_symbolic_power()
@@ -128,14 +126,6 @@ class Power(Variable):
 
         self._variable = variable
         self._exponent = exponent_sp
-
-    def _set_power_dimensions(self):
-        dimensions = {}
-        if not self._variable.is_nondimensional:
-            for dim, exp in self._variable.dimensions.items():
-                dimensions[dim] = exp * self._exponent
-
-        self._dimensions = dimensions
 
     def _set_symbolic_power(self):
         var = self._variable

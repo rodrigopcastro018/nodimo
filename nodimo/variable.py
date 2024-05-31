@@ -13,13 +13,14 @@ Classes
 Variable
     Creates a variable.
 OneVar
-    Creates the nondimensional number one.
+    Creates the dimensionless number one.
 """
 
 from sympy import sstr, srepr, latex, Symbol, Mul, Pow, S, Number
 from typing import Optional, Union
 
-from nodimo._internal import _sympify_number, _unsympify_number
+from nodimo.dimension import Dimension
+from nodimo._internal import _unsympify_number
 
 
 class Variable:
@@ -43,14 +44,14 @@ class Variable:
     ----------
     name : str
         Name used as the variable representation.
-    dimensions : dict[str, Number]
-        Dictionary containing dimensions' names and exponents.
+    dimension : Dimension
+        The quantity dimension.
     is_dependent : bool
         If ``True``, the variable is dependent.
     is_scaling : bool
         If ``True``, the variable can be used as scaling parameter.
-    is_nondimensional : bool
-        If ``True``, the variable is nondimensional.
+    is_dimensionless : bool
+        If ``True``, the variable is dimensionless.
 
     Raises
     ------
@@ -74,18 +75,16 @@ class Variable:
         name: str,
         dependent: bool = False,
         scaling: bool = False,
-        **dimensions: int,
+        **dimensions: Number,
     ):
         self._name: str
-        self._dimensions: dict[str, Number]  # TODO: ISO80k calls it dimension, not dimensions.
+        self._dimension: Dimension = Dimension(**dimensions)
+        self._is_dimensionless: bool = self._dimension._is_dimensionless
         self._is_dependent: bool = bool(dependent)
         self._is_scaling: bool = bool(scaling)
-        self._is_nondimensional: bool = all(dim == 0 for dim in dimensions.values())
         self._symbolic: Union[Symbol, Mul, Pow]
-
         self._validate_variable()
         self._set_variable_name(name)
-        self._set_variable_dimensions(dimensions)
         self._set_symbolic_variable()
 
     @property
@@ -93,8 +92,8 @@ class Variable:
         return self._name
 
     @property
-    def dimensions(self) -> dict[str, Number]:
-        return self._dimensions
+    def dimension(self) -> Dimension:
+        return self._dimension
 
     @property
     def is_dependent(self) -> bool:
@@ -115,8 +114,8 @@ class Variable:
         self._is_scaling = bool(scaling)
 
     @property
-    def is_nondimensional(self) -> bool:
-        return self._is_nondimensional
+    def is_dimensionless(self) -> bool:
+        return self._is_dimensionless
 
     def _validate_variable(
         self,
@@ -130,8 +129,8 @@ class Variable:
 
         if is_dependent and is_scaling:
             raise ValueError("A variable can not be both dependent and scaling")
-        elif is_scaling and self._is_nondimensional:
-            raise ValueError("A variable can not be both scaling and nondimensional")
+        elif is_scaling and self._is_dimensionless:
+            raise ValueError("A variable can not be both scaling and dimensionless")
     
     def _set_variable_name(self, name: str):
         if not isinstance(name, str):
@@ -141,21 +140,6 @@ class Variable:
 
         self._name = name
 
-    def _set_variable_dimensions(self, dimensions: dict[str, int]):
-        """Sanitizes and sympifies the dimensions' exponents.
-
-        This method removes dimensions with exponent zero and converts
-        the non-zero exponents to Sympy numbers.
-        """
-
-        dimensions_sp = {}
-        for dim, exp in dimensions.items():
-            exp_sp = _sympify_number(exp)
-            if exp_sp != 0:
-                dimensions_sp[dim] = exp_sp
-
-        self._dimensions = dimensions_sp
-
     def _set_symbolic_variable(self):
         # To preserve Product factors order, commutative=False.
         self._symbolic = Symbol(self._name, commutative=False)
@@ -164,7 +148,7 @@ class Variable:
         return eval(srepr(self))
 
     def _key(self) -> tuple:
-        return (self._name, frozenset(self._dimensions.items()))
+        return (self._name, frozenset(self._dimension.items()))
 
     def __hash__(self) -> int:
         return hash(self._key())
@@ -212,9 +196,9 @@ class Variable:
         class_name = type(self).__name__
         name = f"'{self.name}'" if self.name is not None else ''
         dimensions = ''
-        if not self._is_nondimensional:
+        if not self._is_dimensionless:
             dim_exp = []
-            for dim, exp in self._dimensions.items():
+            for dim, exp in self._dimension.items():
                 exp_ = _unsympify_number(exp)
                 dim_exp.append(f'{dim}={repr(exp_)}')
             dimensions = f", {', '.join(dim_exp)}"
@@ -239,7 +223,7 @@ Var = Variable
 
 
 class OneVar(Variable):
-    """Nondimensional one."""
+    """Dimensionless one."""
 
     _is_one = True
 

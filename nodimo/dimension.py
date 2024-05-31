@@ -1,4 +1,20 @@
-from sympy import sstr, latex, Symbol, Mul, Number, S
+#         ┓•         Licensed under the MIT License
+#    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+#    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
+
+"""
+Product
+=======
+
+This module contains the class to create a quantity dimension.
+
+Classes
+-------
+Dimension
+    Creates the dimension of a quantity.
+"""
+
+from sympy import sstr, srepr, latex, Symbol, Mul, Number, S
 from typing import Union
 
 from nodimo._internal import _sympify_number, _unsympify_number
@@ -21,11 +37,11 @@ class Dimension(dict):
         self._dimensions: dict[str, Number]
         self._is_dimensionless: bool
         self._symbolic: Union[S.One, Mul]
-        self._set_dimension(**dimensions)
+        self._set_dimensions(**dimensions)
         super().__init__(**self._dimensions)
         self._set_symbolic_dimension()
 
-    def _set_dimension(self, **dimensions: Number):
+    def _set_dimensions(self, **dimensions: Number):
         """Sympifies and clear null dimensional exponents."""
 
         dimensions_sp = {}
@@ -47,6 +63,36 @@ class Dimension(dict):
                 factors.append(dim_symbol**exp)
             self._symbolic = Mul(*factors)
 
+    def _copy(self):
+        return eval(srepr(self))
+
+    def __mul__(self, other):
+        if not isinstance(other, Dimension):
+            raise NotImplemented
+
+        dimensions = self._dimensions.copy()
+        for dim, exp in other.items():
+            if dim in dimensions:
+                dimensions[dim] += exp
+            else:
+                dimensions[dim] = exp
+        
+        return Dimension(**dimensions)
+
+    def __pow__(self, exponent: Number):
+        exponent_sp = _sympify_number(exponent)
+        dimensions = {}
+        for dim, exp in self.items():
+            dimensions[dim] = exp * exponent_sp
+        
+        return Dimension(**dimensions)
+
+    def __truediv__(self, other):
+        if not isinstance(other, Dimension):
+            raise NotImplemented
+
+        return self * other**-1
+    
     def __str__(self) -> str:
         return sstr(self)
 
@@ -94,18 +140,29 @@ class Dimension(dict):
         """Pretty representation according to Sympy."""
 
         printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
-        
+
         return printer._print(self._symbolic)
 
     def _latex(self, printer) -> str:
         """User string representation according to Sympy.
-        
-        The latex expression is built using a Sans Serif font to follow
-        the conventional dimension representation.
+
+        The dimension's symbol use the Sans Serif font to follow the
+        conventional dimension representation.
         """
 
         printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
 
-        return f'\\mathsf{{{printer._print(self._symbolic)}}}'
+        if self._is_dimensionless:
+            return f'\\mathsf{{{printer._print(self._symbolic)}}}'
+
+        dimensions = []
+        for dim, exp in self.items():
+            dms = f'\\mathsf{{{dim}}}'
+            if exp != 1:
+                dms += f'^{{{printer._print(exp)}}}'
+            dimensions.append(dms)
+
+        return ' '.join(dimensions)
+            
 
     __repr__ = __str__

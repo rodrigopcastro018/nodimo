@@ -165,7 +165,7 @@ class Model(Relation):
         class_name = type(self).__name__
         variables = ', '.join(printer._print(var) for var in self._variables)
 
-        if self._is_nondimensional:
+        if self._is_dimensionless:
             dimensions = ''
         else:
             dims = []

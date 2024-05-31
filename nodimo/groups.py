@@ -94,7 +94,7 @@ class HomogeneousGroup(Group):
             for dim in self._dimensions:
                 dim_bool = []
                 for var in clear_variables:
-                    if dim in var.dimensions:
+                    if dim in var.dimension:
                         dim_bool.append(True)
                     else:
                         dim_bool.append(False)
@@ -230,7 +230,7 @@ class PrimeGroup(Group):
             dimensions[dim] = 1
 
         return dimensions
-    
+
     def _set_bariables(self):
         bariables = []
         for i, var in enumerate(self._variables):
@@ -287,7 +287,7 @@ class DimensionalGroup(HomogeneousGroup, PrimeGroup):
     def __init__(self, *variables: Variable, **dimensions: int):
         super(DimensionalGroup, self).__init__(*variables)
         super(HomogeneousGroup, self).__init__(*self._variables)
-        self._is_nondimensional: bool
+        self._is_dimensionless: bool
         self._xvariables: tuple[Variable] = self._variables
         self._set_dimensions(**dimensions)
         self._set_dimensional_group()
@@ -364,8 +364,8 @@ class DimensionalGroup(HomogeneousGroup, PrimeGroup):
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
         variables = ', '.join(printer._print(var) for var in self._xvariables)
-        
-        if self._is_nondimensional:
+
+        if self._is_dimensionless:
             dimensions = ''
         else:
             dims = []

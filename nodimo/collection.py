@@ -18,6 +18,7 @@ Collection
 from sympy import sstr, latex, S, Number, ImmutableDenseMatrix, sympify
 from sympy.printing.pretty.stringpict import prettyForm
 
+from nodimo.dimension import Dimension
 from nodimo.variable import Variable, OneVar
 from nodimo._internal import _show_object
 
@@ -37,10 +38,6 @@ class Collection:
     ----------
     variables : tuple[Variable]
         Tuple with the variables that constitute the collection.
-    dimensions : dict[str, Number]
-        Dictionary with all dimensions' names as keys, and values are
-        are a definite exponent if all variables share the same
-        dimension exponent. Otherwise, value is set as NaN.
 
     Raises
     ------
@@ -54,7 +51,7 @@ class Collection:
         # Main attributes.
         self._variables: tuple[Variable]
         self._dimensions: dict[str, Number]
-        self._is_nondimensional: bool
+        self._is_dimensionless: bool
 
         # Attributes to be used in child classes.
         self._disassembled_variables: tuple[Variable]
@@ -67,7 +64,7 @@ class Collection:
         self._independent_variables: tuple[Variable]
 
         self._dimensional_variables: tuple[Variable]
-        self._nondimensional_variables: tuple[Variable]
+        self._dimensionless_variables: tuple[Variable]
 
         self._raw_matrix: list[list[Number]]
         self._matrix: ImmutableDenseMatrix
@@ -81,10 +78,6 @@ class Collection:
     @property
     def variables(self) -> tuple[Variable]:
         return self._variables
-
-    @property
-    def dimensions(self) -> dict[str, Number]:
-        return self._dimensions
 
     def show(self, use_custom_css: bool = True):
         _show_object(self, use_custom_css=use_custom_css)  # TODO: Include use_custom_css in the future global settings.
@@ -119,53 +112,62 @@ class Collection:
             )
 
     def _set_collection_dimensions(self):
+        """
+        Dimensional exponents are set to NaN, unless all quantities
+        share the same exponent for a particular dimension, case in
+        which the exponent value is preserved.
+        """
+
         dimensions = {}
         for var in self._variables:
-            for dim in var.dimensions:
+            for dim in var.dimension:
                 if dim not in dimensions:
                     dimensions[dim] = S.NaN
 
         for dim in dimensions:
             same_dim = []
             for i, var in enumerate(self._variables):
-                if dim not in var.dimensions:
+                if dim not in var.dimension:
                     same_dim.append(False)
                     break
                 if i > 0:
-                    same_dim.append(var.dimensions[dim] == var_ref.dimensions[dim])
+                    same_dim.append(var.dimension[dim] == var_ref.dimension[dim])
                 var_ref = var
             if all(same_dim):
-                dimensions[dim] = var_ref.dimensions[dim]
+                dimensions[dim] = var_ref.dimension[dim]
 
         self._dimensions = dimensions
-        self._is_nondimensional = all(dim == 0 for dim in dimensions.values())
+        self._is_dimensionless = all(dim == 0 for dim in dimensions.values())
 
-    def _set_dimensions(self, **dimensions: int):
+    def _set_dimensions(self, **dimensions: Number):
         """Reserved for subclasses that need dimensions setting."""
 
         # Validate input dimensions in face of the collection's.
-        var = Variable('dummy_var', **dimensions)
-        if not set(var.dimensions).issubset(set(self._dimensions)):
+        dimension = Dimension(**dimensions)
+        if not set(dimension._dimensions).issubset(set(self._dimensions)):
             invalid_dimensions = []
-            for dim in var.dimensions:
+            for dim in dimension._dimensions:
                 if dim not in self._dimensions:
                     invalid_dimensions.append(dim)
             raise ValueError(f"Invalid dimensions ({str(invalid_dimensions)[1:-1]})")
 
-        group_dimensions = var.dimensions
+        group_dimensions = dimension._dimensions
         for dim in self._dimensions:
-            if dim not in var.dimensions:
+            if dim not in dimension._dimensions:
                 group_dimensions[dim] = S.Zero
 
         self._dimensions = group_dimensions
-        self._is_nondimensional = var.is_nondimensional
+        self._is_dimensionless = dimension._is_dimensionless
 
     def _clear_null_dimensions(self):
         """Removes dimensions with null exponents."""
 
-        for dim, exp in self._dimensions.copy().items():
-            if exp == 0:
-                del self._dimensions[dim]
+        dimensions = {}
+        for dim, exp in self._dimensions.items():
+            if exp != 0:
+                dimensions[dim] = exp
+        
+        self._dimensions = dimensions
 
     def _clear_ones(self):
         """Removes instances of OneVar."""
@@ -238,19 +240,19 @@ class Collection:
         self._dependent_variables = tuple(dependent_variables)
         self._independent_variables = tuple(independent_variables)
 
-    def _set_dimensional_variables(self):
-        """Separates dimensional and nondimensional variables."""
+    # def _set_dimensional_variables(self):  # TODO: If it is not being used, delete it.
+    #     """Separates dimensional and dimensionless variables."""
 
-        dimensional_variables = []
-        nondimensional_variables = []
-        for var in self._variables:
-            if var.is_nondimensional:
-                nondimensional_variables.append(var)
-            else:
-                dimensional_variables.append(var)
+    #     dimensional_variables = []
+    #     dimensionless_variables = []
+    #     for var in self._variables:
+    #         if var.is_dimensionless:
+    #             dimensionless_variables.append(var)
+    #         else:
+    #             dimensional_variables.append(var)
 
-        self._dimensional_variables = tuple(dimensional_variables)
-        self._nondimensional_variables = tuple(nondimensional_variables)
+    #     self._dimensional_variables = tuple(dimensional_variables)
+    #     self._dimensionless_variables = tuple(dimensionless_variables)
     
     def _set_matrix(self):
         """Builds basic dimensional matrix."""
@@ -259,8 +261,8 @@ class Collection:
         for dim in self._dimensions:
             dim_exponents = []
             for var in self._variables:
-                if dim in var.dimensions:
-                    dim_exponents.append(var.dimensions[dim])
+                if dim in var.dimension:
+                    dim_exponents.append(var.dimension[dim])
                 else:
                     dim_exponents.append(S.Zero)
             raw_matrix.append(dim_exponents)

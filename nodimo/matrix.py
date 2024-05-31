@@ -111,16 +111,16 @@ class DimensionalMatrix(Group):
         dmatrix = R'\begin{array}'
         dmatrix += '{r|' + 'r' * len(self._variables) + '} & '
         dmatrix += ' & '.join([printer._print(var) for var in self._variables])
-        dmatrix += R'\\ \hline '
+        dmatrix += R' \\ \hline '
         for dim, exponents in zip(self._dimensions, self._raw_matrix):
-            row = [printer._print(dim)]
+            row = [f'\\mathsf{{{dim}}}']
             for exp in exponents:
                 if exp < 0:
                     row.append(printer._print(exp))
                 else:
                     # Mimic the minus sign to preserve column width.
                     row.append(R'\phantom{-}' + printer._print(exp))
-            dmatrix += ' & '.join(row) + R'\\'
+            dmatrix += ' & '.join(row) + R' \\ '
         dmatrix += R'\end{array}'
 
         return dmatrix

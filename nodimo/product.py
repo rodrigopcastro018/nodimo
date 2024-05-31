@@ -14,7 +14,8 @@ Product
     Creates a product of variables.
 """
 
-from sympy import Symbol, Pow, Mul, S, srepr
+from sympy import srepr, Symbol, Pow, Mul, S
+from functools import reduce
 from typing import Union
 
 from nodimo.variable import Variable, OneVar
@@ -69,15 +70,14 @@ class Product(Variable):
         dependent: bool = False,
         scaling: bool = False,
     ):
-
         self._variables = self._simplify_factors(*variables)
-        self._set_product_dimensions()
-
+        self._dimension = reduce(
+            lambda x, y: x*y, (qty.dimension for qty in self._variables)
+        )
         dummy_name = 'Product' if name == '' else name
         super().__init__(
-            name=dummy_name, **self._dimensions, dependent=dependent, scaling=scaling,
+            name=dummy_name, **self._dimension, dependent=dependent, scaling=scaling,
         )
-
         self._numerator_symbols: tuple[Union[Symbol, Mul, Pow]]
         self._denominator_symbols: tuple[Union[Symbol, Mul, Pow]]
         if name == '':
@@ -111,17 +111,6 @@ class Product(Variable):
             col._clear_ones()
 
         return col._variables
-
-    def _set_product_dimensions(self):
-        dimensions = {}
-        for var in self._variables:
-            for dim, exp in var.dimensions.items():
-                if dim in dimensions:
-                    dimensions[dim] += exp
-                else:
-                    dimensions[dim] = exp
-
-        self._dimensions = dimensions
 
     def _set_symbolic_product(self):
         """Not currently used by the printing methods.
