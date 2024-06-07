@@ -7,107 +7,113 @@ Collection
 ==========
 
 This module contains the base class for everything that is created with
-a collection of variables.
+a collection of quantities.
 
 Classes
 -------
 Collection
-    Creates a collection of variables.
+    Creates a collection of quantities.
 """
 
-from sympy import sstr, latex, S, Number, ImmutableDenseMatrix, sympify
+from sympy import sstr, latex, S, Number, Matrix, ImmutableDenseMatrix, eye
 from sympy.printing.pretty.stringpict import prettyForm
 
 from nodimo.dimension import Dimension
-from nodimo.variable import Variable, OneVar
-from nodimo._internal import _show_object
+from nodimo.quantity import Quantity, One
+from nodimo._internal import _show_object, _show_nodimo_warning
 
 
-class Collection:
-    """Collection of variables.
+class Collection:  # TODO: make collection indexable, like tuples and lists.
+    """Collection of quantities.
 
     This is the base class for all classes created with a collection of
-    variables.
+    quantities.
 
     Parameters
     ----------
-    *variables : Variable
-        Variables that constitute the collection.
+    *quantities : Quantity
+        Quantities that constitute the collection.
 
     Attributes
     ----------
-    variables : tuple[Variable]
-        Tuple with the variables that constitute the collection.
+    quantities : tuple[Quantity]
+        Tuple with the quantities that constitute the collection.
 
     Raises
     ------
     TypeError
-        If inputs to class are not objects of type Variable.
+        If inputs to class are not objects of type Quantity.
     ValueError
-        If inputs contains different variables with equal names.
+        If inputs contains different quantities with equal names.
+
+    Warns
+    -----
+    NodimoWarning
+        Dimensions that are treated as independent.
     """
 
-    def __init__(self, *variables: Variable):
+    def __init__(self, *quantities: Quantity):
         # Main attributes.
-        self._variables: tuple[Variable]
+        self._quantities: tuple[Quantity]
         self._dimensions: dict[str, Number]
         self._is_dimensionless: bool
 
         # Attributes to be used in child classes.
-        self._disassembled_variables: tuple[Variable]
-        self._base_variables: tuple[Variable]
+        self._disassembled_quantities: tuple[Quantity]
+        self._base_quantities: tuple[Quantity]
 
-        self._scaling_variables: tuple[Variable]
-        self._nonscaling_variables: tuple[Variable]
+        self._scaling_quantities: tuple[Quantity]
+        self._nonscaling_quantities: tuple[Quantity]
 
-        self._dependent_variables: tuple[Variable]
-        self._independent_variables: tuple[Variable]
-
-        self._dimensional_variables: tuple[Variable]
-        self._dimensionless_variables: tuple[Variable]
+        self._dependent_quantities: tuple[Quantity]
+        self._independent_quantities: tuple[Quantity]
 
         self._raw_matrix: list[list[Number]]
         self._matrix: ImmutableDenseMatrix
         self._rank: int
+        self._rcef: ImmutableDenseMatrix
         self._independent_rows: tuple[int]
-        self._submatrices: dict[Variable, ImmutableDenseMatrix]
+        self._submatrices: dict[Quantity, ImmutableDenseMatrix]
 
-        self._set_collection_variables(*variables)
+        self._set_collection_quantities(*quantities)
         self._set_collection()
 
     @property
-    def variables(self) -> tuple[Variable]:
-        return self._variables
+    def quantities(self) -> tuple[Quantity]:
+        return self._quantities
 
     def show(self, use_custom_css: bool = True):
         _show_object(self, use_custom_css=use_custom_css)  # TODO: Include use_custom_css in the future global settings.
-    
+
     def _set_collection(self):
-        self._set_base_variables()
+        self._set_disassembled_quantities()
+        self._set_base_quantities()
         self._validate_collection()
         self._set_collection_dimensions()
 
-    def _set_collection_variables(self, *variables):
-        not_variables = []
-        for var in variables:
-            if not isinstance(var, Variable):
-                not_variables.append(var)
-        if len(not_variables) > 0:
-            raise TypeError(f"Not variables ({str(not_variables)[1:-1]})")
+    def _set_collection_quantities(self, *quantities):
+        not_quantities = []
+        for qty in quantities:
+            if not isinstance(qty, Quantity):
+                not_quantities.append(qty)
+        if len(not_quantities) > 0:
+            raise TypeError(
+                f"Non-quantity types given as input ({str(not_quantities)[1:-1]})"
+            )
 
-        self._variables = variables
+        self._quantities = quantities
 
     def _validate_collection(self):
         repeated_names = []
-        for i, var1 in enumerate(self._base_variables):
-            for var2 in list(self._base_variables)[i+1:]:
-                repname = var1.name if var1.name == var2.name else None
+        for i, qty1 in enumerate(self._base_quantities):
+            for qty2 in list(self._base_quantities)[i+1:]:
+                repname = qty1.name if qty1.name == qty2.name else None
                 if repname is not None and repname not in repeated_names:
                     repeated_names.append(repname)
 
         if len(repeated_names) > 0:
             raise ValueError(
-                f"A collection can not contain different variables "
+                f"A collection can not contain different quantities "
                 f"with equal names ({str(repeated_names)[1:-1]})"
             )
 
@@ -119,22 +125,22 @@ class Collection:
         """
 
         dimensions = {}
-        for var in self._variables:
-            for dim in var.dimension:
+        for qty in self._quantities:
+            for dim in qty.dimension:
                 if dim not in dimensions:
                     dimensions[dim] = S.NaN
 
         for dim in dimensions:
             same_dim = []
-            for i, var in enumerate(self._variables):
-                if dim not in var.dimension:
+            for i, qty in enumerate(self._quantities):
+                if dim not in qty.dimension:
                     same_dim.append(False)
                     break
                 if i > 0:
-                    same_dim.append(var.dimension[dim] == var_ref.dimension[dim])
-                var_ref = var
+                    same_dim.append(qty.dimension[dim] == qty_ref.dimension[dim])
+                qty_ref = qty
             if all(same_dim):
-                dimensions[dim] = var_ref.dimension[dim]
+                dimensions[dim] = qty_ref.dimension[dim]
 
         self._dimensions = dimensions
         self._is_dimensionless = all(dim == 0 for dim in dimensions.values())
@@ -144,20 +150,20 @@ class Collection:
 
         # Validate input dimensions in face of the collection's.
         dimension = Dimension(**dimensions)
-        if not set(dimension._dimensions).issubset(set(self._dimensions)):
+        if not set(dimension).issubset(set(self._dimensions)):
             invalid_dimensions = []
-            for dim in dimension._dimensions:
+            for dim in dimension:
                 if dim not in self._dimensions:
                     invalid_dimensions.append(dim)
             raise ValueError(f"Invalid dimensions ({str(invalid_dimensions)[1:-1]})")
 
-        group_dimensions = dimension._dimensions
         for dim in self._dimensions:
-            if dim not in dimension._dimensions:
-                group_dimensions[dim] = S.Zero
+            if dim not in dimension:
+                dimension[dim] = S.Zero
 
-        self._dimensions = group_dimensions
-        self._is_dimensionless = dimension._is_dimensionless
+        self._dimensions = dict(**dimension)
+        self._set_matrix_independent_rows()
+        self._is_dimensionless = all(dim == 0 for dim in self._dimensions.values())
 
     def _clear_null_dimensions(self):
         """Removes dimensions with null exponents."""
@@ -170,89 +176,72 @@ class Collection:
         self._dimensions = dimensions
 
     def _clear_ones(self):
-        """Removes instances of OneVar."""
+        """Removes instances of One."""
 
-        clear_variables = []
-        for var in self._variables:
-            if not isinstance(var, OneVar):
-                clear_variables.append(var)
+        clear_quantities = []
+        for qty in self._quantities:
+            if not isinstance(qty, One):
+                clear_quantities.append(qty)
 
-        self._variables = tuple(clear_variables)
+        self._quantities = tuple(clear_quantities)
 
-    def _set_disassembled_variables(self):
-        """Determines all instances of Variable, OneVar and Power.
+    def _set_disassembled_quantities(self):
+        """Determines all instances of Quantity, One and Power.
 
         It does that by disassembling instances of Product.
         """
 
-        disassembled_variables = []
-        for var in self._variables:
-            if var._is_product:
-                disassembled_variables.extend(var.variables)
+        disassembled_quantities = []
+        for qty in self._quantities:
+            if qty._is_product:
+                disassembled_quantities.extend(qty.quantities)
             else:
-                disassembled_variables.append(var)
+                disassembled_quantities.append(qty)
 
-        self._disassembled_variables = tuple(disassembled_variables)
+        self._disassembled_quantities = tuple(disassembled_quantities)
 
-    def _set_base_variables(self):
-        """Determines all nonrepetitive instances of Variable."""
-        
-        if not hasattr(self, '_disassembled_variables'):
-            self._set_disassembled_variables()
+    def _set_base_quantities(self):
+        """Determines all nonrepetitive instances of Quantity."""
 
-        base_variables = []
-        for var in self._disassembled_variables:
-            if var._is_power:
-                base_var = var._variable
+        base_quantities = []
+        for qty in self._disassembled_quantities:
+            if qty._is_power:
+                base_qty = qty._quantity
             else:
-                base_var = var
+                base_qty = qty
             
-            if base_var not in base_variables and not base_var._is_one:
-                base_variables.append(base_var)
+            if base_qty not in base_quantities and not base_qty._is_one:
+                base_quantities.append(base_qty)
 
-        self._base_variables = tuple(base_variables)
+        self._base_quantities = tuple(base_quantities)
     
-    def _set_scaling_variables(self):
-        """Separates scaling and nonscaling variables."""
+    def _set_scaling_quantities(self):
+        """Separates scaling and nonscaling quantities."""
 
-        scaling_variables = []
-        nonscaling_variables = []
-        for var in self._variables:
-            if var.is_scaling:
-                scaling_variables.append(var)
+        scaling_quantities = []
+        nonscaling_quantities = []
+        for qty in self._quantities:
+            if qty.is_scaling:
+                scaling_quantities.append(qty)
             else:
-                nonscaling_variables.append(var)
+                nonscaling_quantities.append(qty)
 
-        self._scaling_variables = tuple(scaling_variables)
-        self._nonscaling_variables = tuple(nonscaling_variables)
+        self._scaling_quantities = tuple(scaling_quantities)
+        self._nonscaling_quantities = tuple(nonscaling_quantities)
 
-    def _set_dependent_variables(self):
-        """Separates dependent and independent variables."""
+    def _set_dependent_quantities(self):
+        """Separates dependent and independent quantities."""
 
-        dependent_variables = []
-        independent_variables = []
-        for var in self.variables:
-            if var.is_dependent:
-                dependent_variables.append(var)
+        dependent_quantities = []
+        independent_quantities = []
+        for qty in self.quantities:
+            if qty.is_dependent:
+                dependent_quantities.append(qty)
             else:
-                independent_variables.append(var)
+                independent_quantities.append(qty)
 
-        self._dependent_variables = tuple(dependent_variables)
-        self._independent_variables = tuple(independent_variables)
-
-    # def _set_dimensional_variables(self):  # TODO: If it is not being used, delete it.
-    #     """Separates dimensional and dimensionless variables."""
-
-    #     dimensional_variables = []
-    #     dimensionless_variables = []
-    #     for var in self._variables:
-    #         if var.is_dimensionless:
-    #             dimensionless_variables.append(var)
-    #         else:
-    #             dimensional_variables.append(var)
-
-    #     self._dimensional_variables = tuple(dimensional_variables)
-    #     self._dimensionless_variables = tuple(dimensionless_variables)
+        self._dependent_quantities = tuple(dependent_quantities)
+        self._independent_quantities = tuple(independent_quantities)
     
     def _set_matrix(self):
         """Builds basic dimensional matrix."""
@@ -260,9 +249,9 @@ class Collection:
         raw_matrix = []
         for dim in self._dimensions:
             dim_exponents = []
-            for var in self._variables:
-                if dim in var.dimension:
-                    dim_exponents.append(var.dimension[dim])
+            for qty in self._quantities:
+                if dim in qty.dimension:
+                    dim_exponents.append(qty.dimension[dim])
                 else:
                     dim_exponents.append(S.Zero)
             raw_matrix.append(dim_exponents)
@@ -277,59 +266,87 @@ class Collection:
         self._rank = self._matrix.rank()
 
     def _set_matrix_independent_rows(self):
+        """Independent rows are also independent dimensions.
+        
+        This method also takes the opportunity to fix dimensions set by
+        the user, specially when the dimensions are not all independent.
+        """
+
         if not hasattr(self, '_rank'):
             self._set_matrix_rank()
 
         if len(self._dimensions) > self._rank:
-            _, independent_rows = self._matrix.T.rref()
+            # In case the number of dimensions is larger than the rank,
+            # the dimensions are not all independent.
+            rref, independent_rows = self._matrix.T.rref()
+            rcef = rref.T[:,:len(self._dimensions)]
+            exponents = rcef @ Matrix(list(self._dimensions.values()))
+            dimensions = dict(zip(self._dimensions, exponents[:]))
+            independent_dimensions = {}
+            for i, dim in enumerate(self._dimensions):
+                if i in independent_rows:
+                    independent_dimensions[dim] = self._dimensions[dim]
+
+            dimensions_str = ', '.join(dim for dim in self._dimensions)
+            indep_dimensions_str = ', '.join(dim for dim in independent_dimensions)
+            _show_nodimo_warning(
+                f"From the dimensions ({dimensions_str}), only "
+                f"({indep_dimensions_str}) are treated as independent"
+            )
         else:
+            rcef = eye(len(self._dimensions))
             independent_rows = tuple(range(len(self._dimensions)))
+            dimensions = self._dimensions
+            independent_dimensions = self._dimensions.copy()
         
+        self._rcef = rcef
         self._independent_rows = independent_rows
+        self._dimensions = dimensions
+        self._independent_dimensions = independent_dimensions
 
     def _set_submatrices(self):
-        """Builds one column matrix for each variable."""
+        """Builds one column matrix for each quantity."""
 
         if not hasattr(self, '_matrix'):
             self._set_matrix()
 
         submatrices = []
-        for i, var in enumerate(self._variables):
-            submatrices.append((var, self._matrix.col(i)))
+        for i, qty in enumerate(self._quantities):
+            submatrices.append((qty, self._matrix.col(i)))
 
         self._submatrices = dict(submatrices)
 
-    def _get_submatrix(self, *variables) -> ImmutableDenseMatrix:
-        """Combines the variables' submatrices into one submatrix.
+    def _get_submatrix(self, *quantities) -> ImmutableDenseMatrix:
+        """Combines the quantities' submatrices into one submatrix.
 
         Parameters
         ----------
-        *variables : BasicVariable
-            Variables used to build the submatrix.
+        *quantities : Quantity
+            Quantities used to build the submatrix.
 
         Returns
         -------
-        submatrix : ImmutableDenseMatrix
-            The submatrix built from the given variables.
+        submatrix : Matrix
+            The submatrix built from the given quantities.
 
         Raises
         ------
         ValueError
-            If the given variables are not all part of the collection.
+            If the given quantities are not all part of the collection.
         """
 
-        if not set(variables).issubset(set(self._variables)):
-            raise ValueError(f"'{variables}' is not a subset of '{self._variables}'")
+        if not set(quantities).issubset(set(self._quantities)):
+            raise ValueError(f"'{quantities}' is not a subset of '{self._quantities}'")
         elif not hasattr(self, '_submatrices'):
             self._set_submatrices()
 
-        submatrices = [self._submatrices[var] for var in variables]
+        submatrices = [self._submatrices[qty] for qty in quantities]
         submatrix = ImmutableDenseMatrix.hstack(*submatrices)
 
         return submatrix
 
     def _key(self) -> tuple:
-        return (frozenset(self._variables),)
+        return (frozenset(self._quantities),)
 
     def __hash__(self) -> int:
         return hash(self._key())
@@ -342,13 +359,13 @@ class Collection:
         return False
     
     def __contains__(self, item) -> bool:
-        return self._variables.__contains__(item)
+        return self._quantities.__contains__(item)
 
     def __len__(self) -> int:
-        return self._variables.__len__()
+        return self._quantities.__len__()
 
     def __iter__(self):
-        return self._variables.__iter__()
+        return self._quantities.__iter__()
 
     def __next__(self):
         return self.__iter__().__next__() 
@@ -364,33 +381,34 @@ class Collection:
         return f'$\\displaystyle {latex(self)}$'
 
     def _sympy_(self):
-        return sympify(self._variables)
+        from sympy import sympify
+        return sympify(self._quantities)
 
     def _sympyrepr(self, printer) -> str:
         """Developer string representation according to Sympy."""
 
         class_name = type(self).__name__
-        variables = ', '.join(printer._print(var) for var in self._variables)
+        quantities = ', '.join(printer._print(qty) for qty in self._quantities)
 
-        return f'{class_name}({variables})'
+        return f'{class_name}({quantities})'
 
     def _sympystr(self, printer) -> str:
         """User string representation according to Sympy."""
 
         printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
         class_name = printer._print(type(self).__name__)
-        variables = ', '.join(printer._print(var) for var in self._variables)
+        quantities = ', '.join(printer._print(qty) for qty in self._quantities)
 
-        return f'{class_name}({variables})'
+        return f'{class_name}({quantities})'
 
     def _latex(self, printer) -> str:
         """Latex representation according to Sympy."""
 
         printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
         class_name = printer._print(type(self).__name__)
-        variables = R',\ '.join(printer._print(var) for var in self._variables)
+        quantities = R',\ '.join(printer._print(qty) for qty in self._quantities)
 
-        return f'{class_name}\\left({variables}\\right)'
+        return f'{class_name}\\left({quantities}\\right)'
 
     def _pretty(self, printer) -> prettyForm:
         """Pretty representation according to Sympy."""
@@ -398,10 +416,10 @@ class Collection:
         printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
         class_name = printer._print(type(self).__name__)
 
-        variables = prettyForm('')
-        for i, var in enumerate(self._variables):
+        quantities = prettyForm('')
+        for i, qty in enumerate(self._quantities):
             sep = ', ' if i > 0 else ''
-            variables = prettyForm(*variables.right(sep, printer._print(var)))
-        variables = prettyForm(*variables.parens())
+            quantities = prettyForm(*quantities.right(sep, printer._print(qty)))
+        quantities = prettyForm(*quantities.parens())
 
-        return prettyForm(*class_name.right(variables))
+        return prettyForm(*class_name.right(quantities))

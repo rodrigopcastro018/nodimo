@@ -30,7 +30,7 @@ NodimoWarning
     (Custom) Nodimo warning
 """
 
-from sympy import pretty, Number, sympify, nsimplify
+from sympy import pretty, Number, ImmutableDenseMatrix, sympify, nsimplify
 from typing import Union
 import warnings
 
@@ -182,6 +182,45 @@ def _unsympify_number(number_sp: Number) -> Union[int, float, str, tuple]:
         return str(number_sp)
 
 
+def _sequence_to_matrix(sequence: list[list[Number]]) -> ImmutableDenseMatrix:
+    """Converts a list of lists of numbers to a Sympy matrix.
+
+    Parameters
+    ----------
+    sequence : list[list[Number]]
+        Sequence that represents a matrix.
+
+    Returns
+    -------
+    matrix : ImmutableDenseMatrix
+        The original sequence converted to a Sympy matrix.
+
+    Raises
+    ------
+    TypeError
+        If the input is not a list of lists of numbers.
+    """
+
+    if hasattr(sequence, 'is_Matrix') and sequence.is_Matrix:
+        return sequence.as_immutable
+    elif not isinstance(sequence, (list, tuple)):
+        raise TypeError(f"{sequence} is not a list of lists of numbers")
+
+    sequence_sp = []
+    for row in sequence:
+        if isinstance(row, (list, tuple)):
+            row_sp = []
+            for e in row:
+                row_sp.append(_sympify_number(e))
+            sequence_sp.append(row_sp)
+        else:
+            sequence_sp.append(_sympify_number(row))
+    
+    matrix = ImmutableDenseMatrix(sequence_sp)
+
+    return matrix
+
+
 class NodimoWarning(Warning):
     """(Custom) Nodimo warning.
 
@@ -190,9 +229,6 @@ class NodimoWarning(Warning):
     """
 
     pass
-
-
-warnings.simplefilter('always', NodimoWarning)
 
 
 def _nodimo_formatwarning(message, category, filename, lineno, line=None):

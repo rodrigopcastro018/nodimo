@@ -51,17 +51,17 @@ model
 
 # from sympy import init_printing
 
-from nodimo.variable import Variable, Var
+from nodimo.quantity import Quantity, Q
 from nodimo.power import Power
-from nodimo.product import Product, Prod
-from nodimo.matrix import DimensionalMatrix, DimMatrix
+from nodimo.product import Product
+from nodimo.matrix import DimensionalMatrix
 from nodimo.relation import Relation
 from nodimo.model import Model
 
 # init_printing(root_notation=False)
 
-__all__ = ['Variable', 'Var', 'Power', 'Product', 'Prod',
-           'DimensionalMatrix', 'DimMatrix', 'Relation', 'Model']
+__all__ = ['Quantity', 'Q', 'Power', 'Product',
+           'DimensionalMatrix', 'Relation', 'Model']
 
 """To include in global settings:
     - root_notation

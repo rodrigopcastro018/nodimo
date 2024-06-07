@@ -3,16 +3,16 @@
 #    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
 
 """
-Variable
+Quantity
 ========
 
-This module contains the class to create a variable.
+This module contains the class to create a physical quantity.
 
 Classes
 -------
-Variable
-    Creates a variable.
-OneVar
+Quantity
+    Creates a quantity.
+One
     Creates the dimensionless number one.
 """
 
@@ -23,49 +23,49 @@ from nodimo.dimension import Dimension
 from nodimo._internal import _unsympify_number
 
 
-class Variable:
-    """Base class for variables.
+class Quantity:
+    """Base class for quantities.
 
-    Most basic type of variable, with a attributes that are useful in
-    describing its dimensional properties.
+    Most basic type of physical quantity, with attributes that are
+    useful in describing its dimensional properties.
 
     Parameters
     ----------
     name : str
-        Name to be used as the variable representation.
+        Name to be used as the quantity representation.
     dependent : bool, default=False
-        If ``True``, the variable is dependent.
+        If ``True``, the quantity is dependent.
     scaling : bool, default=False
-        If ``True``, the variable can be used as scaling parameter.
-    **dimensions : int
-        The dimensions of the variable given as keyword arguments.
+        If ``True``, the quantity can be used as scaling parameter.
+    **dimensions : Number
+        The dimensions of the quantity given as keyword arguments.
 
     Attributes
     ----------
     name : str
-        Name used as the variable representation.
+        Name used as the quantity representation.
     dimension : Dimension
         The quantity dimension.
     is_dependent : bool
-        If ``True``, the variable is dependent.
+        If ``True``, the quantity is dependent.
     is_scaling : bool
-        If ``True``, the variable can be used as scaling parameter.
+        If ``True``, the quantity can be used as scaling parameter.
     is_dimensionless : bool
-        If ``True``, the variable is dimensionless.
+        If ``True``, the quantity is dimensionless.
 
     Raises
     ------
     TypeError
-        If the variable name is not an non-empty string.
+        If the quantity name is not an non-empty string.
     ValueError
-        If the variable name is invalid.
+        If the quantity name is invalid.
     ValueError
-        If the variable is set as both dependent and scaling.
+        If the quantity is set as both dependent and scaling.
     ValueError
-        If the variable is set as scaling, but with no dimensions.
+        If the quantity is set as scaling, but with no dimensions.
     """
 
-    _is_variable: bool = True
+    _is_quantity: bool = True
     _is_power: bool = False
     _is_product: bool = False
     _is_one: bool = False
@@ -83,9 +83,9 @@ class Variable:
         self._is_dependent: bool = bool(dependent)
         self._is_scaling: bool = bool(scaling)
         self._symbolic: Union[Symbol, Mul, Pow]
-        self._validate_variable()
-        self._set_variable_name(name)
-        self._set_symbolic_variable()
+        self._validate_quantity()
+        self._set_quantity_name(name)
+        self._set_symbolic_quantity()
 
     @property
     def name(self) -> str:
@@ -101,7 +101,7 @@ class Variable:
 
     @is_dependent.setter
     def is_dependent(self, dependent: bool):
-        self._validate_variable(is_dependent=dependent)
+        self._validate_quantity(is_dependent=dependent)
         self._is_dependent = bool(dependent)
 
     @property
@@ -110,14 +110,14 @@ class Variable:
 
     @is_scaling.setter
     def is_scaling(self, scaling: bool):
-        self._validate_variable(is_scaling=scaling)
+        self._validate_quantity(is_scaling=scaling)
         self._is_scaling = bool(scaling)
 
     @property
     def is_dimensionless(self) -> bool:
         return self._is_dimensionless
 
-    def _validate_variable(
+    def _validate_quantity(
         self,
         is_dependent: Optional[bool] = None,
         is_scaling: Optional[bool] = None,
@@ -128,19 +128,19 @@ class Variable:
             is_scaling = self._is_scaling
 
         if is_dependent and is_scaling:
-            raise ValueError("A variable can not be both dependent and scaling")
+            raise ValueError("A quantity can not be both dependent and scaling")
         elif is_scaling and self._is_dimensionless:
-            raise ValueError("A variable can not be both scaling and dimensionless")
-    
-    def _set_variable_name(self, name: str):
+            raise ValueError("A quantity can not be both scaling and dimensionless")
+
+    def _set_quantity_name(self, name: str):
         if not isinstance(name, str):
-            raise TypeError("Variable name must be a non-empty string")
+            raise TypeError("Quantity name must be a non-empty string")
         elif name.strip() == '':
-            raise ValueError("Invalid variable name")
+            raise ValueError("Invalid quantity name")
 
         self._name = name
 
-    def _set_symbolic_variable(self):
+    def _set_symbolic_quantity(self):
         # To preserve Product factors order, commutative=False.
         self._symbolic = Symbol(self._name, commutative=False)
 
@@ -161,7 +161,7 @@ class Variable:
         return False
 
     def __mul__(self, other):
-        if not isinstance(other, Variable):
+        if not isinstance(other, Quantity):
             raise NotImplemented
         
         from .product import Product
@@ -174,7 +174,7 @@ class Variable:
         return Power(self, exponent)
 
     def __truediv__(self, other):
-        if not isinstance(other, Variable):
+        if not isinstance(other, Quantity):
             raise NotImplemented
 
         return self * other**-1
@@ -218,11 +218,11 @@ class Variable:
     __repr__ = __str__
 
 
-# Alias for the class Variable.
-Var = Variable
+# Alias for the class Quantity to facilitate the creation of instances.
+Q = Quantity
 
 
-class OneVar(Variable):
+class One(Quantity):
     """Dimensionless one."""
 
     _is_one = True
@@ -231,7 +231,7 @@ class OneVar(Variable):
         return super().__new__(cls)
     
     def __init__(self):
-        super().__init__('OneVar')
+        super().__init__('One')
         self._name = ''
         self._symbolic = S.One
 

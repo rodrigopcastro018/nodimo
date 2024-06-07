@@ -11,33 +11,33 @@ This module contains the class to create a dimensional matrix.
 Classes
 -------
 DimensionalMatrix
-    Creates a dimensional matrix from a group of variables.
+    Creates a dimensional matrix from a group of quantities.
 """
 
 from sympy import Symbol, ImmutableDenseMatrix, Matrix
 
-from nodimo.variable import Variable
+from nodimo.quantity import Quantity
 from nodimo.groups import Group
 
 
 class DimensionalMatrix(Group):
-    """Dimensional matrix of a group of variables.
+    """Dimensional matrix of a group of quantities.
 
-    A DimensionalMatrix is a matrix with one column for each variable,
+    A DimensionalMatrix is a matrix with one column for each quantity,
     one row for each dimension's name, and every element represents the
-    dimension's exponent of a particular variable. Labels at the top
-    and at the right side are added to identify the variables and the
+    dimension's exponent of a particular quantity. Labels at the top
+    and at the right side are added to identify the quantities and the
     dimensions' names, respectively.
 
     Parameters
     ----------
-    *variables : Variable
-        Variables that constitute the dimensional matrix.
+    *quantities : Quantity
+        Quantities that constitute the dimensional matrix.
 
     Attributes
     ----------
-    variables : tuple[Variable]
-        List with the variables used to build the dimensional matrix.
+    quantities : tuple[Quantity]
+        List with the quantities used to build the dimensional matrix.
     matrix : ImmutableDenseMatrix
         Dimensional matrix containing only the dimensions' exponents.
     rank : int
@@ -55,17 +55,17 @@ class DimensionalMatrix(Group):
     Examples
     --------
 
-    >>> from nodimo import Variable, Product, DimensionalMatrix
-    >>> F = Variable('F', M=1, L=1, T=-2)
-    >>> k = Variable('m', M=1, T=-2)
-    >>> x = Variable('a', L=1)
+    >>> from nodimo import Quantity, Product, DimensionalMatrix
+    >>> F = Quantity('F', M=1, L=1, T=-2)
+    >>> k = Quantity('m', M=1, T=-2)
+    >>> x = Quantity('a', L=1)
     >>> kx = Product(k, x)
     >>> dmatrix = DimensionalMatrix(F, k, x, kx)
     >>> dmatrix.show()
     """
 
-    def __init__(self, *variables: Variable):
-        super().__init__(*variables)
+    def __init__(self, *quantities: Quantity):
+        super().__init__(*quantities)
         self._set_dimensional_matrix()
 
     @property
@@ -88,10 +88,10 @@ class DimensionalMatrix(Group):
 
     def _set_symbolic_dimensional_matrix(self):
         labeled_matrix = self._matrix.as_mutable()
-        dimensions_matrix = Matrix(list(self._dimensions))
-        variables_matrix = Matrix([[Symbol('')] + list(self._variables)])
-        labeled_matrix = labeled_matrix.col_insert(0, dimensions_matrix)
-        labeled_matrix = labeled_matrix.row_insert(0, variables_matrix)
+        dimensions_column = Matrix(list(self._dimensions))
+        quantities_row = Matrix([[Symbol('')] + list(self._quantities)])
+        labeled_matrix = labeled_matrix.col_insert(0, dimensions_column)
+        labeled_matrix = labeled_matrix.row_insert(0, quantities_row)
 
         self._symbolic = labeled_matrix.as_immutable()
 
@@ -100,17 +100,17 @@ class DimensionalMatrix(Group):
 
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
-        variables = ', '.join(printer._print(var) for var in self._variables)
+        quantities = ', '.join(printer._print(qty) for qty in self._quantities)
 
-        return f'{class_name}({variables})'
+        return f'{class_name}({quantities})'
 
     def _sympystr(self, printer) -> str:
         return self._symbolic.table(printer, rowstart='', rowend='', colsep='  ')
 
     def _latex(self, printer) -> str:
         dmatrix = R'\begin{array}'
-        dmatrix += '{r|' + 'r' * len(self._variables) + '} & '
-        dmatrix += ' & '.join([printer._print(var) for var in self._variables])
+        dmatrix += '{r|' + 'r' * len(self._quantities) + '} & '
+        dmatrix += ' & '.join([printer._print(qty) for qty in self._quantities])
         dmatrix += R' \\ \hline '
         for dim, exponents in zip(self._dimensions, self._raw_matrix):
             row = [f'\\mathsf{{{dim}}}']

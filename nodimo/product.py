@@ -6,32 +6,32 @@
 Product
 =======
 
-This module contains the class to create a product of variables.
+This module contains the class to create the product of quantities.
 
 Classes
 -------
 Product
-    Creates a product of variables.
+    Creates the product of quantities.
 """
 
 from sympy import srepr, Symbol, Pow, Mul, S
 from functools import reduce
 from typing import Union
 
-from nodimo.variable import Variable, OneVar
+from nodimo.quantity import Quantity, One
 from nodimo.collection import Collection
 from nodimo.power import Power
 
 
-class Product(Variable):
-    """Product of variables.
+class Product(Quantity):
+    """Product of quantities.
 
-    This class represents the product of variables.
+    This class represents the product of quantities.
 
     Parameters
     ----------
-    *variables : Variable
-        Variables to be multiplied.
+    *quantities : Quantity
+        Quantities to be multiplied.
     name : str, default=''
         Name to be used as the product representation.
     dependent : bool, default=False
@@ -41,42 +41,42 @@ class Product(Variable):
 
     Attributes
     ----------
-    variables : tuple[Variable]
-        Product factors.
+    quantities : tuple[Quantity]
+        Multiplication factors.
     """
 
     _is_product = True
 
     def __new__(
         cls,
-        *variables: Variable,
+        *quantities: Quantity,
         name: str = '',
         dependent: bool = False,
         scaling: bool = False,
     ):
-        simplified_variables = cls._simplify_factors(*variables)
+        simplified_quantities = cls._simplify_factors(*quantities)
 
-        if len(simplified_variables) == 0:
-            return OneVar()
-        if len(simplified_variables) == 1:
-            return simplified_variables[0]
+        if len(simplified_quantities) == 0:
+            return One()
+        if len(simplified_quantities) == 1:
+            return simplified_quantities[0]
         else:
             return super().__new__(cls)
 
     def __init__(
         self,
-        *variables: Variable,
+        *quantities: Quantity,
         name: str = '',
         dependent: bool = False,
         scaling: bool = False,
     ):
-        self._variables = self._simplify_factors(*variables)
-        self._dimension = reduce(
-            lambda x, y: x*y, (qty.dimension for qty in self._variables)
+        self._quantities = self._simplify_factors(*quantities)
+        product_dimension = reduce(
+            lambda x, y: x*y, (qty.dimension for qty in self._quantities)
         )
         dummy_name = 'Product' if name == '' else name
         super().__init__(
-            name=dummy_name, **self._dimension, dependent=dependent, scaling=scaling,
+            name=dummy_name, **product_dimension, dependent=dependent, scaling=scaling,
         )
         self._numerator_symbols: tuple[Union[Symbol, Mul, Pow]]
         self._denominator_symbols: tuple[Union[Symbol, Mul, Pow]]
@@ -86,76 +86,76 @@ class Product(Variable):
             self._set_symbolic_product()
 
     @property
-    def variables(self) -> tuple[Variable]:
-        return self._variables
+    def quantities(self) -> tuple[Quantity]:
+        return self._quantities
 
     @classmethod
-    def _simplify_factors(self, *variables: Variable) -> tuple[Variable]:
-        col = Collection(*variables)
-        col._set_base_variables()
-        col._variables = col._disassembled_variables
+    def _simplify_factors(self, *quantities: Quantity) -> tuple[Quantity]:
+        col = Collection(*quantities)
+        col._set_base_quantities()
+        col._quantities = col._disassembled_quantities
         col._clear_ones()
 
-        if len(col._variables) > len(col._base_variables):
-            variables = []
-            for base_var in col._base_variables:
+        if len(col._quantities) > len(col._base_quantities):
+            quantities = []
+            for base_qty in col._base_quantities:
                 exponent = S.Zero
-                for var in col._variables:
-                    if var == base_var:
+                for qty in col._quantities:
+                    if qty == base_qty:
                         exponent += S.One
-                    elif var._is_power:
-                        if var._variable == base_var:
-                            exponent += var._exponent
-                variables.append(Power(base_var, exponent))
-            col._variables = tuple(variables)
+                    elif qty._is_power:
+                        if qty._quantity == base_qty:
+                            exponent += qty._exponent
+                quantities.append(Power(base_qty, exponent))
+            col._quantities = tuple(quantities)
             col._clear_ones()
 
-        return col._variables
+        return col._quantities
 
     def _set_symbolic_product(self):
         """Not currently used by the printing methods.
 
         The symbolic attribute created here is not used for printing
-        because the denominator variables don't follow input order.
+        because the denominator symbols don't follow input order.
         """
 
-        var_symb = []
-        for var in self._variables:
-            if var._is_power and var._name:
-                var_pow = Power(var.variable, var.exponent)
-                var_symb.append(var_pow._symbolic)
+        qty_symb = []
+        for qty in self._quantities:
+            if qty._is_power and qty._name:
+                qty_pow = Power(qty.quantity, qty.exponent)
+                qty_symb.append(qty_pow._symbolic)
             else:
-                var_symb.append(var._symbolic)
-        self._symbolic = Mul(*var_symb)
+                qty_symb.append(qty._symbolic)
+        self._symbolic = Mul(*qty_symb)
 
     def _copy(self):
         return eval(srepr(self))
 
     def _key(self) -> tuple:
-        return (frozenset(self._variables),)
+        return (frozenset(self._quantities),)
 
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
-        variables = ', '.join(printer._print(var) for var in self._variables)
+        quantities = ', '.join(printer._print(qty) for qty in self._quantities)
         name = f", name='{self.name}'" if self.name else ''
         dependent = f', dependent=True' if self.is_dependent else ''
         scaling = f', scaling=True' if self.is_scaling else ''
 
-        return f'{class_name}({variables}{name}{dependent}{scaling})'
+        return f'{class_name}({quantities}{name}{dependent}{scaling})'
 
     def _set_numerator_symbols(self):
         numerator_symbols = []
         denominator_symbols = []
-        for var in self._variables:
-            if var._is_power and var.exponent < 0:
-                varinv = Power(var.variable, -var.exponent)
-                denominator_symbols.append(varinv._symbolic)
+        for qty in self._quantities:
+            if qty._is_power and qty.exponent < 0:
+                qtyinv = Power(qty.quantity, -qty.exponent)
+                denominator_symbols.append(qtyinv._symbolic)
             else:
-                if var._is_power and var.name:
-                    var_pow = Power(var.variable, var.exponent)
-                    symbol = var_pow._symbolic
+                if qty._is_power and qty.name:
+                    qty_pow = Power(qty.quantity, qty.exponent)
+                    symbol = qty_pow._symbolic
                 else:
-                    symbol = var._symbolic
+                    symbol = qty._symbolic
                 numerator_symbols.append(symbol)
 
         self._numerator_symbols = tuple(numerator_symbols)
