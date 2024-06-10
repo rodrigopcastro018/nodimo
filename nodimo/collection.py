@@ -19,11 +19,11 @@ from sympy import sstr, latex, S, Number, Matrix, ImmutableDenseMatrix, eye
 from sympy.printing.pretty.stringpict import prettyForm
 
 from nodimo.dimension import Dimension
-from nodimo.quantity import Quantity, One
+from nodimo.quantity import Quantity, Constant, One
 from nodimo._internal import _show_object, _show_nodimo_warning
 
 
-class Collection:  # TODO: make collection indexable, like tuples and lists.
+class Collection:
     """Collection of quantities.
 
     This is the base class for all classes created with a collection of
@@ -175,8 +175,18 @@ class Collection:  # TODO: make collection indexable, like tuples and lists.
         
         self._dimensions = dimensions
 
+    def _clear_constants(self):
+        """Removes dimensionless constants."""
+
+        clear_quantities = []
+        for qty in self._quantities:
+            if not isinstance(qty, Constant):
+                clear_quantities.append(qty)
+
+        self._quantities = tuple(clear_quantities)
+
     def _clear_ones(self):
-        """Removes instances of One."""
+        """Removes dimensionless ones."""
 
         clear_quantities = []
         for qty in self._quantities:
@@ -374,6 +384,9 @@ class Collection:  # TODO: make collection indexable, like tuples and lists.
         return sstr(self)
 
     __repr__ = __str__
+
+    def __getitem__(self, indexes):
+        return self._quantities[indexes]
 
     def _repr_latex_(self):
         """Latex representation according to IPython/Jupyter."""

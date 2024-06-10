@@ -142,7 +142,8 @@ class DimensionalMatrix(Group):
                 dimensions[dim] = self._dimensions[dim]
 
         self._set_dimensions(**dimensions)
-        self._set_dimensional_matrix()
+        self._set_matrix()
+        self._set_symbolic_dimensional_matrix()
 
 
 # Alias for DimensionalMatrix.

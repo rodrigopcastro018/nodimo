@@ -33,7 +33,7 @@ from nodimo.product import Product
 from nodimo._internal import _unsympify_number, _show_nodimo_warning
 
 
-class Group(Collection):  # TODO: What if my input contains two equal quantities, but one of them is dependent.
+class Group(Collection):
     """Group of quantities.
 
     Equivalent to a Collection, but duplicate quantities are removed.
@@ -362,9 +362,9 @@ class DimensionalGroup(HomogeneousGroup, IndependentGroup):
         Z = Matrix([[Z1],
                     [Z2]])
 
-        exponents = E * Z
+        P = E * Z
 
-        self._exponents = exponents.as_immutable()
+        self._exponents = P.as_immutable()
 
     def _set_dimensional_group_quantities(self):
         quantities = self._nonscaling_quantities + self._scaling_quantities

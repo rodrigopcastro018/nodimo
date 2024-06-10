@@ -16,7 +16,8 @@ One
     Creates the dimensionless number one.
 """
 
-from sympy import sstr, srepr, latex, Symbol, Mul, Pow, S, Number
+from sympy import sstr, srepr, latex, Symbol, Mul, Pow, Number
+from sympy.printing.pretty.stringpict import prettyForm
 from typing import Optional, Union
 
 from nodimo.dimension import Dimension
@@ -68,6 +69,7 @@ class Quantity:
     _is_quantity: bool = True
     _is_power: bool = False
     _is_product: bool = False
+    _is_constant: bool = False
     _is_one: bool = False
 
     def __init__(
@@ -222,18 +224,85 @@ class Quantity:
 Q = Quantity
 
 
-class One(Quantity):
-    """Dimensionless one."""
+# class One(Quantity):  # TODO: delete this later
+#     """Dimensionless one."""
 
-    _is_one = True
-
-    def __new__(cls):
-        return super().__new__(cls)
+#     _is_one = True
     
-    def __init__(self):
-        super().__init__('One')
-        self._name = ''
-        self._symbolic = S.One
+#     def __init__(self):
+#         super().__init__('One')
+#         self._name = ''
+#         self._symbolic = S.One
+
+#     @property
+#     def is_dependent(self) -> bool:
+#         return self._is_dependent
+    
+#     @property
+#     def is_scaling(self) -> bool:
+#         return self._is_scaling
+
+
+# class Constant(Quantity):
+#     """Dimensionless constant.
+
+#     Constants are most commonly just dimensionless numbers. Here, they
+#     are preferably represented by letters, which can be provided as the
+#     name parameter. Constants are printed differently on the screen to
+#     avoid confusion with instances of Quantity. In latex, a calligraphic
+#     style is adopted, while the Cnst() operator is employed to identify
+#     contants in non-latex displays.
+#     """
+
+#     _is_constant = True
+
+#     def __init__(self, name: str = 'C'):
+#         super().__init__(name)
+#         self._name = f'Constant({name})'
+
+#     @property
+#     def is_dependent(self) -> bool:
+#         return self._is_dependent
+    
+#     @property
+#     def is_scaling(self) -> bool:
+#         return self._is_scaling
+
+#     def _sympystr(self, printer) -> str:
+#         printer.set_global_settings(root_notation=False)
+
+#         return f'Cnst({printer._print(self._symbolic)})'
+
+#     def _latex(self, printer) -> str:
+#         printer.set_global_settings(root_notation=False)
+
+#         return f'\\mathcal{{{printer._print(self._symbolic)}}}'
+
+#     def _pretty(self, printer) -> prettyForm:
+#         printer.set_global_settings(root_notation=False)
+
+#         cnst = prettyForm('Cnst')
+#         constant = prettyForm(*printer._print(self._symbolic).parens())
+
+#         return prettyForm(*cnst.right(constant))
+
+
+class Constant(Quantity):
+    """Dimensionless constant.
+
+    Constants are most commonly just dimensionless numbers. Here, they
+    are preferably represented by letters, which can be provided as the
+    name parameter. Constants are printed differently on the screen to
+    avoid confusion with instances of Quantity. In latex, a calligraphic
+    style is adopted, while the Cnst() operator is employed to identify
+    contants in non-latex displays.
+    """
+
+    _is_constant = True
+
+    def __init__(self, name: str = 'C'):
+        super().__init__(name)
+        self._name = f'Const({name})'
 
     @property
     def is_dependent(self) -> bool:
@@ -242,3 +311,37 @@ class One(Quantity):
     @property
     def is_scaling(self) -> bool:
         return self._is_scaling
+
+    def _sympystr(self, printer) -> str:
+        printer.set_global_settings(root_notation=False)
+
+        return self._name
+
+    def _latex(self, printer) -> str:
+        printer.set_global_settings(root_notation=False)
+
+        return f'\\mathcal{{{printer._print(self._symbolic)}}}'
+
+    def _pretty(self, printer) -> prettyForm:
+        printer.set_global_settings(root_notation=False)
+
+        cnst = prettyForm('Const')
+        constant = prettyForm(*printer._print(self._symbolic).parens())
+
+        return prettyForm(*cnst.right(constant))
+
+
+class One(Constant):
+    """Dimensionless one."""
+
+    _is_one = True
+    
+    def __init__(self):
+        super().__init__('1')
+
+    def _sympystr(self, printer) -> str:
+        printer.set_global_settings(root_notation=False)
+
+        return printer._print(self._symbolic)
+
+    _latex = _pretty = _sympystr
