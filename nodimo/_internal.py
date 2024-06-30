@@ -30,7 +30,8 @@ NodimoWarning
     (Custom) Nodimo warning
 """
 
-from sympy import pretty, Number, ImmutableDenseMatrix, sympify, nsimplify
+from sympy import pretty, Number, sympify, nsimplify
+from sympy.printing.pretty.pretty_symbology import pretty_symbol
 from typing import Union
 import warnings
 
@@ -84,7 +85,7 @@ def _show_object(obj, use_custom_css=True):
         else:
             display(obj)
     else:
-        print('\n' + pretty(obj) + '\n')  # TODO: root_notation=False was removed. Check if it will affect the diplay.
+        print('\n' + pretty(obj) + '\n')
 
 
 def _print_horizontal_line():
@@ -180,6 +181,36 @@ def _unsympify_number(number_sp: Number) -> Union[int, float, str, tuple]:
         return float(number_sp)
     else:
         return str(number_sp)
+
+
+def _prettify_name(name: str, bold: bool = False):
+    """Wrapper for the Sympy function pretty_symbol.
+
+    This function was created to provide a better exception context for
+    the Sympy function pretty_symbol.
+        
+    Parameters
+    ----------
+    name : str
+        String to be prettified.
+    bold : bool, default=False
+        If ``True``, the string is converted to boldface.
+
+    Returns
+    -------
+    pretty_name : str
+        Prettified string
+
+    Raises
+    ------
+    ValueError
+        If the input name is invalid.
+    """
+
+    try:
+        return pretty_symbol(name, bold_name=bold)
+    except:
+        raise ValueError(f"{repr(name)} is an invalid name")
 
 
 class NodimoWarning(Warning):

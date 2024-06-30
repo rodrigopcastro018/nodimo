@@ -14,14 +14,15 @@ Relation
     Creates a relation between quantities.
 """
 
-from sympy import Equality, Function
+from sympy import Symbol, Equality, Function
 from sympy.printing.pretty.stringpict import prettyForm
 
 from nodimo.quantity import Quantity, Constant
 from nodimo.groups import HomogeneousGroup, IndependentGroup
+from nodimo._internal import _prettify_name
 
 
-class Relation(HomogeneousGroup, IndependentGroup):  # TODO: remove contants from the group of quantities.
+class Relation(HomogeneousGroup, IndependentGroup):
     """Creates a relation of quantities.
 
     This class builds a mathematical relation between quantities.
@@ -56,8 +57,8 @@ class Relation(HomogeneousGroup, IndependentGroup):  # TODO: remove contants fro
     def _validate_relation(self):
         if len(self._dependent_quantities) > 1:
             raise ValueError("A relation cannot have more than one dependent quantity")
-        elif len(self._dependent_quantities) == 0:
-            self._dependent_quantities = (Constant(),)
+        if len(self._dependent_quantities) == 0:
+            self._dependent_quantities = (Constant('const'),)
 
     def _set_symbolic_relation(self):
         dep_qty = self._dependent_quantities[0]
@@ -66,39 +67,40 @@ class Relation(HomogeneousGroup, IndependentGroup):  # TODO: remove contants fro
 
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
-        quantities = ', '.join(printer._print(qty) for qty in self._quantities)
+        quantities = ', '.join(printer._print(qty._unreduced) for qty in self._quantities)
         name = f", name='{self._name}'" if self._name != 'f' else ''
 
         return f'{class_name}({quantities}{name})'
 
     def _sympystr(self, printer) -> str:
         printer.set_global_settings(root_notation=False)
-
-        dep_qty = printer._print(self._dependent_quantities[0])
+        name = self._name
+        dep_qty = printer._print(self._dependent_quantities[0]._unreduced)
         indep_qts = ', '.join(
-            printer._print(qty) for qty in self._independent_quantities
+            printer._print(qty._unreduced) for qty in self._independent_quantities
         )
 
-        return f'{dep_qty} = {self._name}({indep_qts})'
+        return f'{dep_qty} = {name}({indep_qts})'
 
     def _latex(self, printer) -> str:
         printer.set_global_settings(root_notation=False)
+        # name = translate(self._name)
+        name = printer._print(Symbol(self._name))
+        dep_qty = printer._print(self._dependent_quantities[0]._unreduced)
+        indep_qts = R',\ '.join(
+            printer._print(qty._unreduced) for qty in self._independent_quantities
+        )
 
-        if not isinstance(self._dependent_quantities[0], Constant):
-            return printer._print(self._symbolic)
+        return f'{dep_qty} = {name}\\left({indep_qts}\\right)'
 
-        dep_qty = printer._print(self._dependent_quantities[0])
-        indep_qts_func = printer._print(self._symbolic.rhs)
-
-        return f'{dep_qty} = {indep_qts_func}'
-    
     def _pretty(self, printer) -> prettyForm:
         printer.set_global_settings(root_notation=False)
+        name = _prettify_name(self._name)
+        dep_qty = printer._print(self._dependent_quantities[0]._unreduced)
+        indep_qts = prettyForm('')
+        for i, qty in enumerate(self._independent_quantities):
+            sep = ', ' if i > 0 else ''
+            indep_qts = prettyForm(*indep_qts.right(sep, printer._print(qty._unreduced)))
+        indep_qts = prettyForm(*indep_qts.parens())
 
-        if not isinstance(self._dependent_quantities[0], Constant):
-            return printer._print(self._symbolic)
-
-        dep_qty = printer._print(self._dependent_quantities[0])
-        indep_qts_func = printer._print(self._symbolic.rhs)
-
-        return prettyForm(*dep_qty.right(' = ', indep_qts_func))
+        return prettyForm(*dep_qty.right(' = ', name, indep_qts))

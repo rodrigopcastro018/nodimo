@@ -53,14 +53,15 @@ class Collection:
     """
 
     def __init__(self, *quantities: Quantity):
-        # Main attributes.
         self._quantities: tuple[Quantity]
         self._dimensions: dict[str, Number]
         self._is_dimensionless: bool
 
-        # Attributes to be used in child classes.
         self._disassembled_quantities: tuple[Quantity]
         self._base_quantities: tuple[Quantity]
+
+        self._number_constants: tuple[Constant]
+        self._constants: tuple[Constant]
 
         self._scaling_quantities: tuple[Quantity]
         self._nonscaling_quantities: tuple[Quantity]
@@ -77,6 +78,8 @@ class Collection:
 
         self._set_collection_quantities(*quantities)
         self._set_collection()
+        self._validate_collection()
+        self._set_collection_dimensions()
 
     @property
     def quantities(self) -> tuple[Quantity]:
@@ -84,12 +87,6 @@ class Collection:
 
     def show(self, use_custom_css: bool = True):
         _show_object(self, use_custom_css=use_custom_css)  # TODO: Include use_custom_css in the future global settings.
-
-    def _set_collection(self):
-        self._set_disassembled_quantities()
-        self._set_base_quantities()
-        self._validate_collection()
-        self._set_collection_dimensions()
 
     def _set_collection_quantities(self, *quantities):
         not_quantities = []
@@ -103,6 +100,11 @@ class Collection:
 
         self._quantities = quantities
 
+    def _set_collection(self):
+        self._reduce_quantities()
+        self._set_disassembled_quantities()
+        self._set_base_quantities()
+    
     def _validate_collection(self):
         repeated_names = []
         for i, qty1 in enumerate(self._base_quantities):
@@ -175,28 +177,40 @@ class Collection:
         
         self._dimensions = dimensions
 
-    def _clear_constants(self):
-        """Removes dimensionless constants."""
+    def _clear_constants(self, only_numbers: bool = False, only_ones: bool = False):
+        """Removes dimensionless constants.
+
+        Parameters
+        ----------
+        only_numbers : bool, default=False
+            If ``True``, only numerical constants are removed.
+        only_ones : bool, default=False
+            If ``True``, only instances of One are removed.
+        """
+
+        if not only_ones and not hasattr(self, '_constants'):
+            self._set_constants()
+
+        if only_numbers:
+            constants = (qty for qty in self._constants if qty._is_number)
+        elif only_ones:
+            constants = (One(),)
+        else:
+            constants = self._constants
 
         clear_quantities = []
         for qty in self._quantities:
-            if not isinstance(qty, Constant):
+            if qty not in constants:
                 clear_quantities.append(qty)
 
         self._quantities = tuple(clear_quantities)
+        self._set_collection()
 
-    def _clear_ones(self):
-        """Removes dimensionless ones."""
-
-        clear_quantities = []
-        for qty in self._quantities:
-            if not isinstance(qty, One):
-                clear_quantities.append(qty)
-
-        self._quantities = tuple(clear_quantities)
+    def _reduce_quantities(self):
+        self._quantities = tuple(qty._reduce() for qty in self._quantities)
 
     def _set_disassembled_quantities(self):
-        """Determines all instances of Quantity, One and Power.
+        """Determines all instances of Quantity, Constant and Power.
 
         It does that by disassembling instances of Product.
         """
@@ -211,7 +225,7 @@ class Collection:
         self._disassembled_quantities = tuple(disassembled_quantities)
 
     def _set_base_quantities(self):
-        """Determines all nonrepetitive instances of Quantity."""
+        """Determines all nonnumerical instances of Quantity."""
 
         base_quantities = []
         for qty in self._disassembled_quantities:
@@ -219,12 +233,27 @@ class Collection:
                 base_qty = qty._quantity
             else:
                 base_qty = qty
-            
-            if base_qty not in base_quantities and not base_qty._is_one:
+
+            if not base_qty._symbolic.is_number and base_qty not in base_quantities:
                 base_quantities.append(base_qty)
 
         self._base_quantities = tuple(base_quantities)
-    
+
+    def _set_constants(self):
+        """Determines all nonrepetitive instances of Constant."""
+
+        number_constants = []
+        symbol_constants = []
+        for qty in self._quantities:
+            if qty._is_constant:
+                if qty._is_number and qty not in number_constants:
+                    number_constants.append(qty)
+                elif qty not in symbol_constants:
+                    symbol_constants.append(qty)
+
+        self._number_constants = tuple(number_constants)
+        self._constants = tuple(number_constants + symbol_constants)
+
     def _set_scaling_quantities(self):
         """Separates scaling and nonscaling quantities."""
 
@@ -269,7 +298,7 @@ class Collection:
         self._raw_matrix = raw_matrix
         self._matrix = ImmutableDenseMatrix(raw_matrix)
 
-    def _set_matrix_rank(self):
+    def _set_matrix_rank(self):  # TODO: Find a way to remove this hasattr check
         if not hasattr(self, '_matrix'):
             self._set_matrix()
 
@@ -401,7 +430,7 @@ class Collection:
         """Developer string representation according to Sympy."""
 
         class_name = type(self).__name__
-        quantities = ', '.join(printer._print(qty) for qty in self._quantities)
+        quantities = ', '.join(printer._print(qty._unreduced) for qty in self._quantities)
 
         return f'{class_name}({quantities})'
 
@@ -410,29 +439,29 @@ class Collection:
 
         printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
         class_name = printer._print(type(self).__name__)
-        quantities = ', '.join(printer._print(qty) for qty in self._quantities)
+        quantities = ', '.join(printer._print(qty._unreduced) for qty in self._quantities)
 
         return f'{class_name}({quantities})'
 
     def _latex(self, printer) -> str:
         """Latex representation according to Sympy."""
 
-        printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
+        printer.set_global_settings(root_notation=False)
         class_name = printer._print(type(self).__name__)
-        quantities = R',\ '.join(printer._print(qty) for qty in self._quantities)
+        quantities = R',\ '.join(printer._print(qty._unreduced) for qty in self._quantities)
 
         return f'{class_name}\\left({quantities}\\right)'
 
     def _pretty(self, printer) -> prettyForm:
         """Pretty representation according to Sympy."""
 
-        printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
+        printer.set_global_settings(root_notation=False)
         class_name = printer._print(type(self).__name__)
 
         quantities = prettyForm('')
         for i, qty in enumerate(self._quantities):
             sep = ', ' if i > 0 else ''
-            quantities = prettyForm(*quantities.right(sep, printer._print(qty)))
+            quantities = prettyForm(*quantities.right(sep, printer._print(qty._unreduced)))
         quantities = prettyForm(*quantities.parens())
 
         return prettyForm(*class_name.right(quantities))

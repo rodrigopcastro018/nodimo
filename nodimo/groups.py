@@ -17,8 +17,8 @@ HomogeneorusGroup
     Creates a homogeneous group of quantities.
 ScalingGroup
     Creates a Group of scaling quantities.
-PrimeGroup
-    Creates a group of prime quantities.
+IndependentGroup
+    Creates a independent group of quantities.
 DimensionalGroup
     Creates a dimensional group of derived quantities.
 """
@@ -40,6 +40,7 @@ class Group(Collection):
 
     Warns
     -----
+    NodimoWarning
         Removed duplicate quantities.
     """
 
@@ -57,7 +58,7 @@ class Group(Collection):
             if qty not in clear_quantities:
                 clear_quantities.append(qty)
             else:
-                duplicate_quantities.append(qty)
+                duplicate_quantities.append(qty._unreduced)
 
         self._quantities = tuple(clear_quantities)
 
@@ -101,7 +102,7 @@ class HomogeneousGroup(Group):
                 dim_count = sum(dim_bool)
                 if dim_count == 1:
                     irr_qty = clear_quantities[dim_bool.index(True)]
-                    irrelevant_quantities.append(irr_qty)
+                    irrelevant_quantities.append(irr_qty._unreduced)
                     clear_quantities.remove(irr_qty)
                     self._quantities = tuple(clear_quantities)
                     self._set_collection_dimensions()
@@ -129,7 +130,7 @@ class ScalingGroup(Group):
         self._set_scaling_group()
 
     def _set_scaling_group(self):
-        self._clear_ones()
+        self._clear_constants()
         self._set_scaling_group_quantities()
         self._set_matrix_rank()
         self._validate_scaling_group()
@@ -154,7 +155,7 @@ class ScalingGroup(Group):
 
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
-        quantities = ', '.join(printer._print(qty) for qty in self._quantities)
+        quantities = ', '.join(printer._print(qty._unreduced) for qty in self._quantities)
         id_number = f', id_number={self._id_number}' if self._id_number else ''
 
         return f'{class_name}({quantities}{id_number})'
@@ -162,14 +163,14 @@ class ScalingGroup(Group):
     def _sympystr(self, printer) -> str:
         id_number = f' {self._id_number}' if self._id_number else ''
         scgroup = printer._print(f"Scaling group{id_number} ")
-        quantities = ', '.join(printer._print(qty) for qty in self._quantities)
+        quantities = ', '.join(printer._print(qty._unreduced) for qty in self._quantities)
 
         return f'{scgroup}({quantities})'
 
     def _latex(self, printer) -> str:
         id_number = f' {self._id_number}' if self._id_number else ''
         scgroup = printer._print(f"Scaling group{id_number} ")
-        quantities = R',\ '.join(printer._print(qty) for qty in self._quantities)
+        quantities = R',\ '.join(printer._print(qty._unreduced) for qty in self._quantities)
 
         return f'{scgroup}\\left({quantities}\\right)'
 
@@ -180,7 +181,7 @@ class ScalingGroup(Group):
         quantities = prettyForm('')
         for i, qty in enumerate(self._quantities):
             sep = ', ' if i > 0 else ''
-            quantities = prettyForm(*quantities.right(sep, printer._print(qty)))
+            quantities = prettyForm(*quantities.right(sep, printer._print(qty._unreduced)))
         quantities = prettyForm(*quantities.parens())
 
         return prettyForm(*scgroup.right(quantities))
@@ -222,7 +223,7 @@ class IndependentGroup(Group):
         self._set_independent_group()
 
     def _set_independent_group(self):
-        self._clear_ones()
+        self._clear_constants()
         self._set_derived_quantities()
         self._clear_dependent_derived_quantities()
 
@@ -242,7 +243,7 @@ class IndependentGroup(Group):
         derived_quantities = []
         for i, qty in enumerate(self._quantities):
             dimensions = self._get_derived_dimensions(qty)
-            derived_quantities.append(Quantity(f'b_{i}', **dimensions))
+            derived_quantities.append(Quantity(f'dqty_{i}', **dimensions))
 
         self._derived_quantities = tuple(derived_quantities)
 
@@ -260,7 +261,7 @@ class IndependentGroup(Group):
             if i in indep_qts_indexes:
                 independent_quantities.append(qty)
             else:
-                dependent_quantities.append(qty)
+                dependent_quantities.append(qty._unreduced)
 
         self._quantities = tuple(independent_quantities)
 
@@ -379,7 +380,7 @@ class DimensionalGroup(HomogeneousGroup, IndependentGroup):
 
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
-        quantities = ', '.join(printer._print(qty) for qty in self._xquantities)
+        quantities = ', '.join(printer._print(qty._unreduced) for qty in self._xquantities)
 
         if self._is_dimensionless:
             dimensions = ''
