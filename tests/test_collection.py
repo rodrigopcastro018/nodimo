@@ -369,6 +369,20 @@ def test_latex():
     assert latex(col) == '\\mathtt{\\text{Collection}}\\left(a,\\ b,\\ \\frac{1}{{a}^{2}},\\ \\frac{a b}{{a}^{2}},\\ 2 \\pi\\right)'
 
 
+# def test_pretty():
+#     a = Quantity('a', A=-1, B=10, C=7, D=16, scaling=True)
+#     b = Quantity('b', A=1, B=0, C=9, D=10, dependent=True)
+#     c = Power(a,-2)
+#     d = Product(a,b,c, reduce=False)
+#     e = Constant('2*pi')
+#     col = Collection(a,b,c,d,e)
+
+#     assert pretty(col) == ('          ⎛      1   a⋅b     ⎞\n'
+#                            'Collection⎜a, b, ──, ───, 2⋅π⎟\n'
+#                            '          ⎜       2    2     ⎟\n'
+#                            '          ⎝      a    a      ⎠')
+
+
 def test_pretty():
     a = Quantity('a', A=-1, B=10, C=7, D=16, scaling=True)
     b = Quantity('b', A=1, B=0, C=9, D=10, dependent=True)
@@ -377,7 +391,8 @@ def test_pretty():
     e = Constant('2*pi')
     col = Collection(a,b,c,d,e)
 
-    assert pretty(col) == ('          ⎛      1   a⋅b     ⎞\n'
-                           'Collection⎜a, b, ──, ───, 2⋅π⎟\n'
-                           '          ⎜       2    2     ⎟\n'
-                           '          ⎝      a    a      ⎠')
+    assert pretty(col, use_unicode=False) == ('          /      1   a*b      \\\n'
+                                              'Collection|a, b, --, ---, 2*pi|\n'
+                                              '          |       2    2      |\n'
+                                              '          \\      a    a       /'
+    )
