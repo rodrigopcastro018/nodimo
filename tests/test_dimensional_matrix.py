@@ -1,133 +1,107 @@
-import sys
-import sympy as sp
-from nodimo import Variable, VariableGroup, DimensionalMatrix
+from sympy import srepr, latex, pretty, sympify, Symbol, ImmutableDenseMatrix
+from nodimo.quantity import Quantity
+from nodimo.matrix import DimensionalMatrix
 
 
-def test_variables():
-    var1 = Variable('var1', d1=1, d2=-2, dependent=True)
-    var2 = Variable('var2', d1=-1, scaling=False)
+def test_properties():
+    a = Quantity('a', A=3, B=-1)
+    b = Quantity('b', C=-4, A=1, scaling=True)
+    c = Quantity('c', A=-5)
+    dm = DimensionalMatrix(a, b, c)
 
-    group = VariableGroup([var1, var2], [-1, 2])
-
-    dmatrix1 = DimensionalMatrix(var1, var2)
-    dmatrix2 = DimensionalMatrix(var1, group)
-
-    assert dmatrix1.variables == [var1, var2]
-    assert dmatrix2.variables == [var1, group]
+    assert dm.matrix == ImmutableDenseMatrix([[ 3,  1, -5],
+                                              [-1,  0,  0],
+                                              [ 0, -4,  0]])
+    assert dm.rank == 3
+    assert dm.independent_rows == (0,1,2)
 
 
 def test_dimensions():
-    var1 = Variable('var1', d1=3, d2=0)
-    var2 = Variable('var2', d1=4, d2=1, scaling=False)
+    a = Quantity('a', A=3, B=-1)
+    b = Quantity('b', C=-4, A=1, scaling=True)
+    c = Quantity('c', A=-5)
+    dm = DimensionalMatrix(a, b, c)
 
-    group = VariableGroup([var1, var2], [3, 1])
+    assert tuple(dm._dimensions.keys()) == ('A', 'B', 'C')
 
-    dmatrix1 = DimensionalMatrix(var1, var2)
-    dmatrix2 = DimensionalMatrix(var1, var2, dimensions=['d1', 'd2'])
-    dmatrix3 = DimensionalMatrix(var1, var2, dimensions=['d2'])
-    dmatrix4 = DimensionalMatrix(var2, group)
+    dm.set_dimensions_order('B', 'C', 'A')
 
-    assert dmatrix1.dimensions == ['d1', 'd2']
-    assert dmatrix2.dimensions == ['d1', 'd2']
-    assert dmatrix1.matrix[1,:] == dmatrix3.matrix
-    assert dmatrix4.dimensions == ['d1', 'd2']
+    assert tuple(dm._dimensions.keys()) == ('B', 'C', 'A')
 
+    dm.set_dimensions_order('C')
 
-
-def test_matrix():
-    var1 = Variable('var1', d1=6, d2=5, scaling=True)
-    var2 = Variable('var2', d1=-3, d2=-1, scaling=False)
-
-    group = VariableGroup([var1, var2], [1, 1])
-
-    matrix1 = sp.Matrix([[6, -3],
-                         [5, -1]])
-
-    matrix2 = sp.Matrix([[3],
-                         [4]])
-
-    dmatrix1 = DimensionalMatrix(var1, var2)
-    dmatrix2 = DimensionalMatrix(group)
-
-    assert dmatrix1.matrix == matrix1
-    assert dmatrix2.matrix == matrix2
+    assert tuple(dm._dimensions.keys()) == ('C', 'B', 'A')
 
 
-def test_labeled_matrix():
-    var1 = Variable('var1', d1=5, d2=-2, scaling=True)
-    var2 = Variable('var2', d1=7, d2=3, scaling=False)
+def test_symbolic():
+    a = Quantity('a', A=3, B=-1)
+    b = Quantity('b', C=-4, A=1, scaling=True)
+    c = Quantity('c', A=-5)
+    dm = DimensionalMatrix(a, b, c)
+    ax = a._symbolic
+    bx = b._symbolic
+    cx = c._symbolic
+    A = Symbol('A')
+    B = Symbol('B')
+    C = Symbol('C')
+    N = Symbol('')
 
-    labeled_matrix = sp.Matrix([[Variable(''), var1, var2],
-                                [        'd1',    5,    7],
-                                [        'd2',   -2,    3]])
-    
-    dmatrix = DimensionalMatrix(var1, var2)
-
-    assert dmatrix.labeled_matrix == labeled_matrix
-
-
-def test_rank():
-    var1 = Variable('var1', d1=1, d2=0, d3=0, d4=0)
-    var2 = Variable('var2', d1=0, d2=1, d3=0, d4=0)
-    var3 = Variable('var3', d1=0, d2=0, d3=1, d4=0)
-    var4 = Variable('var4', d1=0, d2=0, d3=0, d4=1)
-    var5 = Variable('var5', d1=1, d2=0, d3=1, d4=0)
-    var6 = Variable('var6', d1=0, d2=1, d3=0, d4=1)
-
-    dmatrix1 = DimensionalMatrix()
-    dmatrix2 = DimensionalMatrix(var1)
-    dmatrix3 = DimensionalMatrix(var1, var2)
-    dmatrix4 = DimensionalMatrix(var1, var2, var3)
-    dmatrix5 = DimensionalMatrix(var1, var2, var3, var4)
-    dmatrix6 = DimensionalMatrix(var1, var2, var3, var4, var5)
-    dmatrix7 = DimensionalMatrix(var1, var2, var3, var4, var5, var6)
-
-    assert dmatrix1.rank == 0
-    assert dmatrix2.rank == 1
-    assert dmatrix3.rank == 2
-    assert dmatrix4.rank == 3
-    assert dmatrix5.rank == 4
-    assert dmatrix6.rank == 4
-    assert dmatrix7.rank == 4
+    assert dm._symbolic == ImmutableDenseMatrix([[N, ax, bx, cx],
+                                                 [A,  3,  1, -5],
+                                                 [B, -1,  0,  0],
+                                                 [C,  0, -4,  0]])
 
 
-def test_matrix_display(capfd):
-    var1 = Variable('var1', d1=-1, d2=3)
-    var2 = Variable('var2', d1=4, d2=-2, dependent=True)
-    dmatrix = DimensionalMatrix(var1, var2)
+def test_sympify():
+    a = Quantity('a', A=3, B=-1)
+    b = Quantity('b', C=-4, A=1, scaling=True)
+    c = Quantity('c', A=-5)
+    dm = DimensionalMatrix(a, b, c)
 
-    dmatrix.show()
-    out, _ = capfd.readouterr()
-    assert out == ('\n'
-                   '⎡    var₁  var₂⎤\n'
-                   '⎢              ⎥\n'
-                   '⎢d₁   -1    4  ⎥\n'
-                   '⎢              ⎥\n'
-                   '⎣d₂   3     -2 ⎦\n'
-                   '\n')
+    assert sympify(dm) == ImmutableDenseMatrix([[ 3,  1, -5],
+                                                [-1,  0,  0],
+                                                [ 0, -4,  0]])
 
 
-def test_dimensional_matrix_repr():
-    var1 = Variable('var1', d1=1, d2=-2, dependent=True)
-    var2 = Variable('var2', d1=-1, scaling=False)
+def test_sympyrepr():
+    a = Quantity('a', A=3, B=-1)
+    b = Quantity('b', C=-4, A=1, scaling=True)
+    c = Quantity('c', A=-5)
+    d = b*c*a**-2
+    e = c**-5
+    dm = DimensionalMatrix(a, d, e)
 
-    dmatrix1 = DimensionalMatrix(var1, var2)
-    dmatrix2 = DimensionalMatrix(var1, var2, dimensions=['d2', 'd1'])
-
-    assert eval(sp.srepr(dmatrix1)) == dmatrix1
-    assert eval(sp.srepr(dmatrix2)) == dmatrix2
+    assert srepr(dm) == "DimensionalMatrix(Quantity('a', A=3, B=-1), Product(Quantity('b', C=-4, A=1, scaling=True), Quantity('c', A=-5), Power(Quantity('a', A=3, B=-1), -2)), Power(Quantity('c', A=-5), -5))"
 
 
-def test_dimensional_matrix_eq():
-    var1 = Variable('var1', d1=1, d2=-2, dependent=True)
-    var2 = Variable('var2', d1=-1, scaling=False)
-    group = VariableGroup([var1, var2], [1, 1])
+def test_sympystr():
+    a = Quantity('a', A=3, B=-1)
+    b = Quantity('b', C=-4, A=1, scaling=True)
+    c = Quantity('c', A=-5)
+    d = b*c*a**-2
+    e = c**-5
+    dm = DimensionalMatrix(a, d, e)
 
-    dmatrix1 = DimensionalMatrix(var1, var2)
-    dmatrix2 = DimensionalMatrix(var2, var1, dimensions=['d2', 'd1'])
-    dmatrix3 = 'DummyDimensionalMatrix'
-    dmatrix4 = DimensionalMatrix(var1, var2, group)
+    assert str(dm) == '    a  b*c/a**2  1/c**5\nA   3       -10      25\nB  -1         2       0\nC   0        -4       0'
 
-    assert dmatrix1 == dmatrix2
-    assert dmatrix1 != dmatrix3
-    assert dmatrix1 != dmatrix4
+
+def test_latex():
+    a = Quantity('a', A=3, B=-1)
+    b = Quantity('b', C=-4, A=1, scaling=True)
+    c = Quantity('c', A=-5)
+    d = b*c*a**-2
+    e = c**-5
+    dm = DimensionalMatrix(a, d, e)
+
+    assert latex(dm) == '\\begin{array}{r|rrr} & a & \\frac{b c}{{a}^{2}} & \\frac{1}{{c}^{5}} \\\\ \\hline \\mathsf{A} & \\phantom{-}3 & -10 & \\phantom{-}25 \\\\ \\mathsf{B} & -1 & \\phantom{-}2 & \\phantom{-}0 \\\\ \\mathsf{C} & \\phantom{-}0 & -4 & \\phantom{-}0 \\\\ \\end{array}'
+
+
+def test_pretty():
+    a = Quantity('a', A=3, B=-1)
+    b = Quantity('b', C=-4, A=1, scaling=True)
+    c = Quantity('c', A=-5)
+    d = b*c*a**-2
+    e = c**-5
+    dm = DimensionalMatrix(a, d, e)
+
+    assert pretty(dm) == '       b⋅c  1 \n    a  ───  ──\n         2   5\n        a   c \nA   3  -10  25\nB  -1    2   0\nC   0   -4   0'

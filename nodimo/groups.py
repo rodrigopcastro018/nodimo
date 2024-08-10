@@ -23,8 +23,9 @@ DimensionalGroup
     Creates a dimensional group of derived quantities.
 """
 
-from sympy import Number, Matrix, zeros, eye
+from sympy import Number, Matrix, zeros, eye, S
 from sympy.printing.pretty.stringpict import prettyForm
+from typing import Union
 
 from nodimo.quantity import Quantity
 from nodimo.collection import Collection
@@ -36,7 +37,7 @@ from nodimo._internal import _unsympify_number, _show_nodimo_warning
 class Group(Collection):
     """Group of quantities.
 
-    Equivalent to a Collection, but duplicate quantities are removed.
+    Equivalent to a Collection, but without duplicate quantities.
 
     Warns
     -----
@@ -60,7 +61,7 @@ class Group(Collection):
             else:
                 duplicate_quantities.append(qty._unreduced)
 
-        self._quantities = tuple(clear_quantities)
+        self._quantities = clear_quantities
 
         if len(duplicate_quantities) > 0:
             _show_nodimo_warning(
@@ -70,8 +71,6 @@ class Group(Collection):
 
 class HomogeneousGroup(Group):
     """Dimensionally homogeneous group of quantities.
-
-    Equivalent to a dimmensionally homogenous Group.
 
     Warns
     -----
@@ -104,15 +103,17 @@ class HomogeneousGroup(Group):
                     irr_qty = clear_quantities[dim_bool.index(True)]
                     irrelevant_quantities.append(irr_qty._unreduced)
                     clear_quantities.remove(irr_qty)
-                    self._quantities = tuple(clear_quantities)
+                    self._quantities = clear_quantities
                     self._set_collection_dimensions()
                     break
             if irr_qty is None:
                 break
 
         if len(irrelevant_quantities) > 0:
-            _show_nodimo_warning(f"Dimensionally irrelevant quantities "
-                                 f"({str(irrelevant_quantities)[1:-1]})")
+            _show_nodimo_warning(
+                f"Dimensionally irrelevant quantities "
+                f"({str(irrelevant_quantities)[1:-1]})"
+            )
 
 
 class ScalingGroup(Group):
@@ -144,18 +145,21 @@ class ScalingGroup(Group):
                 new_qty = qty
             else:
                 new_qty = qty._copy()
-                new_qty.is_scaling = True
+                new_qty._is_scaling = True
+                new_qty._validate_quantity()
             new_quantities.append(new_qty)
 
-        self._quantities = tuple(new_quantities)
+        self._quantities = new_quantities
 
     def _validate_scaling_group(self):
-        if len(self._quantities) != self._rank:
+        if len(self._quantities) > self._rank:
             raise ValueError("Quantities are not dimensionally independent")
 
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
-        quantities = ', '.join(printer._print(qty._unreduced) for qty in self._quantities)
+        quantities = ', '.join(
+            printer._print(qty._unreduced) for qty in self._quantities
+        )
         id_number = f', id_number={self._id_number}' if self._id_number else ''
 
         return f'{class_name}({quantities}{id_number})'
@@ -163,14 +167,18 @@ class ScalingGroup(Group):
     def _sympystr(self, printer) -> str:
         id_number = f' {self._id_number}' if self._id_number else ''
         scgroup = printer._print(f"Scaling group{id_number} ")
-        quantities = ', '.join(printer._print(qty._unreduced) for qty in self._quantities)
+        quantities = ', '.join(
+            printer._print(qty._unreduced) for qty in self._quantities
+        )
 
         return f'{scgroup}({quantities})'
 
     def _latex(self, printer) -> str:
         id_number = f' {self._id_number}' if self._id_number else ''
         scgroup = printer._print(f"Scaling group{id_number} ")
-        quantities = R',\ '.join(printer._print(qty._unreduced) for qty in self._quantities)
+        quantities = R',\ '.join(
+            printer._print(qty._unreduced) for qty in self._quantities
+        )
 
         return f'{scgroup}\\left({quantities}\\right)'
 
@@ -181,7 +189,9 @@ class ScalingGroup(Group):
         quantities = prettyForm('')
         for i, qty in enumerate(self._quantities):
             sep = ', ' if i > 0 else ''
-            quantities = prettyForm(*quantities.right(sep, printer._print(qty._unreduced)))
+            quantities = prettyForm(
+                *quantities.right(sep, printer._print(qty._unreduced))
+            )
         quantities = prettyForm(*quantities.parens())
 
         return prettyForm(*scgroup.right(quantities))
@@ -211,15 +221,16 @@ class IndependentGroup(Group):
 
     Notes
     -----
-    1. The terms 'dependent' and 'independent' have nothing to do with
-       the quantity attribute (is_dependent) used to build relations.
+    1. The terms 'dependent' and 'independent' employed here have
+       nothing to do with the quantity attribute ``is_dependent``
+       used to build relations.
     2. The base quantities are not necessarily the quantities of the
        group.
     """
 
     def __init__(self, *quantities: Quantity):
         super().__init__(*quantities)
-        self._derived_quantities: tuple[Quantity]
+        self._derived_quantities: list[Quantity]
         self._set_independent_group()
 
     def _set_independent_group(self):
@@ -227,25 +238,25 @@ class IndependentGroup(Group):
         self._set_derived_quantities()
         self._clear_dependent_derived_quantities()
 
-    def _get_derived_dimensions(self, quantity) -> dict[str, Number]:
+    def _get_derived_dimensions(self, quantity):
         dimensions = {}
         if quantity._is_product:
-            for qty in quantity.quantities:
+            for qty in quantity.factors:
                 dimensions = {**dimensions, **self._get_derived_dimensions(qty)}
         elif quantity._is_power:
-            dimensions[quantity.quantity.name] = quantity.exponent
-        else:
-            dimensions[quantity.name] = 1
+            dimensions[quantity.base.name] = quantity.exponent
+        elif not quantity._is_constant:
+            dimensions[quantity.name] = S.One
 
         return dimensions
 
     def _set_derived_quantities(self):
-        derived_quantities = []
+        derived_quantities = {}
         for i, qty in enumerate(self._quantities):
             dimensions = self._get_derived_dimensions(qty)
-            derived_quantities.append(Quantity(f'dqty_{i}', **dimensions))
+            derived_quantities[Quantity(f'dQ{i}', **dimensions)] = qty
 
-        self._derived_quantities = tuple(derived_quantities)
+        self._derived_quantities = derived_quantities
 
     def _clear_dependent_derived_quantities(self):
         derived_group = Group(*self._derived_quantities)
@@ -263,7 +274,7 @@ class IndependentGroup(Group):
             else:
                 dependent_quantities.append(qty._unreduced)
 
-        self._quantities = tuple(independent_quantities)
+        self._quantities = independent_quantities
 
         if len(dependent_quantities) > 0:
             _show_nodimo_warning(
@@ -292,13 +303,18 @@ class DimensionalGroup(HomogeneousGroup, IndependentGroup):
         Quantities to be transformed.
     **dimensions : Number
         Aimed dimensions for the group given as keyword arguments.
-        Dimensions that are given are considered null.
+        Dimensions that are not given are considered null.
 
     Raises
     ------
     ValueError
         If the group does not have the necessary number of dimensionally
         independent scaling quantities.
+
+    Warns
+    -----
+    NodimoWarning
+        Dimensions that are treated as independent.
 
     References
     ----------
@@ -309,7 +325,7 @@ class DimensionalGroup(HomogeneousGroup, IndependentGroup):
     def __init__(self, *quantities: Quantity, **dimensions: Number):
         super(DimensionalGroup, self).__init__(*quantities)
         super(HomogeneousGroup, self).__init__(*self._quantities)
-        self._xquantities: tuple[Quantity] = self._quantities
+        self._original_quantities: list[Quantity] = self._quantities
         self._set_dimensions(**dimensions)
         self._set_dimensional_group()
 
@@ -352,16 +368,14 @@ class DimensionalGroup(HomogeneousGroup, IndependentGroup):
 
         E11 = eye(nnonsc)
         E12 = zeros(nnonsc, rank)
-        E21 = -A**-1 * B
+        E21 = -(A**-1) * B
         E22 = A**-1
-        E = Matrix([[E11, E12],
-                    [E21, E22]])
+        E = Matrix([[E11, E12], [E21, E22]])
 
         Z1 = Matrix.hstack(eye(nnonsc), zeros(nnonsc, hasdim))
         Z2C = Matrix(list(self._independent_dimensions.values()))
-        Z2 = Matrix.hstack(*nprods*[Z2C])
-        Z = Matrix([[Z1],
-                    [Z2]])
+        Z2 = Matrix.hstack(*nprods * [Z2C])
+        Z = Matrix([[Z1], [Z2]])
 
         P = E * Z
 
@@ -376,11 +390,13 @@ class DimensionalGroup(HomogeneousGroup, IndependentGroup):
                 factors.append(Power(qty, exp))
             products.append(Product(*factors))
 
-        self._quantities = tuple(products)
+        self._quantities = products
 
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
-        quantities = ', '.join(printer._print(qty._unreduced) for qty in self._xquantities)
+        quantities = ', '.join(
+            printer._print(qty._unreduced) for qty in self._original_quantities
+        )
 
         if self._is_dimensionless:
             dimensions = ''

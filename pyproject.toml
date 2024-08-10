@@ -4,14 +4,14 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'nodimo'
-version = '1.1.0'
+version = '2.0.0'
 authors = [
   {name = 'Rodrigo Castro', email = 'rodrigopcastro018@gmail.com'}
 ]
 maintainers = [
   {name = 'Rodrigo Castro', email = 'rodrigopcastro018@gmail.com'}
 ]
-description = "Nodimo is a tool that creates nondimensional models"
+description = "Nodimo is a tool that creates dimensionless models"
 readme = 'README.md'
 requires-python = '>=3.9'
 license = {file = 'LICENSE'}
@@ -38,6 +38,7 @@ dependencies = ['sympy>=1.7']
 test = ['mypy>=1.0', 'pytest>=6.2', 'nbval>=0.11', 'coverage>=7.0', 'pytest-cov>=2.10']
 tox = ['tox>=4.0', 'tox-pyenv-redux>=1.0']
 docs = ['sphinx>=7.2.6', 'furo>=2024.1.29', 'nbsphinx>=0.9.3', 'numpydoc>=1.6.0', 'IPython>=8.8.0']
+format = ['black>=22.1.0']
 
 [project.urls]
 'Source' = 'https://github.com/rodrigopcastro018/nodimo'
@@ -64,6 +65,11 @@ source = ['nodimo']
 
 [tool.coverage.html]
 directory = '.coverage/htmlcov'
+
+[tool.black]
+target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
+skip-string-normalization = 'True'
+include = 'nodimo\/.*\.pyi?$'
 
 [tool.tox]
 legacy_tox_ini = """

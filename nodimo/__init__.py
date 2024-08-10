@@ -7,49 +7,52 @@
 Nodimo
 ======
 
-Nodimo is a tool that creates nondimensional models.
+Nodimo is a tool that creates dimensionless models.
 
 The main purpose of Nodimo is to transform a dimensional relationship
-between variables into a nondimensional one. The variables are gathered
-in nondimensional groups such that the number of groups is lower than
-the number of variables. The resulting nondimensional model is, at the
-same time, a generalization and simplification of the dimensional model.
+between quantities into a dimensionless one. This is done by grouping
+dimensional quantities into dimensionless products in such a way that
+the resulting number of products is always lower than or equal to the
+starting number of quantities. Therefore, the ensuing dimensionless
+model is, at the same time, a generalization and simplification of the
+dimensional model.
 
-Nodimo supports any number of dimensions and variables. It can be used
+Nodimo supports any number of dimensions and quantities. It can be used
 for applications in science, engineering, economics and finance. The
-resulting nondimensional groups can be used as the basis for further
+resulting dimensionless relations can be used as the basis for further
 studies in similarity and model testing.
 
 Notes
 -----
-The use of this package requires basic knowledge of dimensional
-analysis, specially on choosing the appropriate set of scaling
-parameters and indentifying established nondimensional groups.
+The use of Nodimo requires basic knowledge of dimensional analysis,
+specially on choosing the appropriate set of scaling parameters and
+indentifying established dimensionless groups. It is recommended the
+use of IPython/Jupyter for a better displaying of the results.
 
 Modules
 -------
-variable
-    This module contains the class to create a variable.
+dimension
+    This module contains the class to create a quantity dimension.
+quantity
+    This module contains the class to create a quantity.
 power
-    This module contains the class to create a power of a variable.
+    This module contains the class to create a power of a quantity.
 product
-    This module contains the class to create a product of variables.
+    This module contains the class to create a product of quantities.
 collection
     This module contains the base class for everything that is created
-    with a collection of variables.
+    with a collection of quantities.
 groups
-    This module contains classes to create groups of variables, which
+    This module contains classes to create groups of quantities, which
     are specific types of collections.
 matrix
     This module contains the class to create a dimensional matrix.
 relation
     This module contains the class to create a relation between
-    variables.
+    quantities.
 model
     This module contains the classes to create (non)dimensional models.
 """
-
-# from sympy import init_printing
 
 from nodimo.quantity import Quantity, Q
 from nodimo.power import Power
@@ -58,12 +61,12 @@ from nodimo.matrix import DimensionalMatrix
 from nodimo.relation import Relation
 from nodimo.model import Model
 
-# init_printing(root_notation=False)
-
-__all__ = ['Quantity', 'Q', 'Power', 'Product',
-           'DimensionalMatrix', 'Relation', 'Model']
-
-"""To include in global settings:
-    - root_notation
-    - warnings display
-"""
+__all__ = [
+    'Quantity',
+    'Q',
+    'Power',
+    'Product',
+    'DimensionalMatrix',
+    'Relation',
+    'Model',
+]

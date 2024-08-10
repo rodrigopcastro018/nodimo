@@ -23,9 +23,7 @@ from nodimo._internal import _prettify_name
 
 
 class Relation(HomogeneousGroup, IndependentGroup):
-    """Creates a relation of quantities.
-
-    This class builds a mathematical relation between quantities.
+    """Creates a relation between quantities.
 
     Parameters
     ----------
@@ -34,7 +32,7 @@ class Relation(HomogeneousGroup, IndependentGroup):
 
     Attributes
     ----------
-    quantities : tuple[Quantity]
+    quantities : list[Quantity]
         Quantities that constitute the relation.
 
     Raises
@@ -57,7 +55,7 @@ class Relation(HomogeneousGroup, IndependentGroup):
     def _validate_relation(self):
         if len(self._dependent_quantities) > 1:
             raise ValueError("A relation cannot have more than one dependent quantity")
-        if len(self._dependent_quantities) == 0:
+        elif len(self._dependent_quantities) == 0:
             self._dependent_quantities = (Constant('const'),)
 
     def _set_symbolic_relation(self):
@@ -65,15 +63,25 @@ class Relation(HomogeneousGroup, IndependentGroup):
         indep_qts_func = Function(self._name)(*self._independent_quantities)
         self._symbolic = Equality(dep_qty, indep_qts_func, evaluate=False)
 
+    def _key(self) -> tuple:
+        return (
+            tuple(self._dependent_quantities),
+            frozenset(self._independent_quantities),
+        )
+
+    def _sympy_(self):
+        return self._symbolic
+
     def _sympyrepr(self, printer) -> str:
         class_name = type(self).__name__
-        quantities = ', '.join(printer._print(qty._unreduced) for qty in self._quantities)
+        quantities = ', '.join(
+            printer._print(qty._unreduced) for qty in self._quantities
+        )
         name = f", name='{self._name}'" if self._name != 'f' else ''
 
         return f'{class_name}({quantities}{name})'
 
     def _sympystr(self, printer) -> str:
-        printer.set_global_settings(root_notation=False)
         name = self._name
         dep_qty = printer._print(self._dependent_quantities[0]._unreduced)
         indep_qts = ', '.join(
@@ -83,8 +91,6 @@ class Relation(HomogeneousGroup, IndependentGroup):
         return f'{dep_qty} = {name}({indep_qts})'
 
     def _latex(self, printer) -> str:
-        printer.set_global_settings(root_notation=False)
-        # name = translate(self._name)
         name = printer._print(Symbol(self._name))
         dep_qty = printer._print(self._dependent_quantities[0]._unreduced)
         indep_qts = R',\ '.join(
@@ -94,13 +100,14 @@ class Relation(HomogeneousGroup, IndependentGroup):
         return f'{dep_qty} = {name}\\left({indep_qts}\\right)'
 
     def _pretty(self, printer) -> prettyForm:
-        printer.set_global_settings(root_notation=False)
         name = _prettify_name(self._name)
         dep_qty = printer._print(self._dependent_quantities[0]._unreduced)
         indep_qts = prettyForm('')
         for i, qty in enumerate(self._independent_quantities):
             sep = ', ' if i > 0 else ''
-            indep_qts = prettyForm(*indep_qts.right(sep, printer._print(qty._unreduced)))
+            indep_qts = prettyForm(
+                *indep_qts.right(sep, printer._print(qty._unreduced))
+            )
         indep_qts = prettyForm(*indep_qts.parens())
 
         return prettyForm(*dep_qty.right(' = ', name, indep_qts))

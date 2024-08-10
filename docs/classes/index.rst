@@ -7,10 +7,12 @@ API
 .. toctree::
    :maxdepth: 1
 
-   Variable.rst
-   VariableGroup.rst
+   Dimension.rst
+   Quantity.rst
+   Power.rst
+   Product.rst
+   Collection.rst
+   Groups.rst
    DimensionalMatrix.rst
-   ModelFunction.rst
-   DimensionalModel.rst
-   NonDimensionalModel.rst
-   NonDimensionalModels.rst
+   Relation.rst
+   Model.rst

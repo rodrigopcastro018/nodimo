@@ -14,7 +14,8 @@ DimensionalMatrix
     Creates a dimensional matrix from a group of quantities.
 """
 
-from sympy import Symbol, ImmutableDenseMatrix, Matrix
+from sympy import Symbol, ImmutableDenseMatrix, Matrix, S
+from sympy.printing.pretty.stringpict import prettyForm
 
 from nodimo.quantity import Quantity
 from nodimo.groups import Group
@@ -36,7 +37,7 @@ class DimensionalMatrix(Group):
 
     Attributes
     ----------
-    quantities : tuple[Quantity]
+    quantities : list[Quantity]
         List with the quantities used to build the dimensional matrix.
     matrix : ImmutableDenseMatrix
         Dimensional matrix containing only the dimensions' exponents.
@@ -49,18 +50,22 @@ class DimensionalMatrix(Group):
     -------
     set_dimensions_order(*dimensions_names)
         Sets the dimensions' names order.
-    show()
+    show(use_custom_css=True, use_unicode=True)
         Displays the dimensional matrix.
+
+    Warns
+    -----
+    NodimoWarning
+        Dimensions that are treated as independent.
 
     Examples
     --------
 
-    >>> from nodimo import Quantity, Product, DimensionalMatrix
+    >>> from nodimo import Quantity, DimensionalMatrix
     >>> F = Quantity('F', M=1, L=1, T=-2)
-    >>> k = Quantity('m', M=1, T=-2)
-    >>> x = Quantity('a', L=1)
-    >>> kx = Product(k, x)
-    >>> dmatrix = DimensionalMatrix(F, k, x, kx)
+    >>> k = Quantity('k', M=1, T=-2)
+    >>> x = Quantity('x', L=1)
+    >>> dmatrix = DimensionalMatrix(F, k, x, k*x)
     >>> dmatrix.show()
     """
 
@@ -79,6 +84,23 @@ class DimensionalMatrix(Group):
     @property
     def independent_rows(self) -> tuple[int]:
         return self._independent_rows
+
+    def set_dimensions_order(self, *dimensions_names: str):
+        """Sets the dimensions column order.
+
+        Parameters
+        ----------
+        *dimensions_names : str
+            Dimensions' names in the requested order.
+        """
+
+        dimensions = dict((dim, S.Zero) for dim in dimensions_names)
+        for dim in self._dimensions:
+            dimensions[dim] = self._dimensions[dim]
+
+        self._set_dimensions(**dimensions)
+        self._set_matrix()
+        self._set_symbolic_dimensional_matrix()
 
     def _set_dimensional_matrix(self):
         self._set_matrix()
@@ -105,7 +127,37 @@ class DimensionalMatrix(Group):
         return f'{class_name}({quantities})'
 
     def _sympystr(self, printer) -> str:
-        return self._symbolic.table(printer, rowstart='', rowend='', colsep='  ')
+        nrows = len(self._dimensions) + 1
+        ncols = len(self._quantities) + 1
+        raw_dmatrix = {}
+        for i in range(nrows):
+            for j in range(ncols):
+                if i == j == 0:
+                    raw_dmatrix[i, j] = printer._print('')
+                elif i == 0:
+                    raw_dmatrix[i, j] = printer._print(self._quantities[j - 1])
+                elif j == 0:
+                    raw_dmatrix[i, j] = printer._print(list(self._dimensions)[i - 1])
+                else:
+                    raw_dmatrix[i, j] = printer._print(self._matrix[i - 1, j - 1])
+
+        maxwidth = []
+        for j in range(ncols):
+            maxwidth.append(max(len(raw_dmatrix[i, j]) for i in range(nrows)))
+
+        for i in range(nrows):
+            for j in range(ncols):
+                nspaces = maxwidth[j] - len(raw_dmatrix[i, j])
+                left_space = ' ' * nspaces
+                raw_dmatrix[i, j] = left_space + raw_dmatrix[i, j]
+
+        rows = []
+        for i in range(nrows):
+            row = '  '.join(raw_dmatrix[i, j] for j in range(ncols))
+            rows.append(row)
+        dmatrix = '\n'.join(rows)
+
+        return dmatrix
 
     def _latex(self, printer) -> str:
         dmatrix = R'\begin{array}'
@@ -125,26 +177,40 @@ class DimensionalMatrix(Group):
 
         return dmatrix
 
-    def _pretty(self, printer):
-        return printer._print_matrix_contents(self._symbolic)
+    def _pretty(self, printer) -> prettyForm:
+        nrows = len(self._dimensions) + 1
+        ncols = len(self._quantities) + 1
+        raw_dmatrix = {}
+        for i in range(nrows):
+            for j in range(ncols):
+                if i == j == 0:
+                    raw_dmatrix[i, j] = printer._print('')
+                elif i == 0:
+                    raw_dmatrix[i, j] = printer._print(self._quantities[j - 1])
+                elif j == 0:
+                    raw_dmatrix[i, j] = printer._print(list(self._dimensions)[i - 1])
+                else:
+                    raw_dmatrix[i, j] = printer._print(self._matrix[i - 1, j - 1])
 
-    def set_dimensions_order(self, *dimensions_names: str):
-        """Sets the dimensions column order.
+        maxwidth = []
+        for j in range(ncols):
+            maxwidth.append(max(raw_dmatrix[i, j].width() for i in range(nrows)))
 
-        Parameters
-        ----------
-        *dimensions_names : str
-            Dimensions' names in the requested order.
-        """
+        for i in range(nrows):
+            for j in range(ncols):
+                nspaces = 0 if j == 0 else 2
+                nspaces += maxwidth[j] - raw_dmatrix[i, j].width()
+                left_space = prettyForm(' ' * nspaces)
+                raw_dmatrix[i, j] = prettyForm(*left_space.right(raw_dmatrix[i, j]))
 
-        dimensions = dict((dim, 0) for dim in dimensions_names)
-        for dim in self._dimensions:
-                dimensions[dim] = self._dimensions[dim]
+        for i in range(nrows):
+            row = raw_dmatrix[i, 0]
+            for j in range(1, ncols):
+                row = prettyForm(*row.right(raw_dmatrix[i, j]))
 
-        self._set_dimensions(**dimensions)
-        self._set_matrix()
-        self._set_symbolic_dimensional_matrix()
+            if i == 0:
+                dmatrix = row
+            else:
+                dmatrix = prettyForm(*dmatrix.below(row))
 
-
-# Alias for DimensionalMatrix.
-DimMatrix = DimensionalMatrix
+        return dmatrix

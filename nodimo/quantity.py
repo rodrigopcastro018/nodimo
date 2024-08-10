@@ -15,7 +15,7 @@ Quantity
 Constant
     Creates a dimensionless constant.
 One
-    Creates the dimensionless number one.
+    Creates a dimensionless number one.
 """
 
 from sympy import sstr, srepr, latex, Symbol, Mul, Pow, Number
@@ -34,7 +34,7 @@ class Quantity:
     Parameters
     ----------
     name : str
-        Name to be used as the quantity representation.
+        Name (symbol) to be used as the quantity representation.
     dependent : bool, default=False
         If ``True``, the quantity is considered dependent in a relation
         of quantities
@@ -46,27 +46,50 @@ class Quantity:
     Attributes
     ----------
     name : str
-        Name used as the quantity representation.
+        Name (symbol) used as the quantity representation.
     dimension : Dimension
         The quantity dimension.
     is_dependent : bool
-        If ``True``, the quantity is considered dependent in a relation
+        If ``True``, the quantity is considered dependent in a relation.
         of quantities
     is_scaling : bool
         If ``True``, the quantity can be used as scaling parameter.
     is_dimensionless : bool
         If ``True``, the quantity is dimensionless.
 
+    Methods
+    -------
+    reduce()
+        Turns an unreduced quantity into a reduced quantity.
+
     Raises
     ------
     TypeError
-        If the quantity name is not an non-empty string.
+        If the quantity name is not a string.
     ValueError
         If the quantity name is invalid.
     ValueError
         If the quantity is set as both dependent and scaling.
     ValueError
         If the quantity is set as scaling, but with no dimensions.
+
+    Examples
+    --------
+    Considering the dimensions mass ``M``, length ``L`` and time ``T``,
+    a force ``F`` can be defined as:
+
+    >>> from nodimo import Quantity
+    >>> F = Quantity('F', M=1, L=1, T=-2)
+
+    To define a dimensionless quantity ``A`` is sufficient to provide
+    just its name:
+
+    >>> A = Quantity('A')
+
+    To use a greek letter in symbolic expressions, just provide its
+    english representation as the name of the quantity:
+
+    >>> a = Quantity('alpha')
     """
 
     _is_power: bool = False
@@ -86,12 +109,15 @@ class Quantity:
         self._is_dimensionless: bool = self._dimension._is_dimensionless
         self._is_dependent: bool = bool(dependent)
         self._is_scaling: bool = bool(scaling)
-        self._symbolic: Union[Symbol, Mul, Pow]
+        self._symbolic: Union[Symbol, Mul, Pow, Number]
         self._is_constant: bool = False
         self._is_number: bool = False
         self._is_quotient: bool = False
         self._is_reduced: bool = True
         self._unreduced: Quantity = self
+        self._base: Quantity
+        self._exponent: Number
+        self._factors: list[Quantity]
         self._validate_quantity()
         self._set_quantity_name(name)
         self._set_symbolic_quantity()
@@ -108,46 +134,27 @@ class Quantity:
     def is_dependent(self) -> bool:
         return self._is_dependent
 
-    @is_dependent.setter
-    def is_dependent(self, dependent: bool):
-        self._validate_quantity(is_dependent=dependent)
-        self._is_dependent = bool(dependent)
-
     @property
     def is_scaling(self) -> bool:
         return self._is_scaling
-
-    @is_scaling.setter
-    def is_scaling(self, scaling: bool):
-        self._validate_quantity(is_scaling=scaling)
-        self._is_scaling = bool(scaling)
 
     @property
     def is_dimensionless(self) -> bool:
         return self._is_dimensionless
 
-    def _validate_quantity(
-        self,
-        is_dependent: Optional[bool] = None,
-        is_scaling: Optional[bool] = None,
-    ):
-        if is_dependent is None:
-            is_dependent = self._is_dependent
-        if is_scaling is None:
-            is_scaling = self._is_scaling
-
-        if is_dependent and self._is_constant:
+    def _validate_quantity(self):
+        if self._is_dependent and self._is_constant:
             raise ValueError("A constant can not be dependent")
-        elif is_scaling and self._is_constant:
+        elif self._is_scaling and self._is_constant:
             raise ValueError("A constant can not be scaling")
-        elif is_dependent and is_scaling:
+        elif self._is_dependent and self._is_scaling:
             raise ValueError("A quantity can not be both dependent and scaling")
-        elif is_scaling and self._is_dimensionless:
+        elif self._is_scaling and self._is_dimensionless:
             raise ValueError("A quantity can not be both scaling and dimensionless")
 
     def _set_quantity_name(self, name: str):
         if not isinstance(name, str):
-            raise TypeError("Quantity name must be a non-empty string")
+            raise TypeError("Quantity name must be a string")
         elif name.strip() == '':
             raise ValueError("Invalid quantity name")
 
@@ -161,34 +168,35 @@ class Quantity:
         qty_copy._unreduced = self._unreduced
         return qty_copy
 
-    def _reduce(self):
+    def reduce(self):
         if self._is_reduced:
             return self
         elif self._is_power:
             from nodimo.power import Power
-            quantity = self.quantity._reduce()
+
+            base = self.base.reduce()
             exponent = self.exponent
             reduced_power = Power(
-                quantity,
+                base,
                 exponent,
                 name=self._name,
                 dependent=self._is_dependent,
-                scaling=self._is_scaling
+                scaling=self._is_scaling,
             )
             reduced_power._unreduced = self
             return reduced_power
         elif self._is_product:
             from nodimo.product import Product
-            quantities = [qty._reduce() for qty in self.quantities]
+
+            factors = [qty.reduce() for qty in self.factors]
             reduced_product = Product(
-                *quantities,
+                *factors,
                 name=self._name,
                 dependent=self._is_dependent,
-                scaling=self._is_scaling
+                scaling=self._is_scaling,
             )
             reduced_product._unreduced = self
             return reduced_product
-        return self
 
     def _key(self) -> tuple:
         return (self._name, frozenset(self._dimension.items()))
@@ -205,12 +213,12 @@ class Quantity:
 
     def __mul__(self, other):
         if not isinstance(other, Quantity):
-            raise NotImplemented
-        
+            raise NotImplementedError(f"{self} and {other} cannot be multiplied")
+
         from nodimo.product import Product
-        
+
         return Product(self, other)
-    
+
     def __pow__(self, exponent: Number):
         from nodimo.power import Power
 
@@ -218,7 +226,7 @@ class Quantity:
 
     def __truediv__(self, other):
         if not isinstance(other, Quantity):
-            raise NotImplemented
+            raise NotImplementedError(f"{other} cannot divide {self}")
 
         return self * other**-1
 
@@ -233,7 +241,7 @@ class Quantity:
     def _sympy_(self):
         return self._symbolic
 
-    def _sympyrepr(self, printer) -> str:
+    def _sympyrepr(self, printer):
         """Developer string representation according to Sympy."""
 
         class_name = type(self).__name__
@@ -250,10 +258,13 @@ class Quantity:
 
         return f'{class_name}({name}{dimensions}{dependent}{scaling})'
 
-    def _sympystr(self, printer) -> str:
+    def _sympystr(self, printer):
         """User string representation according to Sympy."""
-        
-        printer.set_global_settings(root_notation=False)  # TODO: Set global settings at the __init__ file and remove from everywhere else. Use the instantiated printer to control different behavior.
+
+        if self._symbolic.is_number:
+            printer._settings['root_notation'] = True
+        else:
+            printer._settings['root_notation'] = False
 
         return printer._print(self._symbolic)
 
@@ -266,13 +277,42 @@ Q = Quantity
 
 
 class Constant(Quantity):
-    """Dimensionless constant.  # TODO: Write more about why this class was created and give examples on how it can be used.
+    """Dimensionless constant.
 
     Constants are most commonly just dimensionless numbers. Here, they
     can be represented by letters, which are be provided as the value
     parameter. If the value is a string of characters, the constant is
     printed in bold on the screen to avoid confusion with instances of
     Quantity.
+
+    Constants were implemented to allow the creation of expressions that
+    contain dimensionless numbers. In general, these numbers are only
+    useful in the mathematical equations that represent the model. In
+    Nodimo, constants are used only for aesthetic purposes, mainly in
+    product of quantities.
+
+    Examples
+    --------
+    * Drag coefficient
+
+    Dimensions: mass ``M``, length ``L`` and time ``T``.
+
+    Quantities: drag force ``Fd``, fluid density ``rho``,
+    velocity ``V``, reference area ``A``, ``half`` and
+    drag coefficient ``Cd``.
+
+    In this example, the ``reduce`` parameter set to ``False`` is
+    important to keep the constant in the denominator of the expression.
+
+    >>> from nodimo import Quantity, Power, Product
+    >>> from nodimo.quantity import Constant
+    >>> Fd = Quantity('F_D', M=1, L=1, T=-2)
+    >>> rho = Quantity('rho', M=1, L=-3)
+    >>> V = Quantity('V', L=1, T=-1)
+    >>> A = Quantity('A', L=2)
+    >>> half = Constant(1/2)
+    >>> half_inv = Power(half, -1, reduce=False)
+    >>> Cd = Product(Fd, half_inv, rho**-1, V**-2, A**-1, reduce=False)
     """
 
     def __new__(cls, value: Union[str, Number]):
@@ -287,16 +327,9 @@ class Constant(Quantity):
         super().__init__(str(converted_value))
         self._set_constant(converted_value)
 
-    @property
-    def is_dependent(self) -> bool:
-        return self._is_dependent
-
-    @property
-    def is_scaling(self) -> bool:
-        return self._is_scaling
-
     @classmethod
     def _convert_value(self, value: Union[str, Number]) -> Union[str, Number]:
+        converted_value: Union[str, Number]
         try:
             converted_value = _sympify_number(value)
         except:
@@ -310,8 +343,6 @@ class Constant(Quantity):
         self._is_constant = True
         self._constant_name = str(value)
         if isinstance(value, str):
-            self._is_number = False
-            self._is_quotient = False
             self._name = _prettify_name(value, bold=True)
             self._set_symbolic_quantity()
         else:
@@ -320,14 +351,15 @@ class Constant(Quantity):
             if value.is_Rational and not value.is_Integer:
                 self._is_quotient = True
             elif value.is_Mul:
-                is_fraction = []
                 for num in value.args:
-                    is_fraction.append(num.is_Rational and not num.is_Integer)
-                self._is_quotient = any(is_fraction)
-            else:
-                self._is_quotient = False
+                    if num.is_Rational and not num.is_Integer:
+                        self._is_quotient = True
+                        break
+                    elif num.is_Pow and Pow(num, 1).exp < 0:
+                        self._is_quotient = True
+                        break
 
-    def _sympyrepr(self, printer) -> str:
+    def _sympyrepr(self, printer):
         class_name = type(self).__name__
         if self._is_number and self._symbolic.is_Number:
             value = _unsympify_number(self._symbolic)
@@ -335,12 +367,6 @@ class Constant(Quantity):
             value = f"'{self._constant_name}'"
 
         return f'{class_name}({value})'
-
-    def _sympystr(self, printer) -> str:
-        printer._settings['root_notation'] = True
-        return printer._print(self._symbolic)
-
-    _latex = _pretty = _sympystr
 
 
 class One(Constant):
@@ -353,3 +379,6 @@ class One(Constant):
 
     def __init__(self, *args, **kwargs):
         super().__init__(1)
+
+    def _sympyrepr(self, printer):
+        return f'{type(self).__name__}()'

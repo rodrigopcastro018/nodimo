@@ -21,6 +21,12 @@ _show_object(obj, use_custom_css=True)
     Prints object in shell.
 _print_horizontal_line()
     Prints a horizontal line.
+_sympify_number(number)
+    Converts a number representation into a Sympy number.
+_unsympify_number(number)
+    Does the inverse of _sympify_number.
+_prettify_name(name, bold=True)
+    Wrapper for the Sympy function pretty_symbol.
 _show_nodimo_warning(message)
     Displays a NodimoWarning message with custom format.
 
@@ -30,7 +36,7 @@ NodimoWarning
     (Custom) Nodimo warning
 """
 
-from sympy import pretty, Number, sympify, nsimplify
+from sympy import pretty, Number, Rational, nsimplify, sympify
 from sympy.printing.pretty.pretty_symbology import pretty_symbol
 from typing import Union
 import warnings
@@ -61,14 +67,12 @@ def _custom_display(obj):
         The object to print.
     """
 
-    css_style = ('<style>.jp-OutputArea-output{'
-        'overflow-y: hidden;'
-    '}</style>')
+    css_style = '<style>.jp-OutputArea-output{overflow-y: hidden;}</style>'
 
     display(HTML(css_style + f'${obj._repr_latex_()}$'))
 
 
-def _show_object(obj, use_custom_css=True):
+def _show_object(obj, use_custom_css=True, use_unicode=True):
     """Prints object in shell.
 
     Parameters
@@ -76,7 +80,11 @@ def _show_object(obj, use_custom_css=True):
     obj : Any
         The object to print.
     use_custom_css : bool, default=True
-        If ``True``, the object is displayed using custom css.
+        If ``True``, the object is displayed using custom css. Only
+        available in IPython/Jupyter.
+    use_unicode : bool, default=False
+        If ``True``, the object is displayed using unicode characters.
+        Only available for pretty printing.
     """
 
     if _is_running_on_jupyter:
@@ -85,17 +93,19 @@ def _show_object(obj, use_custom_css=True):
         else:
             display(obj)
     else:
-        print('\n' + pretty(obj) + '\n')
+        print('\n' + pretty(obj, use_unicode=use_unicode) + '\n')
 
 
 def _print_horizontal_line():
+    """Prints a horizontal line in shell."""
+
     if _is_running_on_jupyter:
         display(Markdown('<hr>'))
     else:
         print(78 * '-')
 
 
-def _sympify_number(number: Union[int, float, str, tuple]) -> Number:
+def _sympify_number(number: Union[int, float, str, tuple, Number]) -> Number:
     """Converts a number representation into a Sympy number.
 
     This method is roughly a wrapper for Sympy.sympify, but it only
@@ -105,7 +115,7 @@ def _sympify_number(number: Union[int, float, str, tuple]) -> Number:
 
     Parameters
     ----------
-    number : Union[int, float, str, tuple]
+    number : Union[int, float, str, tuple, Number]
         Anything that represents a number.
 
     Returns
@@ -117,7 +127,7 @@ def _sympify_number(number: Union[int, float, str, tuple]) -> Number:
     ------
     ValueError
         If the input could not be converted into a Sympy number.
-    
+
     Examples
     --------
 
@@ -127,29 +137,23 @@ def _sympify_number(number: Union[int, float, str, tuple]) -> Number:
     >>> spnum((2,3)) == spnum(2/3) == spnum('2/3') == Rational(2,3)
     """
 
-    if hasattr(number, 'is_number') and number.is_number:
-        return number
+    number_sp = sympify(number)
 
-    try:
-        number_sp = sympify(number)
-
-        if number_sp.is_Rational:
+    if number_sp.is_Rational:
+        return number_sp
+    elif number_sp.is_Float and not isinstance(number, Number):
+        number_sp_rational = nsimplify(number_sp, rational=True)
+        if number_sp_rational.denominator <= 100:
+            return number_sp_rational
+        else:
             return number_sp
-        elif number_sp.is_Float:
-            number_sp_rational = nsimplify(number_sp, rational=True)
-            if number_sp_rational.denominator <= 100:
-                return number_sp_rational
-            else:
-                return number_sp
-        elif isinstance(number, tuple) and len(number) in {1,2}:
-            if all(obj.is_Number for obj in number_sp):
-                return Number(*number_sp)
-        elif number_sp.is_number:
-            return number_sp
+    elif isinstance(number, tuple) and len(number) in {1, 2}:
+        if all(obj.is_Number for obj in number_sp):
+            return Number(*number_sp)
+    elif number_sp.is_number:
+        return number_sp
 
-        raise
-    except:
-        raise ValueError(f"{repr(number)} could not be converted to a Sympy number")
+    raise ValueError(f"{repr(number)} could not be converted to a Sympy number")
 
 
 def _unsympify_number(number_sp: Number) -> Union[int, float, str, tuple]:
@@ -176,7 +180,8 @@ def _unsympify_number(number_sp: Number) -> Union[int, float, str, tuple]:
     elif number_sp.is_Integer:
         return int(number_sp)
     elif number_sp.is_Rational:
-        return (int(number_sp.numerator), int(number_sp.denominator))
+        number_rat: Rational = Rational(number_sp)
+        return (int(number_rat.numerator), int(number_rat.denominator))
     elif number_sp.is_Float:
         return float(number_sp)
     else:
@@ -188,13 +193,14 @@ def _prettify_name(name: str, bold: bool = False):
 
     This function was created to provide a better exception context for
     the Sympy function pretty_symbol.
-        
+
     Parameters
     ----------
     name : str
         String to be prettified.
     bold : bool, default=False
-        If ``True``, the string is converted to boldface.
+        If ``True``, the string is converted to boldface. Only availabe
+        for non-numeric values.
 
     Returns
     -------
@@ -227,8 +233,16 @@ def _nodimo_formatwarning(message, category, filename, lineno, line=None):
     return f'\033[93m{category.__name__}\033[0m: {message}\n'
 
 
-warnings.formatwarning = _nodimo_formatwarning  # TODO: Check if this does not impact other warning messages.
-
-
 def _show_nodimo_warning(message: str):
+    """Displays a NodimoWarning message with custom formattting.
+
+    Parameters
+    ----------
+    message : str
+        The message to be displayed in the warning.
+    """
+
+    original_formatwarning = warnings.formatwarning
+    warnings.formatwarning = _nodimo_formatwarning
     warnings.warn(message, NodimoWarning)
+    warnings.formatwarning = original_formatwarning

@@ -14,7 +14,7 @@ Power
     Creates the power of a quantity.
 """
 
-from sympy import srepr, Symbol, Pow, Number, S, Abs
+from sympy import srepr, Pow, Number, S, Abs
 from sympy.printing.pretty.stringpict import prettyForm
 
 from nodimo.quantity import Quantity, Constant, One
@@ -24,16 +24,14 @@ from nodimo._internal import _sympify_number, _unsympify_number, _prettify_name
 class Power(Quantity):
     """Power of a quantity.
 
-    This class represents the power of a quantity.
-
     Parameters
     ----------
-    quantity : Quantity
+    base : Quantity
         Quantity to be exponentiated.
     exponent : Number
         Exponent to which the quantity will be raised.
     name : str, default=''
-        Name to be used as the power representation.
+        Name (symbol) to be used as the power representation.
     dependent : bool, default=False
         If ``True``, the power is dependent.
     scaling : bool, default=False
@@ -43,11 +41,16 @@ class Power(Quantity):
 
     Attributes
     ----------
-    quantity : Quantity
+    base : Quantity
         Quantity that is the base of the exponentiation.
     exponent : Number
         Exponent to which the quantity is raised.
-    
+
+    Methods
+    -------
+    reduce()
+        Turns an unreduced quantity into a reduced quantity.
+
     Raises
     ------
     TypeError
@@ -59,57 +62,56 @@ class Power(Quantity):
 
     def __new__(
         cls,
-        quantity: Quantity,
+        base: Quantity,
         exponent: Number,
         name: str = '',
         dependent: bool = False,
         scaling: bool = False,
-        reduce: bool = True
+        reduce: bool = True,
     ):
-        if not isinstance(quantity, Quantity):
-            raise TypeError(f"{repr(quantity)} is not a quantity")
-        elif quantity._is_one:
+        if not isinstance(base, Quantity):
+            raise TypeError(f"{repr(base)} is not a quantity")
+        elif base._is_one:
             return One()
         exponent_sp = _sympify_number(exponent)
         if exponent_sp == 0:
             return One()
 
         if reduce:
-            if quantity._is_power:
-                exponent_sp *= quantity._exponent
-                quantity = quantity._quantity
-            if quantity._is_number:
-                return Constant(quantity._symbolic**exponent_sp)
-            if quantity._is_product:
+            if base._is_power:
+                exponent_sp *= base._exponent
+                base = base._base
+            if base._is_number:
+                return Constant(Pow(base._symbolic, exponent_sp))
+            if base._is_product:
                 from nodimo.product import Product
+
                 factors = []
-                for qty in quantity.quantities:
+                for qty in base._factors:
                     factors.append(Power(qty, exponent_sp))
                 return Product(
                     *factors, name=name, dependent=dependent, scaling=scaling
                 )
 
         if exponent_sp == 1:
-            return quantity
+            return base
 
         return super().__new__(cls)
 
     def __init__(
         self,
-        quantity: Quantity,
+        base: Quantity,
         exponent: Number,
         name: str = '',
         dependent: bool = False,
         scaling: bool = False,
-        reduce: bool = True
+        reduce: bool = True,
     ):
-        self._quantity: Quantity
-        self._exponent: Number
-        self._preset_power(quantity, exponent, reduce)
-        power_dimension = self._quantity.dimension**self._exponent
+        self._preset_power(base, exponent, reduce)
+        power_dimension = self._base.dimension**self._exponent
         dummy_name = 'Power' if name == '' else name
         super().__init__(
-            dummy_name, **power_dimension, dependent=dependent, scaling=scaling,
+            dummy_name, **power_dimension, dependent=dependent, scaling=scaling
         )
         self._set_power(reduce)
         self._validate_quantity()
@@ -118,29 +120,29 @@ class Power(Quantity):
             self._set_symbolic_power()
 
     @property
-    def quantity(self) -> Quantity:
-        return self._quantity
+    def base(self) -> Quantity:
+        return self._base
 
     @property
     def exponent(self) -> Number:
         return self._exponent
 
-    def _preset_power(self, quantity: Quantity, exponent: Number, reduce: bool):
+    def _preset_power(self, base: Quantity, exponent: Number, reduce: bool):
         exponent_sp = _sympify_number(exponent)
-        if reduce and quantity._is_power:
-            exponent_sp *= quantity.exponent
-            quantity = quantity.quantity
+        if reduce and base._is_power:
+            exponent_sp *= base._exponent
+            base = base._base
 
-        self._quantity = quantity
+        self._base = base
         self._exponent = exponent_sp
 
     def _set_power(self, reduce: bool):
-        self._is_constant = self._quantity._is_constant
-        self._is_number = self._quantity._is_number
+        self._is_constant = self._base._is_constant
+        self._is_number = self._base._is_number
         self._is_reduced = bool(reduce)
-        if not self._quantity._is_derived and not self._is_number:
+        if not self._base._is_derived and not self._is_number:
             self._is_reduced = True
-        if self._quantity._is_quotient or self._exponent < 0:
+        if self._base._is_quotient or self._exponent < 0:
             self._is_quotient = True
         if self._is_constant:
             self._name = _prettify_name(self._name, bold=True)
@@ -153,39 +155,39 @@ class Power(Quantity):
         because unevaluated powers of numbers can not always be printed.
         """
 
-        self._symbolic = Pow(self._quantity._symbolic, self._exponent, evaluate=False)
+        self._symbolic = Pow(self._base._symbolic, self._exponent, evaluate=False)
         if self._is_number:
             self._symbolic = self._symbolic.doit()
 
     def _copy(self):
-        if self._quantity._is_product:
+        if self._base._is_product:
             from nodimo.product import Product
         qty_copy = eval(srepr(self))
         qty_copy._unreduced = self._unreduced
         return qty_copy
 
     def _key(self) -> tuple:
-        return (self._quantity._reduce(), self._exponent)
+        return (self._base.reduce(), self._exponent)
 
-    def _sympyrepr(self, printer) -> str:
+    def _sympyrepr(self, printer):
         class_name = type(self).__name__
-        quantity = printer._print(self._quantity)
+        base = printer._print(self._base)
         unsymp_exp = _unsympify_number(self._exponent)
         exponent = f', {repr(unsymp_exp)}'
-        name = f", name='{self.name}'" if self.name else ''
-        dependent = f', dependent=True' if self.is_dependent else ''
-        scaling = f', scaling=True' if self.is_scaling else ''
+        name = f", name='{self._name}'" if self._name else ''
+        dependent = f', dependent=True' if self._is_dependent else ''
+        scaling = f', scaling=True' if self._is_scaling else ''
         reduce = f', reduce=False' if not self._is_reduced else ''
 
-        return f'{class_name}({quantity}{exponent}{name}{dependent}{scaling}{reduce})'
+        return f'{class_name}({base}{exponent}{name}{dependent}{scaling}{reduce})'
 
-    def _sympystr(self, printer) -> str:
+    def _sympystr(self, printer):
         printer._settings['root_notation'] = False
 
         if self._name:
             return printer._print(self._symbolic)
 
-        pb = self._quantity
+        pb = self._base
         bs = pb._symbolic
         pe = Abs(self._exponent)
 
@@ -193,14 +195,10 @@ class Power(Quantity):
             base = printer._print(pb)
         elif (bs.is_Integer or bs.is_Float) and bs > 0:
             base = printer._print(pb)
-        elif bs.is_Pow and bs.exp is S.Half:
-            base = printer._print(pb)
         else:
             base = f'({printer._print(pb)})'
-        
+
         if pe.is_Integer or pe.is_Float or pe.is_NumberSymbol:
-            exponent = printer._print(pe)
-        elif pe.is_Pow and pe.exp is S.Half:
             exponent = printer._print(pe)
         else:
             exponent = f'({printer._print(pe)})'
@@ -215,13 +213,13 @@ class Power(Quantity):
         else:
             return f'{1}/{power}'
 
-    def _latex(self, printer) -> str:
+    def _latex(self, printer):
         printer._settings['root_notation'] = False
 
         if self._name:
             return printer._print(self._symbolic)
 
-        pb = self._quantity
+        pb = self._base
         bs = pb._symbolic
         pe = Abs(self._exponent)
 
@@ -229,11 +227,9 @@ class Power(Quantity):
             base = printer._print(pb)
         elif (bs.is_Integer or bs.is_Float) and bs > 0:
             base = printer._print(pb)
-        elif bs.is_Pow and bs.exp is S.Half:
-            base = printer._print(pb)
         else:
             base = f'\\left({printer._print(pb)}\\right)'
-        
+
         printer._settings['root_notation'] = True
         if pe == 1:
             power = base
@@ -246,13 +242,13 @@ class Power(Quantity):
         else:
             return f'\\frac{{{1}}}{{{power}}}'
 
-    def _pretty(self, printer) -> prettyForm:
+    def _pretty(self, printer):
         printer._settings['root_notation'] = False
 
         if self._name:
             return printer._print(self._symbolic)
 
-        pb = self._quantity
+        pb = self._base
         bs = pb._symbolic
         pe = Abs(self._exponent)
 
@@ -262,11 +258,9 @@ class Power(Quantity):
             base.binding = prettyForm.ATOM
         elif (bs.is_Integer or bs.is_Float) and bs > 0:
             base = printer._print(pb)
-        elif bs.is_Pow and bs.exp is S.Half:
-            base = printer._print(pb)
         else:
             base = prettyForm(*printer._print(pb).parens())
-        
+
         printer._settings['root_notation'] = True
         if pe == 1:
             power = base
@@ -277,4 +271,4 @@ class Power(Quantity):
         if self._exponent > 0:
             return power
         else:
-            return printer._print(S.One)/power
+            return printer._print(S.One) / power

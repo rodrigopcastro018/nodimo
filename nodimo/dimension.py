@@ -15,6 +15,7 @@ Dimension
 """
 
 from sympy import sstr, srepr, latex, Symbol, Mul, Number, S
+from sympy.printing.pretty.stringpict import prettyForm
 from typing import Union
 
 from nodimo._internal import _sympify_number, _unsympify_number
@@ -36,7 +37,7 @@ class Dimension(dict):
     def __init__(self, **dimensions: Number):
         self._dimensions: dict[str, Number]
         self._is_dimensionless: bool
-        self._symbolic: Union[S.One, Mul]
+        self._symbolic: Mul
         self._set_dimensions(**dimensions)
         super().__init__(**self._dimensions)
         self._set_symbolic_dimension()
@@ -61,14 +62,14 @@ class Dimension(dict):
             for dim, exp in self.items():
                 dim_symbol = Symbol(dim, commutative=False)
                 factors.append(dim_symbol**exp)
-            self._symbolic = Mul(*factors)
+            self._symbolic = Mul(*factors, evaluate=False)
 
     def _copy(self):
         return eval(srepr(self))
 
     def __mul__(self, other):
         if not isinstance(other, Dimension):
-            raise NotImplemented
+            raise NotImplementedError(f"{self} and {other} cannot be multiplied")
 
         dimensions = self._dimensions.copy()
         for dim, exp in other.items():
@@ -76,7 +77,7 @@ class Dimension(dict):
                 dimensions[dim] += exp
             else:
                 dimensions[dim] = exp
-        
+
         return Dimension(**dimensions)
 
     def __pow__(self, exponent: Number):
@@ -84,25 +85,24 @@ class Dimension(dict):
         dimensions = {}
         for dim, exp in self.items():
             dimensions[dim] = exp * exponent_sp
-        
+
         return Dimension(**dimensions)
 
     def __truediv__(self, other):
         if not isinstance(other, Dimension):
-            raise NotImplemented
+            raise NotImplementedError(f"{other} cannot divide {self}")
 
         return self * other**-1
-    
+
     def __str__(self) -> str:
         return sstr(self)
+
+    __repr__ = __str__
 
     def _repr_latex_(self):
         """Latex representation according to IPython/Jupyter."""
 
         return f'$\\displaystyle {latex(self)}$'
-
-    def _sympy_(self):
-        return self._symbolic
 
     def _sympyrepr(self, printer) -> str:
         """Developer string representation according to Sympy."""
@@ -121,27 +121,29 @@ class Dimension(dict):
     def _sympystr(self, printer) -> str:
         """User string representation according to Sympy."""
 
-        printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
+        if self._is_dimensionless:
+            return printer._print(self._symbolic)
 
-        def _print(expr):
-            if expr.is_Pow:
-                # Rational=True is set to avoid the 'sqrt'
-                # operator on the string representation.
-                return printer._print_Pow(expr, rational=True)
+        printer._settings['root_notation'] = True
+        exponents = []
+        for expt in self._dimensions.values():
+            if expt < 0 or expt.is_Mul:
+                exponent = f'({printer._print(expt)})'
+            elif expt.is_Rational and not expt.is_Integer:
+                exponent = f'({printer._print(expt)})'
             else:
-                return printer._print(expr)
+                exponent = printer._print(expt)
+            exponents.append(exponent)
 
-        if self._symbolic.is_Mul:
-            return '*'.join(_print(f) for f in self._symbolic.args)
-        
-        return _print(self._symbolic)
+        printer._settings['root_notation'] = False
+        dimensions = []
+        for dim, exp in zip(self._dimensions, exponents):
+            if self._dimensions[dim] != 1:
+                dimensions.append(f'{printer._print(dim)}**{exp}')
+            else:
+                dimensions.append(printer._print(dim))
 
-    def _pretty(self, printer):
-        """Pretty representation according to Sympy."""
-
-        printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
-
-        return printer._print(self._symbolic)
+        return '*'.join(dimensions)
 
     def _latex(self, printer) -> str:
         """User string representation according to Sympy.
@@ -150,19 +152,43 @@ class Dimension(dict):
         conventional dimension representation.
         """
 
-        printer.set_global_settings(root_notation=False)  # TODO: Include root_notation in the future global settings.
-
         if self._is_dimensionless:
             return f'\\mathsf{{{printer._print(self._symbolic)}}}'
 
+        printer._settings['root_notation'] = True
+        exponents = []
+        for exp in self._dimensions.values():
+            exponents.append(printer._print(exp))
+
+        printer._settings['root_notation'] = False
         dimensions = []
-        for dim, exp in self.items():
-            dms = f'\\mathsf{{{dim}}}'
-            if exp != 1:
-                dms += f'^{{{printer._print(exp)}}}'
-            dimensions.append(dms)
+        for dim, exp in zip(self._dimensions, exponents):
+            if self._dimensions[dim] != 1:
+                dimensions.append(f'\\mathsf{{{dim}}}^{{{exp}}}')
+            else:
+                dimensions.append(f'\\mathsf{{{dim}}}')
 
         return ' '.join(dimensions)
-            
 
-    __repr__ = __str__
+    def _pretty(self, printer) -> prettyForm:
+        """Pretty representation according to Sympy."""
+
+        if self._is_dimensionless:
+            return printer._print(self._symbolic)
+
+        printer._settings['root_notation'] = True
+        exponents = []
+        for exp in self._dimensions.values():
+            exponents.append(printer._print(exp))
+
+        printer._settings['root_notation'] = False
+        for i, (dim, exp) in enumerate(zip(self._dimensions, exponents)):
+            dimexp = printer._print(dim)
+            if self._dimensions[dim] != 1:
+                dimexp = dimexp**exp
+            if i == 0:
+                dimension = dimexp
+            else:
+                dimension *= dimexp
+
+        return dimension
