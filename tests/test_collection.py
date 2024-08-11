@@ -400,9 +400,9 @@ def test_pretty2():
 def test_pretty3():
     a = Quantity('a', A=-1, B=10, C=7, D=16, scaling=True)
     b = Quantity('b', A=1, B=0, C=9, D=10, dependent=True)
-    c = Power(a,-2)
+    c = Power(a,-1)
     d = Product(a,b,c, reduce=False)
     e = Constant('2*pi')
-    col = Collection(a,b,e)
+    col = Collection(c)
 
-    assert pretty(col) == ('Collection(a, b, 2⋅π)')
+    assert pretty(col) == ('          ⎛1⎞\nCollection⎜─⎟\n          ⎝a⎠')
