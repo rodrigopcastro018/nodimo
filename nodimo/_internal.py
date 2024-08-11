@@ -1,34 +1,48 @@
-"""This module contains functions that are used internally.
+#         ┓•         Licensed under the MIT License
+#    ┏┓┏┓┏┫┓┏┳┓┏┓    Copyright (c) 2024 Rodrigo Castro
+#    ┛┗┗┛┗┻┗┛┗┗┗┛    https://nodimo.readthedocs.io
+
+"""
+Internal
+========
+
+This module contains variables and functions for internal use.
 
 Variables
 ---------
 _is_running_on_jupyter : bool
-    If ``True``, the package in running on jupyter notebooks.
-color_warning : str
-    ANSI code for the warning message color.
-color_end : str
-    ANSI code to reset the color.
+    If ``True``, the package in running on IPython/Jupyter.
 
 Functions
 ---------
-_show_object(obj)
+_custom_display(obj)
+    Displays object using a custom CSS style.
+_show_object(obj, use_custom_css=True)
     Prints object in shell.
 _print_horizontal_line()
     Prints a horizontal line.
-_obtain_dimensions(*variables)
-    Obtains the dimensions' names from the given variables.
-_build_dimensional_matrix(variables, dimensions=[])
-    Builds a basic dimensional matrix.
+_sympify_number(number)
+    Converts a number representation into a Sympy number.
+_unsympify_number(number)
+    Does the inverse of _sympify_number.
+_prettify_name(name, bold=True)
+    Wrapper for the Sympy function pretty_symbol.
+_show_nodimo_warning(message)
+    Displays a NodimoWarning message with custom format.
+
+Classes
+-------
+NodimoWarning
+    (Custom) Nodimo warning
 """
 
-import sympy as sp
-from sympy import Matrix
-from typing import Any
-from nodimo.variable import Variable
+from sympy import pretty, Number, Rational, nsimplify, sympify
+from sympy.printing.pretty.pretty_symbology import pretty_symbol
+from typing import Union
+import warnings
 
 
-_is_running_on_jupyter: bool
-
+# Determine if Nodimo is running on IPython/Jupyter.
 try:
     from IPython import get_ipython
 
@@ -40,12 +54,7 @@ except:
     _is_running_on_jupyter = False
 
 
-# ANSI color codes
-color_warning: str = '\033[93m'
-color_end: str = '\033[0m'
-
-
-def _custom_display(obj: Any) -> None:
+def _custom_display(obj):
     """Displays object using a custom CSS style.
 
     This custom display function was created to avoid vertical scrolling
@@ -58,14 +67,12 @@ def _custom_display(obj: Any) -> None:
         The object to print.
     """
 
-    css_style = ('<style>.jp-OutputArea-output{'
-        'overflow-y: hidden;'
-    '}</style>')
+    css_style = '<style>.jp-OutputArea-output{overflow-y: hidden;}</style>'
 
     display(HTML(css_style + f'${obj._repr_latex_()}$'))
 
 
-def _show_object(obj: Any, use_custom_css: bool = True) -> None:
+def _show_object(obj, use_custom_css=True, use_unicode=True):
     """Prints object in shell.
 
     Parameters
@@ -73,7 +80,11 @@ def _show_object(obj: Any, use_custom_css: bool = True) -> None:
     obj : Any
         The object to print.
     use_custom_css : bool, default=True
-        If ``True``, the object is displayed using custom css.
+        If ``True``, the object is displayed using custom css. Only
+        available in IPython/Jupyter.
+    use_unicode : bool, default=False
+        If ``True``, the object is displayed using unicode characters.
+        Only available for pretty printing.
     """
 
     if _is_running_on_jupyter:
@@ -82,13 +93,11 @@ def _show_object(obj: Any, use_custom_css: bool = True) -> None:
         else:
             display(obj)
     else:
-        print()
-        sp.pprint(obj, root_notation=False)
-        print()
+        print('\n' + pretty(obj, use_unicode=use_unicode) + '\n')
 
 
-def _print_horizontal_line() -> None:
-    """Prints a horizontal line."""
+def _print_horizontal_line():
+    """Prints a horizontal line in shell."""
 
     if _is_running_on_jupyter:
         display(Markdown('<hr>'))
@@ -96,71 +105,144 @@ def _print_horizontal_line() -> None:
         print(78 * '-')
 
 
-def _obtain_dimensions(*variables: Variable) -> list[str]:
-    """Obtains the dimensions' names from the given variables.
+def _sympify_number(number: Union[int, float, str, tuple, Number]) -> Number:
+    """Converts a number representation into a Sympy number.
+
+    This method is roughly a wrapper for Sympy.sympify, but it only
+    accepts objects that can be transformed into a Sympy number. A
+    workaround was implemented to allow the creation of rational numbers
+    from tuples.
 
     Parameters
     ----------
-    *variables : Variable
-        Variables to get the dimensions extracted.
+    number : Union[int, float, str, tuple, Number]
+        Anything that represents a number.
 
     Returns
     -------
-    dimensions : list[str]
-        List containing the dimensions' names.
+    number_sp : Number
+        The input number converted to a Sympy number.
+
+    Raises
+    ------
+    ValueError
+        If the input could not be converted into a Sympy number.
+
+    Examples
+    --------
+
+    >>> from nodimo._internal import _sympify_number as spnum
+    >>> from sympy import Integer, Rational
+    >>> spnum(5) == spnum(5.0) == spnum('5') == Integer(5)
+    >>> spnum((2,3)) == spnum(2/3) == spnum('2/3') == Rational(2,3)
     """
 
-    dimensions = []
+    number_sp = sympify(number)
 
-    for var in variables:
-        dimensions += list(var.dimensions.keys())
+    if number_sp.is_Rational:
+        return number_sp
+    elif number_sp.is_Float and not isinstance(number, Number):
+        number_sp_rational = nsimplify(number_sp, rational=True)
+        if number_sp_rational.denominator <= 100:
+            return number_sp_rational
+        else:
+            return number_sp
+    elif isinstance(number, tuple) and len(number) in {1, 2}:
+        if all(obj.is_Number for obj in number_sp):
+            return Number(*number_sp)
+    elif number_sp.is_number:
+        return number_sp
 
-    # Eliminate duplicates but keep order.
-    dimensions = sorted(set(dimensions), key=dimensions.index)
-
-    return dimensions
+    raise ValueError(f"{repr(number)} could not be converted to a Sympy number")
 
 
-def _build_dimensional_matrix(variables: list[Variable],
-                              dimensions: list[str] = []) -> Matrix:
-    """Builds a basic dimensional matrix.
-
-    A basic dimensional matrix contains only numbers, no labels.
+def _unsympify_number(number_sp: Number) -> Union[int, float, str, tuple]:
+    """Does the inverse of _sympify_number.
 
     Parameters
     ----------
-    variables : list[Variable]
-        List with the variables used to build the dimensional matrix.
-    dimensions : list[str], default=[]
-        List with the dimensions' names of the given variables. If not
-        provided, this list is obtained from the variables.
+    number_sp : Number
+        The Sympy number.
 
     Returns
     -------
-    dimensional_matrix : Matrix
-        Matrix with one column for each variable, one row for each
-        dimension, and every entry represents the dimension's exponent
-        of a particular variable.
+    number : Union[int, float, str, tuple]
+        Any expression that represents a number.
+
+    Raises
+    ------
+    ValueError
+        If the input is not a Sympy Number.
     """
 
-    if len(variables) > 0 and dimensions == []:
-        dimensions = _obtain_dimensions(*variables)
+    if not hasattr(number_sp, 'is_number') or not number_sp.is_number:
+        raise ValueError(f"{repr(number_sp)} is not a Sympy number")
+    elif number_sp.is_Integer:
+        return int(number_sp)
+    elif number_sp.is_Rational:
+        number_rat: Rational = Rational(number_sp)
+        return (int(number_rat.numerator), int(number_rat.denominator))
+    elif number_sp.is_Float:
+        return float(number_sp)
+    else:
+        return str(number_sp)
 
-    raw_dimensional_matrix = []
 
-    for dim in dimensions:
-        dimension_exponents = []
+def _prettify_name(name: str, bold: bool = False):
+    """Wrapper for the Sympy function pretty_symbol.
 
-        for var in variables:
-            if dim in var.dimensions.keys():
-                dimension_exponents.append(var.dimensions[dim])
-            else:
-                dimension_exponents.append(0)
+    This function was created to provide a better exception context for
+    the Sympy function pretty_symbol.
 
-        raw_dimensional_matrix.append(dimension_exponents)
+    Parameters
+    ----------
+    name : str
+        String to be prettified.
+    bold : bool, default=False
+        If ``True``, the string is converted to boldface. Only availabe
+        for non-numeric values.
 
-    dimensional_matrix = sp.Matrix(raw_dimensional_matrix)
-    dimensional_matrix = sp.nsimplify(dimensional_matrix,
-                                      rational=True).as_mutable()
+    Returns
+    -------
+    pretty_name : str
+        Prettified string
 
-    return dimensional_matrix
+    Raises
+    ------
+    ValueError
+        If the input name is invalid.
+    """
+
+    try:
+        return pretty_symbol(name, bold_name=bold)
+    except:
+        raise ValueError(f"{repr(name)} is an invalid name")
+
+
+class NodimoWarning(Warning):
+    """(Custom) Nodimo warning.
+
+    Issued anytime Nodimo finds an inconsistency in the user's input,
+    but one that can be handled without halting the execution.
+    """
+
+    pass
+
+
+def _nodimo_formatwarning(message, category, filename, lineno, line=None):
+    return f'\033[93m{category.__name__}\033[0m: {message}\n'
+
+
+def _show_nodimo_warning(message: str):
+    """Displays a NodimoWarning message with custom formattting.
+
+    Parameters
+    ----------
+    message : str
+        The message to be displayed in the warning.
+    """
+
+    original_formatwarning = warnings.formatwarning
+    warnings.formatwarning = _nodimo_formatwarning
+    warnings.warn(message, NodimoWarning)
+    warnings.formatwarning = original_formatwarning

@@ -63,7 +63,7 @@ For more applications and functionalities, check the [documentation][Docs Status
 <!-- Links -->
 [Docs Status]: https://nodimo.readthedocs.io/
 [Docs Status Badge]: https://img.shields.io/readthedocs/nodimo?color=8A2BE2
-[Tests Status]: https://github.com/rodrigopcastro018/nodimo/actions/workflows/full_test.yml
+[Tests Status]: https://github.com/rodrigopcastro018/nodimo/actions/workflows/full_test.yml?query=branch%3Amain
 [Tests Status Badge]: https://img.shields.io/github/actions/workflow/status/rodrigopcastro018/nodimo/full_test.yml?branch=main&label=Tests
 [Coverage]: https://coverage-badge.samuelcolvin.workers.dev/redirect/rodrigopcastro018/nodimo
 [Coverage Badge]: https://coverage-badge.samuelcolvin.workers.dev/rodrigopcastro018/nodimo.svg

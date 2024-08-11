@@ -19,14 +19,12 @@ jobs:
           - macos-latest
         py:
           - python: '3.9'
-            numpy: '1.20.0'
             sympy: '1.7'
           - python: '3.12'
-            numpy: '1.26.4'
             sympy: '1.12'
       fail-fast: false
 
-    name: ${{ matrix.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
+    name: ${{ matrix.os }}-py${{ matrix.py.python }}-sp${{ matrix.py.sympy }}
     
     runs-on: ${{ matrix.os }}
 
@@ -44,20 +42,19 @@ jobs:
       - name: Run tox
         run: tox
         env:
-          CONTEXT: ${{ runner.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
-          NUMPY_VERSION: ${{ matrix.py.numpy }}
+          CONTEXT: ${{ runner.os }}-py${{ matrix.py.python }}-sp${{ matrix.py.sympy }}
           SYMPY_VERSION: ${{ matrix.py.sympy }}
 
       - name: Store coverage files
         uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ runner.os }}-py${{ matrix.py.python }}
-          path: coverage
+          path: .coverage
 
       - name: Store results folder
         uses: actions/upload-artifact@v4
         with:
-          name: results-${{ runner.os }}-py${{ matrix.py.python }}-np${{ matrix.py.numpy }}-sp${{ matrix.py.sympy }}
+          name: results-${{ runner.os }}-py${{ matrix.py.python }}-sp${{ matrix.py.sympy }}
           path: tests_results
 
   merge_tests_results:
@@ -120,19 +117,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Download coverage files
         uses: actions/download-artifact@v4
         with:
           name: coverage
-          path: coverage
+          path: .coverage
       
       - name: Install coverage
         run: pip install coverage[toml]
       
       - name: Coverage combine
-        run: coverage combine coverage
+        run: coverage combine .coverage
       
       - name: Generate combined coverage HTML
         run: coverage html --show-contexts --title "Coverage for ${{ github.sha }}"
@@ -141,7 +138,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage_html
-          path: coverage/htmlcov
+          path: .coverage/htmlcov
 
   smokeshow_coverage:
     name: Smokeshow coverage
@@ -157,19 +154,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Download coverage HTML
         uses: actions/download-artifact@v4
         with:
           name: coverage_html
-          path: coverage/htmlcov
+          path: .coverage/htmlcov
       
       - name: Install smokeshow
         run: pip install smokeshow
       
       - name: Smokeshow coverage HTML
-        run: smokeshow upload coverage/htmlcov
+        run: smokeshow upload .coverage/htmlcov
         env:
           SMOKESHOW_GITHUB_STATUS_DESCRIPTION: Coverage {coverage-percentage}
           SMOKESHOW_GITHUB_COVERAGE_THRESHOLD: 100

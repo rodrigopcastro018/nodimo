@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.abspath('../nodimo'))
 project = 'Nodimo'
 copyright = '2024, Rodrigo Castro'
 author = 'Rodrigo Castro'
-release = '1.1.0'
+release = '2.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -25,6 +25,7 @@ extensions = [
     'nbsphinx',  # This extension requires pandoc and IPython
     'numpydoc',
     'sphinx.ext.linkcode',
+    'sphinx_copybutton',
 ]
 
 templates_path = ['_templates']
@@ -56,6 +57,9 @@ def linkcode_resolve(domain, info):
         return None
     filename = info['module'].replace('.', '/')
     return f'{branch_url}/{filename}.py'
+
+# sphinx-copybutton
+copybutton_prompt_text = ">>> "
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

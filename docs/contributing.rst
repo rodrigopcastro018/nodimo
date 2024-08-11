@@ -12,6 +12,7 @@ Development Environment
 
 Git and GitHub
 ^^^^^^^^^^^^^^
+
 Nodimo is available on `GitHub`_ and uses `Git`_ for source control.
 
 To get the source code from GitHub run::
@@ -24,11 +25,11 @@ Virtual Environment
 Isolate you development environment by using virtual environments. In the repository
 folder, execute::
 
-    python -m venv venv
+    python -m venv .venv
 
 Activate the virtual environment by running::
 
-    venv/scripts/activate
+    .venv/scripts/activate
 
 From the repository folder, install Nodimo in editable mode with::
 
@@ -37,14 +38,14 @@ From the repository folder, install Nodimo in editable mode with::
 Tests
 -----
 
-Currently, Nodimo's tests are integrated with `GitHub Actions`_. The tests coverage
+Currently, Nodimo tests are integrated with `GitHub Actions`_. The tests coverage
 are published by `smokeshow`_.
 
 Tests status: |Tests status|
 
 Tests coverage: |Tests coverage|
 
-To manually execute Nodimo's tests, follow the instructions in the next subsection.
+To manually execute Nodimo tests, follow the instructions in the next subsection.
 
 Manual testing
 ^^^^^^^^^^^^^^
@@ -116,6 +117,11 @@ From the `docs` folder, create the `html` files by running:
 
     make html
 
+Formatting
+----------
+
+Code formatting follows the style established by `black`_.
+
 
 .. _GitHub: https://github.com/rodrigopcastro018/nodimo
 .. _Git: https://git-scm.com/
@@ -138,6 +144,7 @@ From the `docs` folder, create the `html` files by running:
 .. _IPython: https://github.com/ipython/ipython
 .. _pandoc: https://pandoc.org/
 .. _Read the Docs: https://readthedocs.org/
+.. _black: https://black.readthedocs.io/
 .. |Documentation status| image:: https://readthedocs.org/projects/nodimo/badge/?version=latest
     :target: https://nodimo.readthedocs.io/
     :alt: Documentation status
@@ -147,4 +154,3 @@ From the `docs` folder, create the `html` files by running:
 .. |Tests coverage| image:: https://coverage-badge.samuelcolvin.workers.dev/rodrigopcastro018/nodimo.svg
     :target: https://coverage-badge.samuelcolvin.workers.dev/redirect/rodrigopcastro018/nodimo
     :alt: Tests coverage
-      
