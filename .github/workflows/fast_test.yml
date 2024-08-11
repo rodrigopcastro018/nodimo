@@ -12,7 +12,8 @@ jobs:
   
   tests:
     name: Quick test on latest dependencies
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
