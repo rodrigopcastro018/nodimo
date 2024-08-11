@@ -21,7 +21,7 @@ jobs:
           - python: '3.9'
             sympy: '1.7'
           - python: '3.12'
-            sympy: '1.12'
+            sympy: '1.13'
       fail-fast: false
 
     name: ${{ matrix.os }}-py${{ matrix.py.python }}-sp${{ matrix.py.sympy }}
