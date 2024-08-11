@@ -405,4 +405,4 @@ def test_pretty3():
     e = Constant('2*pi')
     col = Collection(a,b,e)
 
-    assert pretty(col) == ('Collection(a, b, 2*pi)')
+    assert pretty(col) == ('Collection(a, b, 2⋅π)')
