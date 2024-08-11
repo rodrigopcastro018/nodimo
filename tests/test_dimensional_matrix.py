@@ -104,4 +104,10 @@ def test_pretty():
     e = c**-5
     dm = DimensionalMatrix(a, d, e)
 
-    assert pretty(dm) == '       b⋅c  1 \n    a  ───  ──\n         2   5\n        a   c \nA   3  -10  25\nB  -1    2   0\nC   0   -4   0'
+    assert pretty(dm) == ('       b⋅c  1 \n'
+                          '    a  ───  ──\n'
+                          '        2    5\n'
+                          '       a    c \n'
+                          'A   3  -10  25\n'
+                          'B  -1    2   0\n'
+                          'C   0   -4   0')

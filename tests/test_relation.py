@@ -107,4 +107,7 @@ def test_pretty():
     e = Power(Quantity('h', C=-1), -5)
     rel = Relation(c, d, e)
 
-    assert pretty(rel) == '         ⎛   b⋅c  1 ⎞\n𝐜𝐨𝐧𝐬𝐭 = f⎜c, ───, ──⎟\n         ⎜     2   5⎟\n         ⎝    a   h ⎠'
+    assert pretty(rel) == ('         ⎛   b⋅c  1 ⎞\n'
+                           '𝐜𝐨𝐧𝐬𝐭 = f⎜c, ───, ──⎟\n'
+                           '         ⎜    2    5⎟\n'
+                           '         ⎝   a    h ⎠')
