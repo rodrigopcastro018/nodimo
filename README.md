@@ -12,22 +12,20 @@
 | **License** | [![License Badge]][License]                                                   |
 
 # Nodimo
-The main purpose of Nodimo is to transform a dimensional relationship between variables into a nondimensional one. The variables are gathered in nondimensional groups such that the number of groups is lower than the number of variables. The resulting nondimensional model is, at the same time, a generalization and simplification of the dimensional model.
+The main purpose of Nodimo is to transform a dimensional relationship between quantities into a dimensionless one. This is done by grouping dimensional quantities into dimensionless products in such a way that the resulting number of products is always lower than or equal to the starting number of quantities. Therefore, the ensuing dimensionless model is, at the same time, a generalization and simplification of the dimensional model.
 
-Nodimo supports any number of dimensions and variables. It can be used for applications in science, engineering, economics and finance. The resulting nondimensional groups can be used as the basis for further studies in similarity and model testing.
+Nodimo supports any number of dimensions and quantities. It can be used for applications in science, engineering, economics and finance. The resulting dimensionless relations can be used as the basis for further studies in similarity and model testing.
 
 ## Installation
-Nodimo and its dependencies (`numpy` and `sympy`) are installed by:
+Nodimo and its dependency `sympy` is installed by:
 ```shell
 pip install nodimo
 ```
 
-Alternatively, Nodimo and dependencies can be installed via `conda`:
+Or alternatively, via `conda`:
 ```shell
 conda install nodimo --channel rodrigopcastro018
 ```
-
-When running Nodimo on the terminal, make sure that the terminal supports Unicode characters. For the best experience, it is recommended the use of [jupyter notebook][Jupyter Notebook].
 
 ## Getting started
 ### Basic example
@@ -37,28 +35,30 @@ When running Nodimo on the terminal, make sure that the terminal supports Unicod
     <img width="30%" src="docs/tutorials/drawings/01_simple_pendulum.svg" alt="Simple Pendulum">
 </p>
 
-The nondimensional model for the pendulum's period `T` as a function of the other variables is built and displayed as:
+The dimensionless relation between the pendulum's period `T` and the other quantities presented in the figure above is built and displayed as:
 
 ```python
-from nodimo import Variable, NonDimensionalModel
+from nodimo import Quantity, Model
 
-T = Variable('T', mass=0, length=0, time=1, dependent=True)  # period
-L = Variable('L', mass=0, length=1, time=0, scaling=True)    # length
-m = Variable('m', mass=1, length=0, time=0)                  # mass
-g = Variable('g', mass=0, length=1, time=-2, scaling=True)   # gravity
-t0 = Variable('theta_0')                                     # initial angle
+T = Quantity('T', mass=0, length=0, time=1, dependent=True)  # period
+L = Quantity('L', mass=0, length=1, time=0, scaling=True)    # length
+m = Quantity('m', mass=1, length=0, time=0)                  # mass
+g = Quantity('g', mass=0, length=1, time=-2, scaling=True)   # gravity
+t0 = Quantity('theta_0')                                     # initial angle
 
-ndmodel = NonDimensionalModel(T, L, m, g, t0)
-ndmodel.show()
+model = Model(T, L, m, g, t0)
+model.show()
 ```
 
 And the result is:
 
-$$\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Pi{\left(\theta_{0} \right)}$$
+$$\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Phi{\left(\theta_{0} \right)}$$
 
 For more applications and functionalities, check the [documentation][Docs Status].
 
-# Aknowledgements
+## Notes
+
+The use of Nodimo requires basic knowledge of dimensional analysis, specially on choosing the appropriate set of scaling parameters and indentifying established dimensionless groups. It is recommended the use of [jupyter notebook][Jupyter Notebook] for a better displaying of the results.
 
 <!-- Links -->
 [Docs Status]: https://nodimo.readthedocs.io/
@@ -79,4 +79,4 @@ For more applications and functionalities, check the [documentation][Docs Status
 [Conda Downloads Badge]: https://img.shields.io/conda/d/rodrigopcastro018/nodimo?label=Conda%20downloads&color=green
 [License]: https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE
 [License Badge]: https://img.shields.io/github/license/rodrigopcastro018/nodimo?label=License&color=yellow
-[Jupyter Notebook]: https://github.com/jupyter/notebook
+[Jupyter Notebook]: https://jupyter.org/
