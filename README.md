@@ -17,12 +17,12 @@ The main purpose of Nodimo is to transform a dimensional relationship between qu
 Nodimo supports any number of dimensions and quantities. It can be used for applications in science, engineering, economics and finance. The resulting dimensionless relations can be used as the basis for further studies in similarity and model testing.
 
 ## Installation
-Nodimo and its dependency `sympy` is installed by:
+Via `PyPI`, Nodimo and its dependency `sympy` is installed by:
 ```shell
 pip install nodimo
 ```
 
-Or alternatively, via `conda`:
+Alternatively, via `Conda`:
 ```shell
 conda install nodimo --channel rodrigopcastro018
 ```
