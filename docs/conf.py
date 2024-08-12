@@ -40,10 +40,7 @@ autosummary_generate = False
 
 # numpydoc
 numpydoc_show_inherited_class_members = {
-    'nodimo.variable.Variable': False,
-    'nodimo.group.VariableGroup': False,
-    'nodimo.matrix.DimensionalMatrix': False,
-    'nodimo.function.ModelFunction': False,
+    'nodimo.dimension.Dimension': False,
 }
 
 # linkcode
