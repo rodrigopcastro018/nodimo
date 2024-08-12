@@ -103,11 +103,24 @@ def test_pretty():
     d = b*c*a**-2
     e = c**-5
     dm = DimensionalMatrix(a, d, e)
+    pretty_dm = pretty(dm)
 
-    assert pretty(dm) == ('       b⋅c  1 \n'
-                          '    a  ───  ──\n'
-                          '        2    5\n'
-                          '       a    c \n'
-                          'A   3  -10  25\n'
-                          'B  -1    2   0\n'
-                          'C   0   -4   0')
+    # sympy < 1.13
+    pretty1 = ('       b⋅c  1 \n'
+               '    a  ───  ──\n'
+               '         2   5\n'
+               '        a   c \n'
+               'A   3  -10  25\n'
+               'B  -1    2   0\n'
+               'C   0   -4   0')
+
+    # sympy >= 1.13
+    pretty2 = ('       b⋅c  1 \n'
+               '    a  ───  ──\n'
+               '        2    5\n'
+               '       a    c \n'
+               'A   3  -10  25\n'
+               'B  -1    2   0\n'
+               'C   0   -4   0')
+
+    assert pretty_dm == pretty1 or pretty_dm == pretty2

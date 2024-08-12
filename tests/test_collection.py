@@ -376,8 +376,18 @@ def test_pretty():
     d = Product(a,b,c, reduce=False)
     e = Constant('2*pi')
     col = Collection(a,b,c,d,e)
+    pretty_col = pretty(col)
 
-    assert pretty(col) == ('          ⎛      1   a⋅b     ⎞\n'
-                           'Collection⎜a, b, ──, ───, 2⋅π⎟\n'
-                           '          ⎜       2   2      ⎟\n'
-                           '          ⎝      a   a       ⎠')
+    # sympy < 1.13
+    pretty1 = ('          ⎛      1   a⋅b     ⎞\n'
+               'Collection⎜a, b, ──, ───, 2⋅π⎟\n'
+               '          ⎜       2    2     ⎟\n'
+               '          ⎝      a    a      ⎠')
+
+    # sympy >= 1.13
+    pretty2 = ('          ⎛      1   a⋅b     ⎞\n'
+               'Collection⎜a, b, ──, ───, 2⋅π⎟\n'
+               '          ⎜       2   2      ⎟\n'
+               '          ⎝      a   a       ⎠')
+
+    assert pretty_col == pretty1 or pretty_col == pretty2

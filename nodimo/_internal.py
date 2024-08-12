@@ -143,7 +143,9 @@ def _sympify_number(number: Union[int, float, str, tuple, Number]) -> Number:
         return number_sp
     elif number_sp.is_Float and not isinstance(number, Number):
         number_sp_rational = nsimplify(number_sp, rational=True)
-        if number_sp_rational.denominator <= 100:
+        denattr = number_sp_rational.denominator
+        number_denominator = denattr if not callable(denattr) else denattr()
+        if number_denominator <= 100:
             return number_sp_rational
         else:
             return number_sp
@@ -181,7 +183,11 @@ def _unsympify_number(number_sp: Number) -> Union[int, float, str, tuple]:
         return int(number_sp)
     elif number_sp.is_Rational:
         number_rat: Rational = Rational(number_sp)
-        return (int(number_rat.numerator), int(number_rat.denominator))
+        numattr = number_rat.numerator
+        denattr = number_rat.denominator
+        number_numerator = numattr if not callable(numattr) else numattr()
+        number_denominator = denattr if not callable(denattr) else denattr()
+        return (int(number_numerator), int(number_denominator))
     elif number_sp.is_Float:
         return float(number_sp)
     else:

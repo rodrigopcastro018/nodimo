@@ -106,8 +106,18 @@ def test_pretty():
     d = Product(b, c, a**-2)
     e = Power(Quantity('h', C=-1), -5)
     rel = Relation(c, d, e)
+    pretty_rel = pretty(rel)
 
-    assert pretty(rel) == ('         ⎛   b⋅c  1 ⎞\n'
-                           '𝐜𝐨𝐧𝐬𝐭 = f⎜c, ───, ──⎟\n'
-                           '         ⎜    2    5⎟\n'
-                           '         ⎝   a    h ⎠')
+    # sympy < 1.13
+    pretty1 = ('         ⎛   b⋅c  1 ⎞\n'
+               '𝐜𝐨𝐧𝐬𝐭 = f⎜c, ───, ──⎟\n'
+               '         ⎜     2   5⎟\n'
+               '         ⎝    a   h ⎠')
+
+    # sympy >= 1.13
+    pretty2 = ('         ⎛   b⋅c  1 ⎞\n'
+               '𝐜𝐨𝐧𝐬𝐭 = f⎜c, ───, ──⎟\n'
+               '         ⎜    2    5⎟\n'
+               '         ⎝   a    h ⎠')
+
+    assert pretty_rel == pretty1 or pretty_rel == pretty2
