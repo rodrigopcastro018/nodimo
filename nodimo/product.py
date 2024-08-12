@@ -53,6 +53,18 @@ class Product(Quantity):
     ------
     TypeError
         If at least one of the factors is not a quantity.
+
+    Examples
+    --------
+
+    >>> from nodimo import Quantity, Product
+    >>> a = Quantity('a', A=-2, B=1)
+    >>> b = Quantity('b', A=2, B=-1)
+    >>> c = Product(a, b)
+
+    The ``*`` operator can also be used to create a product:
+    
+    >>> d = a*b
     """
 
     _is_product = True

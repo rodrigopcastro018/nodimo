@@ -40,7 +40,7 @@ class DimensionalMatrix(Group):
     quantities : list[Quantity]
         List with the quantities used to build the dimensional matrix.
     matrix : ImmutableDenseMatrix
-        Dimensional matrix containing only the dimensions' exponents.
+        Matrix containing only the dimensions' exponents.
     rank : int
         The rank of the dimensional matrix.
     independent_rows : tuple[int]

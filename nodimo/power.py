@@ -37,7 +37,7 @@ class Power(Quantity):
     scaling : bool, default=False
         If ``True``, the power can be used as scaling parameter.
     reduce : bool, default=True
-        If ``True``, the exponentiation is simmplified.
+        If ``True``, the exponentiation is simplified.
 
     Attributes
     ----------
@@ -55,6 +55,17 @@ class Power(Quantity):
     ------
     TypeError
         If the exponentiation base is not a quantity.
+
+    Examples
+    --------
+
+    >>> from nodimo import Quantity, Power
+    >>> a = Quantity('a', A=-2, B=1)
+    >>> b = Power(a, -2)
+
+    The ``**`` operator can also be used to create a power:
+    
+    >>> c = a**3
     """
 
     _is_power = True

@@ -50,7 +50,7 @@ class Quantity:
     dimension : Dimension
         The quantity dimension.
     is_dependent : bool
-        If ``True``, the quantity is considered dependent in a relation.
+        If ``True``, the quantity is considered dependent in a relation
         of quantities
     is_scaling : bool
         If ``True``, the quantity can be used as scaling parameter.

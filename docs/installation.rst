@@ -18,6 +18,6 @@ Choose one of the following options:
 
     git clone https://github.com/rodrigopcastro018/nodimo
 
-   And then, from the source repository, run::
+   And then, from the package repository, run::
     
     python -m pip install .

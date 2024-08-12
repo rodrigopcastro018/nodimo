@@ -39,6 +39,15 @@ class Relation(HomogeneousGroup, IndependentGroup):
     ------
     ValueError
         If there is more than one dependent quantity.
+
+    Examples
+    --------
+
+    >>> from nodimo import Quantity, Relation
+    >>> F = Quantity('F', M=1, L=1, T=-2, dependent=True)
+    >>> m = Quantity('m', M=1)
+    >>> a = Quantity('a', L=1, T=-2)
+    >>> rel = Relation(F, m, a)
     """
 
     def __init__(self, *quantities: Quantity, name: str = 'f'):
