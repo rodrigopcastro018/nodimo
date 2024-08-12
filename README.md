@@ -58,7 +58,9 @@ For more applications and functionalities, check the [documentation][Docs Status
 
 ## Notes
 
-The use of Nodimo requires basic knowledge of dimensional analysis, specially on choosing the appropriate set of scaling parameters and indentifying established dimensionless groups. It is recommended the use of [jupyter notebook][Jupyter Notebook] for a better displaying of the results.
+* The use of Nodimo requires basic knowledge of dimensional analysis, specially on choosing the appropriate set of scaling parameters and indentifying established dimensionless groups.
+
+* It is recommended the use of [jupyter notebook][Jupyter Notebook] for a better displaying of the results.
 
 <!-- Links -->
 [Docs Status]: https://nodimo.readthedocs.io/

@@ -98,7 +98,8 @@ Build documentation
 
 The documentation is built with `Sphinx`_, using `Furo`_ as a theme. Tutorials 
 made with `jupyter notebook`_ were added to the documentation using the extension
-`nbsphinx`_, and docstrings follow the `numpydoc`_ standard.
+`nbsphinx`_, copy buttons for code are supported by `sphinx-copybutton`_, and docstrings
+follow the `numpydoc`_ standard.
 
 To work properly, ``nbsphinx`` requires the installation of `IPython`_ and `pandoc`_.
 It's recommended to install the latter manually.
@@ -140,6 +141,7 @@ Code formatting follows the style established by `black`_.
 .. _Furo: https://github.com/pradyunsg/furo
 .. _jupyter notebook: https://github.com/jupyter/notebook
 .. _nbsphinx: https://nbsphinx.readthedocs.io/
+.. _sphinx-copybutton: https://sphinx-copybutton.readthedocs.io/
 .. _numpydoc: https://numpydoc.readthedocs.io/
 .. _IPython: https://github.com/ipython/ipython
 .. _pandoc: https://pandoc.org/
