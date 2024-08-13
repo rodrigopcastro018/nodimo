@@ -24,7 +24,7 @@ from nodimo._internal import _print_horizontal_line, _unsympify_number
 
 
 class Model(Relation):
-    """(Non)dimensional model built from the given set of quantities.
+    """(Non)dimensional model built from a given set of quantities.
 
     This class builds relations from the resulting quantities of a group
     transformation (DimensionalGroup). Every relation is associated with
