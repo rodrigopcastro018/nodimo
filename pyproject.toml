@@ -42,6 +42,7 @@ format = ['black>=22.1.0']
 
 [project.urls]
 'Source' = 'https://github.com/rodrigopcastro018/nodimo'
+'Documentation' = 'https://nodimo.readthedocs.io/'
 
 [tool.mypy]
 python_version = '3.12'

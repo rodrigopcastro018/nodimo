@@ -144,6 +144,8 @@ def _sympify_number(number: Union[int, float, str, tuple, Number]) -> Number:
     elif number_sp.is_Float and not isinstance(number, Number):
         number_sp_rational = nsimplify(number_sp, rational=True)
         denattr = number_sp_rational.denominator
+        # In older versions of sympy, denominator and numerator are
+        # methods, while in current versions they are attributes.
         number_denominator = denattr if not callable(denattr) else denattr()
         if number_denominator <= 100:
             return number_sp_rational
@@ -185,6 +187,8 @@ def _unsympify_number(number_sp: Number) -> Union[int, float, str, tuple]:
         number_rat: Rational = Rational(number_sp)
         numattr = number_rat.numerator
         denattr = number_rat.denominator
+        # In older versions of sympy, denominator and numerator are
+        # methods, while in current versions they are attributes.
         number_numerator = numattr if not callable(numattr) else numattr()
         number_denominator = denattr if not callable(denattr) else denattr()
         return (int(number_numerator), int(number_denominator))

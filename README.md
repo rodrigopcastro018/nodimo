@@ -16,8 +16,14 @@ The main purpose of Nodimo is to transform a dimensional relationship between qu
 
 Nodimo supports any number of dimensions and quantities. It can be used for applications in science, engineering, economics and finance. The resulting dimensionless relations can be used as the basis for further studies in similarity and model testing.
 
+## Notes
+
+* The use of Nodimo requires basic knowledge of dimensional analysis, specially on choosing the appropriate set of scaling parameters and indentifying established dimensionless groups.
+
+* It is recommended the use of [jupyter notebook][Jupyter Notebook] for a better displaying of the results.
+
 ## Installation
-Via `PyPI`, Nodimo and its dependency `sympy` is installed by:
+Via `PyPI`, Nodimo and its dependency `Sympy` is installed by:
 ```shell
 pip install nodimo
 ```
@@ -55,12 +61,6 @@ And the result is:
 $$\displaystyle \frac{T g^{\frac{1}{2}}}{L^{\frac{1}{2}}} = \Phi{\left(\theta_{0} \right)}$$
 
 For more applications and functionalities, check the [documentation][Docs Status].
-
-## Notes
-
-* The use of Nodimo requires basic knowledge of dimensional analysis, specially on choosing the appropriate set of scaling parameters and indentifying established dimensionless groups.
-
-* It is recommended the use of [jupyter notebook][Jupyter Notebook] for a better displaying of the results.
 
 <!-- Links -->
 [Docs Status]: https://nodimo.readthedocs.io/

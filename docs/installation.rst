@@ -6,11 +6,11 @@ Installation
 
 Choose one of the following options:
 
-1. To install Nodimo and its dependencies using PyPI, run:: 
+1. To install Nodimo using PyPI, run:: 
 
     pip install nodimo
 
-2. To install Nodimo and its dependencies using Anaconda, run::
+2. To install Nodimo using Anaconda, run::
 
     conda install nodimo --channel rodrigopcastro018
 
