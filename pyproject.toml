@@ -1,5 +1,5 @@
 [build-system]
-requires = ['setuptools>=61.0.0', 'wheel']  # setuptools is using automatic discovery
+requires = ['setuptools>=61.0.0']  # setuptools is using automatic discovery
 build-backend = 'setuptools.build_meta'
 
 [project]
@@ -52,8 +52,14 @@ ignore_missing_imports = 'True'
 
 [tool.pytest.ini_options]
 minversion = '6.2'
-addopts = '--nbval --cov=nodimo --cov-config=pyproject.toml --cov-report=term-missing'
 testpaths = ['tests', 'docs/tutorials']
+addopts = [
+    '--nbval',
+    '--cov=nodimo',
+    '--cov-config=pyproject.toml',
+    '--cov-report=term-missing',
+    '--import-mode=importlib',
+]
 
 [tool.coverage.run]
 source = ['nodimo']
@@ -91,7 +97,7 @@ legacy_tox_ini = """
         pytest-cov>=2.10
         {env:SYMPY}
     commands = 
-        pytest -q --junit-xml=tests_results/results-{env:CONTEXT}/pytest_result.xml
+        python -m pytest -q --junit-xml=tests_results/results-{env:CONTEXT}/pytest_result.xml
         coverage json -o tests_results/results-{env:CONTEXT}/coverage_result.json
     pass_env = 
         CONTEXT

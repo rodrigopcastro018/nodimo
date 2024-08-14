@@ -1,11 +1,7 @@
 from sympy import srepr, Number, ImmutableDenseMatrix
 from pytest import raises
-from warnings import catch_warnings
-from nodimo.quantity import Quantity, Constant
-from nodimo.product import Product
-from nodimo.power import Power
+from nodimo.quantity import Quantity
 from nodimo.groups import DimensionalGroup
-from nodimo._internal import NodimoWarning
 
 
 def test_quantities():

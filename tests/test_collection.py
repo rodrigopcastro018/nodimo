@@ -7,7 +7,6 @@ from nodimo.power import Power
 from nodimo.collection import Collection
 from nodimo._internal import NodimoWarning
 
-
 def test_quantities_and_dimensions():
     a = Quantity('a', A=2, B=3, C=5, scaling=True)
     b = Constant('b')
