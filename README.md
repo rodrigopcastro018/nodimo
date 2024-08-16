@@ -1,5 +1,9 @@
-<p align="center" width="100%">
+<!-- <p align="center" width="100%">
     <img src="docs/logo/logo_name_side.svg" alt="Nodimo Logo" width="500">
+</p> -->
+
+<p align="center" width="100%">
+    <img src="https://raw.githubusercontent.com/rodrigopcastro018/nodimo/main/docs/logo/logo_name_side.svg" alt="Nodimo Logo" width="500">
 </p>
 
 ---
@@ -37,8 +41,12 @@ conda install nodimo --channel rodrigopcastro018
 ### Basic example
 * Simple pendulum
 
-<p align="center" width="100%">
+<!-- <p align="center" width="100%">
     <img width="30%" src="docs/tutorials/drawings/01_simple_pendulum.svg" alt="Simple Pendulum">
+</p> -->
+
+<p align="center" width="100%">
+    <img width="30%" src="https://github.com/rodrigopcastro018/nodimo/blob/main/docs/tutorials/drawings/01_simple_pendulum.svg" alt="Simple Pendulum">
 </p>
 
 The dimensionless relation between the pendulum's period `T` and the other quantities presented in the figure above is built and displayed as:
