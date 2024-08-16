@@ -1,7 +1,3 @@
-<!-- <p align="center" width="100%">
-    <img src="docs/logo/logo_name_side.svg" alt="Nodimo Logo" width="500">
-</p> -->
-
 <p align="center" width="100%">
     <img src="https://github.com/rodrigopcastro018/nodimo/raw/main/docs/logo/logo_name_side.svg" alt="Nodimo Logo" width="500">
 </p>
@@ -40,10 +36,6 @@ conda install nodimo --channel rodrigopcastro018
 ## Getting started
 ### Basic example
 * Simple pendulum
-
-<!-- <p align="center" width="100%">
-    <img width="30%" src="docs/tutorials/drawings/01_simple_pendulum.svg" alt="Simple Pendulum">
-</p> -->
 
 <p align="center" width="100%">
     <img width="30%" src="https://github.com/rodrigopcastro018/nodimo/raw/main/docs/tutorials/drawings/01_simple_pendulum.svg" alt="Simple Pendulum">
