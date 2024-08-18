@@ -5,11 +5,12 @@ build-backend = 'setuptools.build_meta'
 [project]
 name = 'nodimo'
 version = '2.0.0'
+dependencies = ['sympy>=1.7']
 authors = [
-  {name = 'Rodrigo Castro', email = 'rodrigopcastro018@gmail.com'}
+    {name = 'Rodrigo Castro', email = 'rodrigopcastro018@gmail.com'}
 ]
 maintainers = [
-  {name = 'Rodrigo Castro', email = 'rodrigopcastro018@gmail.com'}
+    {name = 'Rodrigo Castro', email = 'rodrigopcastro018@gmail.com'}
 ]
 description = "Nodimo is a tool that creates dimensionless models"
 readme = 'README.md'
@@ -32,7 +33,10 @@ classifiers = [
   'Typing :: Typed',
   'Operating System :: OS Independent',
 ]
-dependencies = ['sympy>=1.7']
+
+[project.urls]
+'Source' = 'https://github.com/rodrigopcastro018/nodimo'
+'Documentation' = 'https://nodimo.readthedocs.io/'
 
 [project.optional-dependencies]
 test = [
@@ -52,10 +56,6 @@ docs = [
     'sphinx-copybutton',
 ]
 format = ['black>=22.1.0']
-
-[project.urls]
-'Source' = 'https://github.com/rodrigopcastro018/nodimo'
-'Documentation' = 'https://nodimo.readthedocs.io/'
 
 [tool.mypy]
 python_version = '3.12'
