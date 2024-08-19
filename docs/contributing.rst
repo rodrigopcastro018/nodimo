@@ -130,6 +130,7 @@ with instructions that were followed in the publishing process and are left as r
 * `Publishing to Anaconda personal repository`_
 * `Publishing to Conda-Forge`_
 * `Conda-Forge Package Maintenance`_
+* `Conda-Forge Feedstock`_
 
 
 .. _GitHub: https://github.com/rodrigopcastro018/nodimo
@@ -168,9 +169,7 @@ with instructions that were followed in the publishing process and are left as r
     :target: https://coverage-badge.samuelcolvin.workers.dev/redirect/rodrigopcastro018/nodimo
     :alt: Tests coverage
 .. _Publishing to PyPI: https://packaging.python.org/en/latest/tutorials/packaging-projects/
-
 .. _Publishing to Anaconda personal repository: https://docs.conda.io/projects/conda-build/en/latest/user-guide/tutorials/build-pkgs.html
-
 .. _Publishing to Conda-Forge: https://conda-forge.org/docs/maintainer/adding_pkgs/ 
-
 .. _Conda-Forge Package Maintenance: https://conda-forge.org/docs/maintainer/updating_pkgs/
+.. _Conda-Forge Feedstock: https://github.com/conda-forge/nodimo-feedstock

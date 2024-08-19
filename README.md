@@ -23,7 +23,7 @@ Nodimo supports any number of dimensions and quantities. It can be used for appl
 * It is recommended the use of [jupyter notebook][Jupyter Notebook] for a better displaying of the results.
 
 ## Installation
-Via `PyPI`, Nodimo and its dependency `Sympy` is installed by:
+Via `PyPI`, Nodimo is installed by:
 ```shell
 pip install nodimo
 ```
