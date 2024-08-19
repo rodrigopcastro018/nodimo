@@ -13,11 +13,8 @@ Development Environment
 Git and GitHub
 ^^^^^^^^^^^^^^
 
-Nodimo is available on `GitHub`_ and uses `Git`_ for source control.
-
-To get the source code from GitHub run::
-
-    git clone https://github.com/rodrigopcastro018/nodimo
+Nodimo is available on `GitHub`_ and uses `Git`_ for source control. To contribute to
+the project with these tools, follow the `GitHub instructions`_.
 
 Virtual Environment
 ^^^^^^^^^^^^^^^^^^^
@@ -123,9 +120,21 @@ Formatting
 
 Code formatting follows the style established by `black`_.
 
+Publishing and Maintenance
+--------------------------
+
+Nodimo is published in `PyPI`_ and `Anaconda`_ repositories. Bellow are given some pages
+with instructions that were followed in the publishing process and are left as reference.
+
+* `Publishing to PyPI`_
+* `Publishing to Anaconda personal repository`_
+* `Publishing to Conda-Forge`_
+* `Conda-Forge Package Maintenance`_
+
 
 .. _GitHub: https://github.com/rodrigopcastro018/nodimo
 .. _Git: https://git-scm.com/
+.. _GitHub instructions: https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project
 .. _GitHub Actions: https://github.com/rodrigopcastro018/nodimo/actions
 .. _smokeshow: https://github.com/samuelcolvin/smokeshow
 .. _mypy: https://mypy-lang.org/
@@ -147,6 +156,8 @@ Code formatting follows the style established by `black`_.
 .. _pandoc: https://pandoc.org/
 .. _Read the Docs: https://readthedocs.org/
 .. _black: https://black.readthedocs.io/
+.. _PyPI: https://pypi.org/
+.. _Anaconda: https://anaconda.org/
 .. |Documentation status| image:: https://readthedocs.org/projects/nodimo/badge/?version=latest
     :target: https://nodimo.readthedocs.io/
     :alt: Documentation status
@@ -156,3 +167,10 @@ Code formatting follows the style established by `black`_.
 .. |Tests coverage| image:: https://coverage-badge.samuelcolvin.workers.dev/rodrigopcastro018/nodimo.svg
     :target: https://coverage-badge.samuelcolvin.workers.dev/redirect/rodrigopcastro018/nodimo
     :alt: Tests coverage
+.. _Publishing to PyPI: https://packaging.python.org/en/latest/tutorials/packaging-projects/
+
+.. _Publishing to Anaconda personal repository: https://docs.conda.io/projects/conda-build/en/latest/user-guide/tutorials/build-pkgs.html
+
+.. _Publishing to Conda-Forge: https://conda-forge.org/docs/maintainer/adding_pkgs/ 
+
+.. _Conda-Forge Package Maintenance: https://conda-forge.org/docs/maintainer/updating_pkgs/

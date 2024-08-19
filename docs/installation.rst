@@ -12,7 +12,7 @@ Choose one of the following options:
 
 2. To install Nodimo using Anaconda, run::
 
-    conda install nodimo --channel rodrigopcastro018
+    conda install nodimo
 
 3. To build from source, first clone the repository by running::
 

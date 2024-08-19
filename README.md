@@ -28,9 +28,9 @@ Via `PyPI`, Nodimo and its dependency `Sympy` is installed by:
 pip install nodimo
 ```
 
-Alternatively, via `Conda`:
+Alternatively, via `Anaconda`:
 ```shell
-conda install nodimo --channel rodrigopcastro018
+conda install nodimo
 ```
 
 ## Getting started
@@ -73,12 +73,12 @@ For more applications and functionalities, check the [documentation][Docs Status
 [Python Versions Badge]: https://img.shields.io/pypi/pyversions/nodimo
 [PyPI Version]: https://pypi.org/project/nodimo/
 [PyPI Version Badge]: https://img.shields.io/pypi/v/nodimo?label=PyPI&color=orange
-[Conda Version]: https://anaconda.org/rodrigopcastro018/nodimo
-[Conda Version Badge]: https://img.shields.io/conda/v/rodrigopcastro018/nodimo?label=Conda&color=green
+[Conda Version]: https://anaconda.org/conda-forge/nodimo
+[Conda Version Badge]: https://img.shields.io/conda/v/conda-forge/nodimo?label=Conda&color=green
 [PyPI Downloads]: https://pypi.org/project/nodimo
 [PyPI Downloads Badge]: https://img.shields.io/pypi/dm/nodimo?label=PyPI%20downloads&color=blue
-[Conda Downloads]: https://anaconda.org/rodrigopcastro018/nodimo
-[Conda Downloads Badge]: https://img.shields.io/conda/d/rodrigopcastro018/nodimo?label=Conda%20downloads&color=green
+[Conda Downloads]: https://anaconda.org/conda-forge/nodimo
+[Conda Downloads Badge]: https://img.shields.io/conda/d/conda-forge/nodimo?label=Conda%20downloads&color=green
 [License]: https://github.com/rodrigopcastro018/nodimo/blob/main/LICENSE
 [License Badge]: https://img.shields.io/github/license/rodrigopcastro018/nodimo?label=License&color=yellow
 [Jupyter Notebook]: https://jupyter.org/
